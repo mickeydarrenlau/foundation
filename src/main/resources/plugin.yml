@@ -1,0 +1,9 @@
+name: Foundation
+version: '${version}'
+main: cloud.kubelet.foundation.Foundation
+api-version: 1.18
+prefix: Foundation
+load: STARTUP
+authors:
+  - kubelet
+commands: {}
