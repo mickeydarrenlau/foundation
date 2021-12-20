@@ -6,4 +6,8 @@ prefix: Foundation
 load: STARTUP
 authors:
   - kubelet
-commands: {}
+commands:
+  fbackup:
+    description: Foundation Backup
+    usage: /fbackup
+    permission: foundation.backup
