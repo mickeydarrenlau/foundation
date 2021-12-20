@@ -1,6 +1,7 @@
 package cloud.kubelet.foundation.command;
 
 import cloud.kubelet.foundation.Foundation;
+import cloud.kubelet.foundation.Util;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,6 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -61,19 +63,23 @@ public class BackupCommand implements CommandExecutor {
   private void runBackup(CommandSender sender) throws IOException {
     RUNNING.set(true);
 
+    final var server = sender.getServer();
+    server.sendMessage(Util.formatSystemMessage("Backup started."));
+
     final var backupFile = backupPath.resolve(
         String.format("backup-%s.zip", Instant.now().toString())).toFile();
     final var zipFileStream = new FileOutputStream(backupFile);
 
     try (zipFileStream; var zipStream = new ZipOutputStream(
         new BufferedOutputStream(zipFileStream))) {
-      final var worlds = sender.getServer().getWorlds();
+      final var worlds = server.getWorlds();
       for (World world : worlds) {
-        final var name = world.getName();
         final var worldPath = world.getWorldFolder().toPath().toString();
-        sender.sendMessage(String.format("%s: %s", name, worldPath));
 
+        // Save the world.
         world.save();
+
+        // Disable auto saving to prevent any world corruption while creating a ZIP.
         world.setAutoSave(false);
 
         try {
@@ -96,10 +102,12 @@ public class BackupCommand implements CommandExecutor {
           e.printStackTrace();
         }
 
+        // Re-enable auto saving for this world.
         world.setAutoSave(true);
       }
     } finally {
       RUNNING.set(false);
+      server.sendMessage(Util.formatSystemMessage("Backup finished."));
     }
   }
 }
