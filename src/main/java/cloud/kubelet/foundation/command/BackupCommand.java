@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
@@ -69,45 +68,64 @@ public class BackupCommand implements CommandExecutor {
     final var backupFile = backupPath.resolve(
         String.format("backup-%s.zip", Instant.now().toString())).toFile();
     final var zipFileStream = new FileOutputStream(backupFile);
+    final var zipStream = new ZipOutputStream(new BufferedOutputStream(zipFileStream));
 
-    try (zipFileStream; var zipStream = new ZipOutputStream(
-        new BufferedOutputStream(zipFileStream))) {
-      final var worlds = server.getWorlds();
-      for (World world : worlds) {
-        final var worldPath = world.getWorldFolder().toPath().toString();
-
-        // Save the world.
-        world.save();
-
-        // Disable auto saving to prevent any world corruption while creating a ZIP.
-        world.setAutoSave(false);
-
-        try {
-          final var paths = Files.walk(Paths.get(worldPath))
-              .filter(Files::isRegularFile)
-              .toList();
-
-          for (Path path : paths) {
-            try (InputStream fileStream = new FileInputStream(path.toFile())) {
-              final var entry = new ZipEntry(path.toString());
-              zipStream.putNextEntry(entry);
-              int n;
-              byte[] buffer = new byte[1024];
-              while ((n = fileStream.read(buffer)) > -1) {
-                zipStream.write(buffer, 0, n);
-              }
-            }
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
-        // Re-enable auto saving for this world.
-        world.setAutoSave(true);
-      }
+    try (zipFileStream; zipStream) {
+      backupPlugins(server, zipStream);
+      backupWorlds(server, zipStream);
     } finally {
       RUNNING.set(false);
       server.sendMessage(Util.formatSystemMessage("Backup finished."));
+    }
+  }
+
+  private void backupPlugins(Server server, ZipOutputStream zipStream) {
+    try {
+      addDirectoryToZip(zipStream, server.getPluginsFolder().toPath());
+    } catch (IOException e) {
+      // TODO: Add error handling.
+      e.printStackTrace();
+    }
+  }
+
+  private void backupWorlds(Server server, ZipOutputStream zipStream) {
+    final var worlds = server.getWorlds();
+    for (World world : worlds) {
+      final var worldPath = world.getWorldFolder().toPath();
+
+      // Save the world.
+      world.save();
+
+      // Disable auto saving to prevent any world corruption while creating a ZIP.
+      world.setAutoSave(false);
+
+      try {
+        addDirectoryToZip(zipStream, worldPath);
+      } catch (IOException e) {
+        // TODO: Add error handling.
+        e.printStackTrace();
+      }
+
+      // Re-enable auto saving for this world.
+      world.setAutoSave(true);
+    }
+  }
+
+  private void addDirectoryToZip(ZipOutputStream zipStream, Path directoryPath) throws IOException {
+    final var paths = Files.walk(directoryPath)
+        .filter(Files::isRegularFile)
+        .toList();
+
+    for (Path path : paths) {
+      try (InputStream fileStream = new FileInputStream(path.toFile())) {
+        final var entry = new ZipEntry(path.toString());
+        zipStream.putNextEntry(entry);
+        int n;
+        byte[] buffer = new byte[1024];
+        while ((n = fileStream.read(buffer)) > -1) {
+          zipStream.write(buffer, 0, n);
+        }
+      }
     }
   }
 }
