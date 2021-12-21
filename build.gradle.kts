@@ -4,6 +4,9 @@ plugins {
   id("com.github.johnrengelman.shadow") version "7.1.1" apply false
 }
 
+// Disable the JAR task for the root project.
+tasks["jar"].enabled = false
+
 allprojects {
   repositories {
     mavenCentral()
@@ -39,8 +42,6 @@ subprojects {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
   }
-
-  tasks["jar"].enabled = false
 
   tasks.processResources {
     val props = mapOf("version" to version)
