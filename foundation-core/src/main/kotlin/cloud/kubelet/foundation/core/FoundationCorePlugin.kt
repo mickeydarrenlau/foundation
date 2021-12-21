@@ -7,14 +7,30 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import java.nio.file.Path
 
 class FoundationCorePlugin : JavaPlugin(), Listener {
+  private lateinit var _pluginDataPath: Path
+
+  var pluginDataPath: Path
+    /**
+     * Data path of the core plugin.
+     * Can be used as a sanity check of sorts for dependencies to be sure the plugin is loaded.
+     */
+    get() {
+      if (!::_pluginDataPath.isInitialized) {
+        throw Exception("FoundationCore is not loaded!")
+      }
+      return _pluginDataPath
+    }
+    private set(value) { _pluginDataPath = value }
+
   override fun onEnable() {
-    val dataPath = dataFolder.toPath()
-    val backupPath = dataPath.resolve(BACKUPS_DIRECTORY)
+    pluginDataPath = dataFolder.toPath()
+    val backupPath = pluginDataPath.resolve(BACKUPS_DIRECTORY)
 
     // Create Foundation plugin directories.
-    dataPath.toFile().mkdir()
+    pluginDataPath.toFile().mkdir()
     backupPath.toFile().mkdir()
 
     // Register this as an event listener.
