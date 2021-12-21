@@ -14,4 +14,4 @@ build:
       - .gradle
   artifacts:
     paths:
-      - "**/build/libs/*.jar"
+      - "**/build/libs/*-plugin.jar"

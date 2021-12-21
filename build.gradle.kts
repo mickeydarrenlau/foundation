@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
   java
   id("org.jetbrains.kotlin.jvm") version "1.6.10" apply false
@@ -50,5 +52,9 @@ subprojects {
     filesMatching("plugin.yml") {
       expand(props)
     }
+  }
+
+  tasks.withType<ShadowJar> {
+    archiveClassifier.set("plugin")
   }
 }
