@@ -40,6 +40,8 @@ subprojects {
     targetCompatibility = javaVersion
   }
 
+  tasks["jar"].enabled = false
+
   tasks.processResources {
     val props = mapOf("version" to version)
     inputs.properties(props)
