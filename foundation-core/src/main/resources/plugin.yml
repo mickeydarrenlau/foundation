@@ -1,6 +1,6 @@
 name: Foundation
 version: '${version}'
-main: cloud.kubelet.foundation.Foundation
+main: cloud.kubelet.foundation.core.FoundationCorePlugin
 api-version: 1.18
 prefix: Foundation
 load: STARTUP

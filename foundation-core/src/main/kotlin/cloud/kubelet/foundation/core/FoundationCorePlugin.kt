@@ -1,6 +1,6 @@
-package cloud.kubelet.foundation
+package cloud.kubelet.foundation.core
 
-import cloud.kubelet.foundation.command.BackupCommand
+import cloud.kubelet.foundation.core.command.BackupCommand
 import io.papermc.paper.event.player.ChatEvent
 import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandExecutor
@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
-class Foundation : JavaPlugin(), Listener {
+class FoundationCorePlugin : JavaPlugin(), Listener {
   override fun onEnable() {
     val dataPath = dataFolder.toPath()
     val backupPath = dataPath.resolve(BACKUPS_DIRECTORY)

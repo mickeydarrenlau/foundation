@@ -1,7 +1,7 @@
-package cloud.kubelet.foundation.command
+package cloud.kubelet.foundation.core.command
 
-import cloud.kubelet.foundation.Foundation
-import cloud.kubelet.foundation.Util
+import cloud.kubelet.foundation.core.FoundationCorePlugin
+import cloud.kubelet.foundation.core.Util
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Server
@@ -20,14 +20,13 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class BackupCommand(
-  private val plugin: Foundation,
+  private val plugin: FoundationCorePlugin,
   private val backupPath: Path
 ) : CommandExecutor {
   override fun onCommand(
-    sender: CommandSender, command: Command,
-    label: String, args: Array<String>
+    sender: CommandSender, command: Command, label: String, args: Array<String>
   ): Boolean {
-    if (!Foundation.BACKUP_ENABLED) {
+    if (!FoundationCorePlugin.BACKUP_ENABLED) {
       sender.sendMessage(
         Component
           .text("Backup is not enabled.")

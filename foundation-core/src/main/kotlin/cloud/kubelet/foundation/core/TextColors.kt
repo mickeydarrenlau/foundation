@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation
+package cloud.kubelet.foundation.core
 
 import net.kyori.adventure.text.format.TextColor
 

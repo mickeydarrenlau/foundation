@@ -1,0 +1,15 @@
+name: Foundation-Bifrost
+version: '${version}'
+main: cloud.kubelet.foundation.bifrost.FoundationBifrostPlugin
+api-version: 1.18
+prefix: Foundation-Bifrost
+load: STARTUP
+depend:
+  - Foundation
+authors:
+  - kubelet
+commands:
+  fbackup:
+    description: Foundation Backup
+    usage: /fbackup
+    permission: foundation.backup
