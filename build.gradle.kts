@@ -1,6 +1,6 @@
 plugins {
-  java
-  id("com.github.johnrengelman.shadow") version("7.1.1")
+  kotlin("jvm") version "1.6.10"
+  id("com.github.johnrengelman.shadow") version "7.1.1"
 }
 
 group = "io.gorence"
@@ -19,8 +19,15 @@ repositories {
 }
 
 dependencies {
-  compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
+  // Kotlin dependencies
+  implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+  // Database layer
   implementation("org.jetbrains.xodus:xodus-openAPI:1.3.232")
+
+  // Paper API
+  compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
 }
 
 java {
