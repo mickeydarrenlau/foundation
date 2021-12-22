@@ -29,8 +29,16 @@ subprojects {
   plugins.apply("org.jetbrains.kotlin.plugin.serialization")
   plugins.apply("com.github.johnrengelman.shadow")
 
+  version = "0.1"
   group = "io.gorence"
-  version = "1.0-SNAPSHOT"
+
+  // Add build number if running under CI.
+  val versionWithBuild = if (System.getenv("CI_PIPELINE_IID") != null) {
+    version as String + ".${System.getenv("CI_PIPELINE_IID")}"
+  } else {
+    "DEV"
+  }
+  version = versionWithBuild
 
   dependencies {
     // Kotlin dependencies
