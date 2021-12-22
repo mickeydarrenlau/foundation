@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
   java
   id("org.jetbrains.kotlin.jvm") version "1.6.10" apply false
+  id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10" apply false
   id("com.github.johnrengelman.shadow") version "7.1.1" apply false
 }
 
@@ -25,6 +26,7 @@ allprojects {
 
 subprojects {
   plugins.apply("org.jetbrains.kotlin.jvm")
+  plugins.apply("org.jetbrains.kotlin.plugin.serialization")
   plugins.apply("com.github.johnrengelman.shadow")
 
   group = "io.gorence"
@@ -34,6 +36,9 @@ subprojects {
     // Kotlin dependencies
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+    // Serialization
+    implementation("com.charleskorn.kaml:kaml:0.38.0")
 
     // Paper API
     compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")

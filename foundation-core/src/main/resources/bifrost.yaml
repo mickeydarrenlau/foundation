@@ -1,0 +1,10 @@
+# Authentication configuration for the bridge.
+authentication:
+  # Token from the Discord Bot developer's page.
+  token: abc123
+
+# Channel configuration for the bridge.
+channel:
+  # Channel ID, can be copied by turning on Developer Mode in User Settings -> Advanced. The ID can
+  # then be copied by right-clicking the channel and selecting "Copy ID".
+  id: 123456789

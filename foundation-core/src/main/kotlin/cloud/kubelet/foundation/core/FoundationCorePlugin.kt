@@ -1,10 +1,8 @@
 package cloud.kubelet.foundation.core
 
 import cloud.kubelet.foundation.core.command.BackupCommand
-import io.papermc.paper.event.player.ChatEvent
 import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandExecutor
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.nio.file.Path
@@ -23,7 +21,9 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
       }
       return _pluginDataPath
     }
-    private set(value) { _pluginDataPath = value }
+    private set(value) {
+      _pluginDataPath = value
+    }
 
   override fun onEnable() {
     pluginDataPath = dataFolder.toPath()
@@ -41,7 +41,7 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
 
     val log = slF4JLogger
     log.info("Features:")
-    Util.printFeatureStatus(log, "Backup: ", BACKUP_ENABLED)
+    Util.printFeatureStatus(log, "Backup", BACKUP_ENABLED)
   }
 
   private fun registerCommandExecutor(name: String, executor: CommandExecutor) {
@@ -49,8 +49,11 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     command.setExecutor(executor)
   }
 
-  @EventHandler
+  // TODO: Disabling chat reformatting until I do something with it and figure out how to make it
+  //  be less disruptive.
+  /*@EventHandler
   private fun onChatMessage(e: ChatEvent) {
+    return
     e.isCancelled = true
     val name = e.player.displayName()
     val component = Component.empty()
@@ -60,7 +63,7 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
       .append(Component.text(' '))
       .append(e.message())
     server.sendMessage(component)
-  }
+  }*/
 
   companion object {
     private const val BACKUPS_DIRECTORY = "backups"
