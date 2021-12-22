@@ -35,3 +35,9 @@ commands:
     aliases:
       - sp
     permission: foundation.command.spectator
+  leaderboard:
+    description: Leaderboard
+    usage: /leaderboard <type>
+    aliases:
+      - lb
+    permission: foundation.command.leaderboard
