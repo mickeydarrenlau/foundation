@@ -1,7 +1,9 @@
 package cloud.kubelet.foundation.core
 
 import cloud.kubelet.foundation.core.command.BackupCommand
+import cloud.kubelet.foundation.core.command.GamemodeCommand
 import net.kyori.adventure.text.Component
+import org.bukkit.GameMode
 import org.bukkit.command.CommandExecutor
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -38,6 +40,10 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
 
     // Register commands.
     registerCommandExecutor("fbackup", BackupCommand(this, backupPath))
+    registerCommandExecutor(listOf("survival", "s"), GamemodeCommand(GameMode.SURVIVAL))
+    registerCommandExecutor(listOf("creative", "c"), GamemodeCommand(GameMode.CREATIVE))
+    registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
+    registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
 
     val log = slF4JLogger
     log.info("Features:")
@@ -45,8 +51,14 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
   }
 
   private fun registerCommandExecutor(name: String, executor: CommandExecutor) {
-    val command = getCommand(name) ?: throw Exception("Failed to get $name command")
-    command.setExecutor(executor)
+    registerCommandExecutor(listOf(name), executor)
+  }
+
+  private fun registerCommandExecutor(names: List<String>, executor: CommandExecutor) {
+    for (name in names) {
+      val command = getCommand(name) ?: throw Exception("Failed to get $name command")
+      command.setExecutor(executor)
+    }
   }
 
   // TODO: Disabling chat reformatting until I do something with it and figure out how to make it

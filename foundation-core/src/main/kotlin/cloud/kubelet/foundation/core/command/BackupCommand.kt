@@ -91,7 +91,7 @@ class BackupCommand(
     for (world in worlds) {
       val worldPath = world.worldFolder.toPath()
 
-      // Save the world.
+      // Save the world, must be run on the main thread.
       server.scheduler.runTask(plugin, Runnable {
         world.save()
       })

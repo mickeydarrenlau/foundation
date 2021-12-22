@@ -11,3 +11,27 @@ commands:
     description: Foundation Backup
     usage: /fbackup
     permission: foundation.backup
+  survival:
+    description: Switch to survival gamemode
+    usage: /survival
+    aliases:
+      - s
+    permission: foundation.command.survival
+  creative:
+    description: Switch to creative gamemode
+    usage: /creative
+    aliases:
+      - c
+    permission: foundation.command.creative
+  adventure:
+    description: Switch to adventure gamemode
+    usage: /adventure
+    aliases:
+      - a
+    permission: foundation.command.adventure
+  spectator:
+    description: Switch to spectator gamemode
+    usage: /spectator
+    aliases:
+      - sp
+    permission: foundation.command.spectator
