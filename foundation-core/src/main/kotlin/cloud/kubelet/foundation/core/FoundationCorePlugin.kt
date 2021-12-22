@@ -3,6 +3,7 @@ package cloud.kubelet.foundation.core
 import cloud.kubelet.foundation.core.command.BackupCommand
 import cloud.kubelet.foundation.core.command.GamemodeCommand
 import cloud.kubelet.foundation.core.command.LeaderboardCommand
+import cloud.kubelet.foundation.core.command.UpdateCommand
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.command.CommandExecutor
@@ -41,6 +42,7 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
 
     // Register commands.
     registerCommandExecutor("fbackup", BackupCommand(this, backupPath))
+    registerCommandExecutor("fupdate", UpdateCommand())
     registerCommandExecutor(listOf("survival", "s"), GamemodeCommand(GameMode.SURVIVAL))
     registerCommandExecutor(listOf("creative", "c"), GamemodeCommand(GameMode.CREATIVE))
     registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))

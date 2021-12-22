@@ -83,6 +83,7 @@ subprojects {
 
     // Serialization
     implementation("com.charleskorn.kaml:kaml:0.38.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
 
     // Paper API
     compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")

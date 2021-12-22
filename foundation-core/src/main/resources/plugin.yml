@@ -8,9 +8,13 @@ authors:
   - kubelet
 commands:
   fbackup:
-    description: Foundation Backup
+    description: Back the server up now
     usage: /fbackup
-    permission: foundation.backup
+    permission: foundation.command.backup
+  fupdate:
+    description: List updates to the Foundation plugin
+    usage: /fupdate
+    permission: foundation.command.update
   survival:
     description: Switch to survival gamemode
     usage: /survival
