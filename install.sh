@@ -4,6 +4,13 @@ set -e
 echo "This script installs Foundation, it is developed against Paper and may depend on"
 echo "Paper-specific features."
 echo
+
+# Ensure curl and jq are installed.
+if ! hash curl jq &> /dev/null; then
+    echo "curl and jq must be installed"
+    exit 1
+fi
+
 echo "Installing..."
 
 # Create the plugins directory if it doesn't exist.
