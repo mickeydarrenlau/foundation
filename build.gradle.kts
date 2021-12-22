@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.com.google.gson.Gson
+import java.io.FileWriter
 
 plugins {
   java
@@ -22,6 +24,40 @@ allprojects {
       url = uri("https://oss.sonatype.org/content/groups/public/")
     }
   }
+}
+
+val manifestsDir = buildDir.resolve("manifests")
+manifestsDir.mkdirs()
+val gson = Gson()
+
+tasks.create("updateManifests") {
+  // TODO: not using task dependencies, outputs, blah blah blah.
+  doLast {
+    val updateFile = manifestsDir.resolve("update.json")
+    val writer = FileWriter(updateFile)
+    writer.use {
+      val rootPath = rootProject.rootDir.toPath()
+      val updateManifest = subprojects.mapNotNull { project ->
+        val files = project.tasks.getByName("shadowJar").outputs
+        val paths = files.files.map { rootPath.relativize(it.toPath()).toString() }
+
+        if (paths.isNotEmpty()) project.name to mapOf(
+          "version" to project.version,
+          "artifacts" to paths,
+        )
+        else null
+      }.toMap()
+
+      gson.toJson(
+        updateManifest,
+        writer
+      )
+    }
+  }
+}
+
+tasks.assemble {
+  dependsOn("updateManifests")
 }
 
 subprojects {
@@ -69,5 +105,9 @@ subprojects {
 
   tasks.withType<ShadowJar> {
     archiveClassifier.set("plugin")
+  }
+
+  tasks.assemble {
+    dependsOn("shadowJar")
   }
 }

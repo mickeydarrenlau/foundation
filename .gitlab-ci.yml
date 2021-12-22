@@ -5,7 +5,7 @@ variables:
 
 build:
   stage: build
-  script: gradle --build-cache shadowJar
+  script: gradle --build-cache assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -14,4 +14,5 @@ build:
       - .gradle
   artifacts:
     paths:
+      - "build/manifests/update.json"
       - "**/build/libs/*-plugin.jar"
