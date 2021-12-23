@@ -5,12 +5,23 @@ import cloud.kubelet.foundation.core.Util
 import com.charleskorn.kaml.Yaml
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.jsonPrimitive
 import java.net.InetSocketAddress
 import kotlin.io.path.inputStream
 
+@ExperimentalSerializationApi
 class DevUpdateServer(val plugin: FoundationCorePlugin) {
   private lateinit var config: DevUpdateConfig
   private var server: HttpServer? = null
+
+  private val json = Json {
+    prettyPrint = true
+    prettyPrintIndent = "  "
+    ignoreUnknownKeys = true
+  }
 
   fun enable() {
     val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
@@ -55,6 +66,23 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
 
       if (exchange.requestURI.query != config.token) {
         exchange.respond(401, "Unauthorized.")
+        return@setHandler
+      }
+
+      val payload: DevUpdatePayload
+      try {
+        payload = json.decodeFromStream(exchange.requestBody)
+      } catch (e: Exception) {
+        plugin.slF4JLogger.error("Failed to decode request body.", e)
+        exchange.respond(400, "Bad Request")
+        return@setHandler
+      }
+
+      if (payload.objectKind != "pipeline" ||
+        payload.objectAttributes["ref"]?.jsonPrimitive?.content != "main" ||
+        payload.objectAttributes["status"]?.jsonPrimitive?.content != "success"
+      ) {
+        exchange.respond(200, "Event was not relevant for update.")
         return@setHandler
       }
 
