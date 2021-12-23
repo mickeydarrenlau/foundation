@@ -13,7 +13,11 @@ class LeaderboardCommand : CommandExecutor, TabCompleter {
     LeaderboardType("player-kills", Statistic.PLAYER_KILLS, "Player Kills", "kills"),
     LeaderboardType("mob-kills", Statistic.MOB_KILLS, "Mob Kills", "kills"),
     LeaderboardType("animals-bred", Statistic.ANIMALS_BRED, "Animals Bred", "animals"),
-    LeaderboardType("chest-opens", Statistic.CHEST_OPENED, "Chest Opens", "opens")
+    LeaderboardType("chest-opens", Statistic.CHEST_OPENED, "Chest Opens", "opens"),
+    LeaderboardType("raid-wins", Statistic.RAID_WIN, "Raid Wins", "wins"),
+    LeaderboardType("item-enchants", Statistic.ITEM_ENCHANTED, "Item Enchants", "enchants"),
+    LeaderboardType("damage-dealt", Statistic.DAMAGE_DEALT, "Damage Dealt", "damage"),
+    LeaderboardType("fish-caught", Statistic.FISH_CAUGHT, "Fish Caught", "fish")
   )
 
   override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
@@ -31,7 +35,8 @@ class LeaderboardCommand : CommandExecutor, TabCompleter {
     val topFivePlayers = statistics.take(5)
     sender.sendMessage(
       "${leaderboardType.friendlyName} Leaderboard:",
-      *topFivePlayers.map { "* ${it.first.name}: ${it.second} ${leaderboardType.unit}" }.toTypedArray()
+      *topFivePlayers.withIndex()
+        .map { "(#${it.index + 1}) ${it.value.first.name}: ${it.value.second} ${leaderboardType.unit}" }.toTypedArray()
     )
     return true
   }
