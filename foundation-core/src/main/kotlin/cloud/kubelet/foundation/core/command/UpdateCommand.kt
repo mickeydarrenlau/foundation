@@ -15,6 +15,7 @@ class UpdateCommand : CommandExecutor {
     args: Array<out String>
   ): Boolean {
     val updateDir = sender.server.pluginsFolder.resolve("update")
+    updateDir.mkdir()
     if (!updateDir.exists()) {
       sender.sendMessage("Error: Failed to create plugin update directory.")
       return true
