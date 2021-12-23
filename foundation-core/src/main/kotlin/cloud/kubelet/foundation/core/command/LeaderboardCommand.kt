@@ -6,8 +6,9 @@ import org.bukkit.Statistic
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabCompleter
 
-class LeaderboardCommand : CommandExecutor {
+class LeaderboardCommand : CommandExecutor, TabCompleter {
   private val leaderboards = listOf(
     LeaderboardType("player-kills", Statistic.PLAYER_KILLS, "Player Kills", "kills"),
     LeaderboardType("mob-kills", Statistic.MOB_KILLS, "Mob Kills", "kills"),
@@ -36,4 +37,21 @@ class LeaderboardCommand : CommandExecutor {
   }
 
   class LeaderboardType(val id: String, val statistic: Statistic, val friendlyName: String, val unit: String)
+
+  override fun onTabComplete(
+    sender: CommandSender,
+    command: Command,
+    alias: String,
+    args: Array<out String>
+  ): MutableList<String> = when {
+    args.isEmpty() -> {
+      leaderboards.map { it.id }.toMutableList()
+    }
+    args.size == 1 -> {
+      leaderboards.map { it.id }.filter { it.startsWith(args[0]) }.toMutableList()
+    }
+    else -> {
+      mutableListOf()
+    }
+  }
 }

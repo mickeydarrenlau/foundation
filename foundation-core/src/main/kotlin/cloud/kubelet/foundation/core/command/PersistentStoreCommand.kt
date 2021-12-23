@@ -73,17 +73,15 @@ class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : Command
     command: Command,
     alias: String,
     args: Array<out String>
-  ): MutableList<String> {
-    return when {
-      args.isEmpty() -> {
-        allSubCommands
-      }
-      args.size == 1 -> {
-        allSubCommands.filter { it.startsWith(args[0]) }.toMutableList()
-      }
-      else -> {
-        mutableListOf()
-      }
+  ): MutableList<String> = when {
+    args.isEmpty() -> {
+      allSubCommands
+    }
+    args.size == 1 -> {
+      allSubCommands.filter { it.startsWith(args[0]) }.toMutableList()
+    }
+    else -> {
+      mutableListOf()
     }
   }
 }
