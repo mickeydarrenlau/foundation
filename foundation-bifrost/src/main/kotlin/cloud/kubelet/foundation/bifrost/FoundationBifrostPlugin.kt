@@ -63,9 +63,7 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
   override fun onEvent(e: GenericEvent) {
     when (e) {
       is ReadyEvent -> {
-        val channel = getChannel() ?: return
-        if (isDev) return
-        channel.sendMessage(":white_check_mark: Server is ready!").queue()
+        onDiscordReady()
       }
       is MessageReceivedEvent -> {
         // Prevent this bot from receiving its own messages and creating a feedback loop.
@@ -97,6 +95,7 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
 
   @EventHandler
   private fun onPlayerJoin(e: PlayerJoinEvent) {
+    if (!config.channel.sendPlayerJoin) return
     val channel = getChannel() ?: return
 
     channel.sendMessage(message {
@@ -109,6 +108,7 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
 
   @EventHandler
   private fun onPlayerQuit(e: PlayerQuitEvent) {
+    if (!config.channel.sendPlayerQuit) return
     val channel = getChannel() ?: return
 
     channel.sendMessage(message {
@@ -131,7 +131,15 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
     }
   }
 
+  private fun onDiscordReady() {
+    if (!config.channel.sendStart) return
+    val channel = getChannel() ?: return
+    if (isDev) return
+    channel.sendMessage(":white_check_mark: Server is ready!").queue()
+  }
+
   private fun onServerStop() {
+    if (!config.channel.sendShutdown) return
     val channel = getChannel() ?: return
     if (isDev) return
     channel.sendMessage(":octagonal_sign: Server is stopping!").queue()

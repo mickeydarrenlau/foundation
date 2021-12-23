@@ -8,3 +8,9 @@ channel:
   # Channel ID, can be copied by turning on Developer Mode in User Settings -> Advanced. The ID can
   # then be copied by right-clicking the channel and selecting "Copy ID".
   id: 123456789
+
+  # Toggles for common events that generate notifications that are sent to the channel.
+  sendStart: true
+  sendShutdown: true
+  sendPlayerJoin: true
+  sendPlayerQuit: true
