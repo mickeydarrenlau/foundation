@@ -1,6 +1,5 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.update
 
-import cloud.kubelet.foundation.core.service.UpdateService
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender

@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.update
+package cloud.kubelet.foundation.core.features.update
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.builtins.MapSerializer

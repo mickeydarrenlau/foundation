@@ -11,10 +11,6 @@ object Util {
   private val whitespace: Component = Component.text(' ')
   private val foundationName: Component = Component.text("Foundation")
 
-  fun printFeatureStatus(logger: Logger, feature: String?, state: Boolean) {
-    logger.info("{}: {}", feature, if (state) "Enabled" else "Disabled")
-  }
-
   fun formatSystemMessage(message: String): Component {
     return formatSystemMessage(TextColors.AMARANTH_PINK, message)
   }

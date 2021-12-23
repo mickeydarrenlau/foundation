@@ -82,6 +82,9 @@ subprojects {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+    implementation("io.insert-koin:koin-core:3.1.4")
+    testImplementation("io.insert-koin:koin-test:3.1.4")
+
     // Serialization
     implementation("com.charleskorn.kaml:kaml:0.38.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")

@@ -1,15 +1,21 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.stats
 
-import cloud.kubelet.foundation.core.FoundationCorePlugin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 
-class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : CommandExecutor, TabCompleter {
+class PersistentStoreCommand(
+  private val statsFeature: StatsFeature
+) : CommandExecutor, TabCompleter {
   private val allSubCommands = mutableListOf("stats", "sample", "delete-all-entities")
 
-  override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+  override fun onCommand(
+    sender: CommandSender,
+    command: Command,
+    label: String,
+    args: Array<out String>
+  ): Boolean {
     if (args.isEmpty()) {
       sender.sendMessage("Invalid Command Usage.")
       return true
@@ -17,7 +23,7 @@ class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : Command
 
     when (args[0]) {
       "stats" -> {
-        plugin.persistentStores.forEach { (name, store) ->
+        statsFeature.persistentStores.forEach { (name, store) ->
           val counts = store.transact {
             entityTypes.associateWith { type -> getAll(type).size() }.toSortedMap()
           }
@@ -36,7 +42,7 @@ class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : Command
 
         val storeName = args[1]
         val entityTypeName = args[2]
-        val store = plugin.getPersistentStore(storeName)
+        val store = statsFeature.getPersistentStore(storeName)
         store.transact {
           val entities = getAll(entityTypeName).take(3)
           for (entity in entities) {
@@ -55,7 +61,7 @@ class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : Command
 
         val storeName = args[1]
         val entityTypeName = args[2]
-        val store = plugin.getPersistentStore(storeName)
+        val store = statsFeature.getPersistentStore(storeName)
         store.transact {
           store.deleteAllEntities(entityTypeName)
         }

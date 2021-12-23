@@ -1,11 +1,10 @@
-package cloud.kubelet.foundation.core.service
+package cloud.kubelet.foundation.core.features.update
 
-import cloud.kubelet.foundation.core.update.UpdateUtil
 import org.bukkit.command.CommandSender
 import kotlin.io.path.name
 import kotlin.io.path.toPath
 
-// TODO: Switch to classes and use dependency injection with koin.
+// TODO: Switch to a class and use dependency injection with koin.
 object UpdateService {
   fun updatePlugins(sender: CommandSender, onFinish: (() -> Unit)? = null) {
     val updateDir = sender.server.pluginsFolder.resolve("update")

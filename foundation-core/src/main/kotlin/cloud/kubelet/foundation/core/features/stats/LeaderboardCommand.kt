@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.stats
 
 import cloud.kubelet.foundation.core.SortOrder
 import cloud.kubelet.foundation.core.allPlayerStatisticsOf

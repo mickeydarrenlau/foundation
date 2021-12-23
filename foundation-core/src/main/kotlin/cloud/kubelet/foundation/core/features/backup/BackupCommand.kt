@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.backup
 
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
@@ -26,15 +26,6 @@ class BackupCommand(
   override fun onCommand(
     sender: CommandSender, command: Command, label: String, args: Array<String>
   ): Boolean {
-    if (!FoundationCorePlugin.BACKUP_ENABLED) {
-      sender.sendMessage(
-        Component
-          .text("Backup is not enabled.")
-          .color(TextColor.fromHexString("#FF0000"))
-      )
-      return true
-    }
-
     if (RUNNING.get()) {
       sender.sendMessage(
         Component
