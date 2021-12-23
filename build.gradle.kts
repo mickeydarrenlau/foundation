@@ -65,7 +65,7 @@ subprojects {
   plugins.apply("org.jetbrains.kotlin.plugin.serialization")
   plugins.apply("com.github.johnrengelman.shadow")
 
-  version = "0.1"
+  version = "0.2"
   group = "io.gorence"
 
   // Add build number if running under CI.
