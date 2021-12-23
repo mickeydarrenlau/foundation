@@ -28,6 +28,9 @@ class PersistentStore(corePlugin: FoundationCorePlugin, fileStoreName: String) :
   fun <T, R> find(entityTypeName: String, propertyName: String, value: Comparable<T>, block: (EntityIterable) -> R): R =
     transact { block(find(entityTypeName, propertyName, value)) }
 
+  fun deleteAllEntities(entityTypeName: String) =
+    transact { entityStore.deleteEntityType(entityTypeName) }
+
   override fun close() {
     entityStore.close()
   }

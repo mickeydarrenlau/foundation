@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.GameMode
 import org.bukkit.command.CommandExecutor
+import org.bukkit.command.TabCompleter
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -81,6 +82,9 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     for (name in names) {
       val command = getCommand(name) ?: throw Exception("Failed to get $name command")
       command.setExecutor(executor)
+      if (executor is TabCompleter) {
+        command.tabCompleter = executor
+      }
     }
   }
 
