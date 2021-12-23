@@ -5,7 +5,6 @@ import cloud.kubelet.foundation.core.devupdate.DevUpdateServer
 import cloud.kubelet.foundation.core.persist.PersistentStore
 import cloud.kubelet.foundation.core.persist.setAllProperties
 import io.papermc.paper.event.player.AsyncChatEvent
-import kotlinx.serialization.ExperimentalSerializationApi
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.GameMode
@@ -18,7 +17,6 @@ import java.nio.file.Path
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-@ExperimentalSerializationApi
 class FoundationCorePlugin : JavaPlugin(), Listener {
   internal val persistentStores = ConcurrentHashMap<String, PersistentStore>()
   private lateinit var _pluginDataPath: Path

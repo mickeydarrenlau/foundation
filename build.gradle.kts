@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.com.google.gson.Gson
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileWriter
 
 plugins {
@@ -97,6 +98,13 @@ subprojects {
     val javaVersion = JavaVersion.toVersion(17)
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
+  }
+
+  tasks.withType<KotlinCompile> {
+    kotlinOptions {
+      freeCompilerArgs =
+        freeCompilerArgs + "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+    }
   }
 
   tasks.processResources {

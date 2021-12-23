@@ -5,14 +5,12 @@ import cloud.kubelet.foundation.core.Util
 import com.charleskorn.kaml.Yaml
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.InetSocketAddress
 import kotlin.io.path.inputStream
 
-@ExperimentalSerializationApi
 class DevUpdateServer(val plugin: FoundationCorePlugin) {
   private lateinit var config: DevUpdateConfig
   private var server: HttpServer? = null
