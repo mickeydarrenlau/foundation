@@ -1,6 +1,5 @@
 package cloud.kubelet.foundation.core
 
-import cloud.kubelet.foundation.core.abstraction.Feature
 import cloud.kubelet.foundation.core.abstraction.FoundationPlugin
 import cloud.kubelet.foundation.core.features.backup.BackupFeature
 import cloud.kubelet.foundation.core.features.dev.DevFeature
@@ -13,15 +12,6 @@ import java.nio.file.Path
 
 class FoundationCorePlugin : FoundationPlugin() {
   private lateinit var _pluginDataPath: Path
-  override val features: List<Feature>
-    get() = listOf(
-      BackupFeature(),
-      DevFeature(),
-      PlayerFeature(),
-      StatsFeature(),
-      UpdateFeature(),
-      WorldFeature(),
-    )
 
   var pluginDataPath: Path
     /**
@@ -38,15 +28,24 @@ class FoundationCorePlugin : FoundationPlugin() {
       _pluginDataPath = value
     }
 
-  override fun module() = module {
-    single { this@FoundationCorePlugin }
-  }
-
   override fun onEnable() {
     // Create core plugin directory.
     pluginDataPath = dataFolder.toPath()
     pluginDataPath.toFile().mkdir()
 
     super.onEnable()
+  }
+
+  override fun createFeatures() = listOf(
+    BackupFeature(),
+    DevFeature(),
+    PlayerFeature(),
+    StatsFeature(),
+    UpdateFeature(),
+    WorldFeature(),
+  )
+
+  override fun createModule() = module {
+    single { this@FoundationCorePlugin }
   }
 }

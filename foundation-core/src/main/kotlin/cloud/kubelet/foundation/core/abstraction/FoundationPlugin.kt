@@ -10,7 +10,8 @@ import org.koin.dsl.module
 abstract class FoundationPlugin : JavaPlugin() {
   private lateinit var pluginModule: Module
   private lateinit var pluginApplication: KoinApplication
-  protected abstract val features: List<Feature>
+  private lateinit var features: List<Feature>
+  private lateinit var module: Module
 
   override fun onEnable() {
     pluginModule = module {
@@ -20,11 +21,14 @@ abstract class FoundationPlugin : JavaPlugin() {
       single { slF4JLogger }
     }
 
+    features = createFeatures()
+    module = createModule()
+
     // TODO: If we have another plugin using this class, we may need to use context isolation.
     //  https://insert-koin.io/docs/reference/koin-core/context-isolation
     pluginApplication = startKoin {
       modules(pluginModule)
-      modules(module())
+      modules(module)
     }
 
     features.forEach {
@@ -50,5 +54,6 @@ abstract class FoundationPlugin : JavaPlugin() {
     stopKoin()
   }
 
-  protected open fun module() = module {}
+  protected open fun createModule() = module {}
+  protected abstract fun createFeatures(): List<Feature>
 }
