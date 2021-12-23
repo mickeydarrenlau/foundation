@@ -16,6 +16,7 @@ data class BifrostAuthentication(
 @Serializable
 data class BifrostChannel(
   val id: String,
+  val bridge: Boolean = true,
   val sendStart: Boolean = true,
   val sendShutdown: Boolean = true,
   val sendPlayerJoin: Boolean = true,

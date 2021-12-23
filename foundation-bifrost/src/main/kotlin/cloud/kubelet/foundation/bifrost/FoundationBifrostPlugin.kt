@@ -66,6 +66,7 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
         onDiscordReady()
       }
       is MessageReceivedEvent -> {
+        if (!config.channel.bridge) return
         // Prevent this bot from receiving its own messages and creating a feedback loop.
         if (e.author.id == jda.selfUser.id) return
 
@@ -121,6 +122,7 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
 
   @EventHandler
   private fun onPlayerChat(e: AsyncChatEvent) {
+    if (!config.channel.bridge) return
     val channel = getChannel() ?: return
     val message = e.message()
 

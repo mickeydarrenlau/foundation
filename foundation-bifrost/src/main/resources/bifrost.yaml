@@ -9,6 +9,9 @@ channel:
   # then be copied by right-clicking the channel and selecting "Copy ID".
   id: 123456789
 
+  # Toggles the chat message bridge.
+  bridge: true
+
   # Toggles for common events that generate notifications that are sent to the channel.
   sendStart: true
   sendShutdown: true
