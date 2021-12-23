@@ -10,7 +10,7 @@ class PersistentStore(corePlugin: FoundationCorePlugin, fileStoreName: String) :
   private val fileStorePath = corePlugin.pluginDataPath.resolve("persistence/${fileStoreName}")
   private val entityStore = PersistentEntityStores.newInstance(fileStorePath.toFile())
 
-  fun <R> transact(block: (StoreTransaction) -> R): R {
+  fun <R> transact(block: StoreTransaction.() -> R): R {
     var result: R? = null
     entityStore.executeInTransaction { tx ->
       result = block(tx)
@@ -18,16 +18,15 @@ class PersistentStore(corePlugin: FoundationCorePlugin, fileStoreName: String) :
     return result!!
   }
 
-  fun create(entityTypeName: String, populate: Entity.() -> Unit) = transact { tx ->
-    val entity = tx.newEntity(entityTypeName)
-    populate(entity)
+  fun create(entityTypeName: String, populate: Entity.() -> Unit) = transact {
+    populate(newEntity(entityTypeName))
   }
 
-  fun getAll(entityTypeName: String) =
-    transact { tx -> tx.getAll(entityTypeName) }
+  fun <R> getAll(entityTypeName: String, block: (EntityIterable) -> R): R =
+    transact { block(getAll(entityTypeName)) }
 
-  fun <T> find(entityTypeName: String, propertyName: String, value: Comparable<T>): EntityIterable =
-    transact { tx -> tx.find(entityTypeName, propertyName, value) }
+  fun <T, R> find(entityTypeName: String, propertyName: String, value: Comparable<T>, block: (EntityIterable) -> R): R =
+    transact { block(find(entityTypeName, propertyName, value)) }
 
   override fun close() {
     entityStore.close()
