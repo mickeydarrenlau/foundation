@@ -35,7 +35,11 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
     val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
     slF4JLogger.info("Plugin data path: ${foundation.pluginDataPath}")
 
-    val configPath = Util.copyDefaultConfig(slF4JLogger, foundation.pluginDataPath, "bifrost.yaml")
+    val configPath = Util.copyDefaultConfig<FoundationBifrostPlugin>(
+      slF4JLogger,
+      foundation.pluginDataPath,
+      "bifrost.yaml"
+    )
     config = Yaml.default.decodeFromStream(BifrostConfig.serializer(), configPath.inputStream())
 
     server.pluginManager.registerEvents(this, this)

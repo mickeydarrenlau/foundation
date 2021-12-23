@@ -33,7 +33,7 @@ object Util {
    * @param resourceName Path to resource, it should be in the root of the `resources` directory,
    *  without the leading slash.
    */
-  fun copyDefaultConfig(log: Logger, targetPath: Path, resourceName: String): Path {
+  inline fun <reified T> copyDefaultConfig(log: Logger, targetPath: Path, resourceName: String): Path {
     if (resourceName.startsWith("/")) {
       throw IllegalArgumentException("resourceName starts with slash")
     }
@@ -48,7 +48,7 @@ object Util {
       return outPath
     }
 
-    val resourceStream = javaClass.getResourceAsStream("/$resourceName")
+    val resourceStream = T::class.java.getResourceAsStream("/$resourceName")
       ?: throw Exception("Configuration resource does not exist!")
     val outputStream = outFile.outputStream()
 
