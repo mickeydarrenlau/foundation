@@ -42,6 +42,11 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
     )
     config = Yaml.default.decodeFromStream(BifrostConfig.serializer(), configPath.inputStream())
 
+    if (config.authentication.token.isEmpty()) {
+      slF4JLogger.warn("Token empty, will not start Bifrost.")
+      return
+    }
+
     server.pluginManager.registerEvents(this, this)
 
     jda = JDABuilder

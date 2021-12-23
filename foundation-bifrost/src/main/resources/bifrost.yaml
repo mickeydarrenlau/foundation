@@ -1,7 +1,8 @@
 # Authentication configuration for the bridge.
 authentication:
-  # Token from the Discord Bot developer's page.
-  token: abc123
+  # Token from the Discord Bot developer's page. If this is empty, the Bifrost plugin will do
+  # nothing.
+  token: ""
 
 # Channel configuration for the bridge.
 channel:
