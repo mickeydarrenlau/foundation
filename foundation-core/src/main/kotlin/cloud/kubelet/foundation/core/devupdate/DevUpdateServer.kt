@@ -45,61 +45,65 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
 
     val server = HttpServer.create()
     server.createContext("/").setHandler { exchange ->
-      val ip = exchange.remoteAddress.address.hostAddress
-      if (!config.ipAllowList.contains("*") && !config.ipAllowList.contains(ip)) {
-        plugin.slF4JLogger.warn("DevUpdate Server received request from IP $ip which is not allowed.")
-        exchange.close()
-        return@setHandler
-      }
-
-      plugin.slF4JLogger.info("DevUpdate Server Request $ip ${exchange.requestMethod} ${exchange.requestURI.path}")
-      if (exchange.requestMethod != "POST") {
-        exchange.respond(405, "Method not allowed.")
-        return@setHandler
-      }
-
-      if (exchange.requestURI.path != "/webhook/update") {
-        exchange.respond(404, "Not Found.")
-        return@setHandler
-      }
-
-      if (exchange.requestURI.query != config.token) {
-        exchange.respond(401, "Unauthorized.")
-        return@setHandler
-      }
-
-      val payload: DevUpdatePayload
-      try {
-        payload = json.decodeFromStream(exchange.requestBody)
-      } catch (e: Exception) {
-        plugin.slF4JLogger.error("Failed to decode request body.", e)
-        exchange.respond(400, "Bad Request")
-        return@setHandler
-      }
-
-      if (payload.objectKind != "pipeline" ||
-        payload.objectAttributes["ref"]?.jsonPrimitive?.content != "main" ||
-        payload.objectAttributes["status"]?.jsonPrimitive?.content != "success"
-      ) {
-        exchange.respond(200, "Event was not relevant for update.")
-        return@setHandler
-      }
-
-      exchange.respond(200, "Success.")
-      plugin.slF4JLogger.info("DevUpdate Started")
-      UpdateService.updatePlugins(plugin.server.consoleSender)
-      plugin.server.scheduler.runTask(plugin) { ->
-        try {
-          plugin.server.shutdown()
-        } catch (e: Exception) {
-          plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
-        }
-      }
+      handle(exchange)
     }
     server.bind(InetSocketAddress("0.0.0.0", config.port), 0)
     server.start()
     this.server = server
     plugin.slF4JLogger.info("DevUpdate Server listening on port ${config.port}")
+  }
+
+  private fun handle(exchange: HttpExchange) {
+    val ip = exchange.remoteAddress.address.hostAddress
+    if (!config.ipAllowList.contains("*") && !config.ipAllowList.contains(ip)) {
+      plugin.slF4JLogger.warn("DevUpdate Server received request from IP $ip which is not allowed.")
+      exchange.close()
+      return
+    }
+
+    plugin.slF4JLogger.info("DevUpdate Server Request $ip ${exchange.requestMethod} ${exchange.requestURI.path}")
+    if (exchange.requestMethod != "POST") {
+      exchange.respond(405, "Method not allowed.")
+      return
+    }
+
+    if (exchange.requestURI.path != "/webhook/update") {
+      exchange.respond(404, "Not Found.")
+      return
+    }
+
+    if (exchange.requestURI.query != config.token) {
+      exchange.respond(401, "Unauthorized.")
+      return
+    }
+
+    val payload: DevUpdatePayload
+    try {
+      payload = json.decodeFromStream(exchange.requestBody)
+    } catch (e: Exception) {
+      plugin.slF4JLogger.error("Failed to decode request body.", e)
+      exchange.respond(400, "Bad Request")
+      return
+    }
+
+    if (payload.objectKind != "pipeline" ||
+      payload.objectAttributes["ref"]?.jsonPrimitive?.content != "main" ||
+      payload.objectAttributes["status"]?.jsonPrimitive?.content != "success"
+    ) {
+      exchange.respond(200, "Event was not relevant for update.")
+      return
+    }
+
+    exchange.respond(200, "Success.")
+    plugin.slF4JLogger.info("DevUpdate Started")
+    UpdateService.updatePlugins(plugin.server.consoleSender)
+    plugin.server.scheduler.runTask(plugin) { ->
+      try {
+        plugin.server.shutdown()
+      } catch (e: Exception) {
+        plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
+      }
+    }
   }
 
   fun disable() {
