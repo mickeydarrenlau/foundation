@@ -11,13 +11,13 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.EventListener
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -27,8 +27,11 @@ import kotlin.io.path.inputStream
 class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
   private lateinit var config: BifrostConfig
   private lateinit var jda: JDA
+  private var isDev = false
 
   override fun onEnable() {
+    isDev = description.version == "DEV"
+
     val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
     slF4JLogger.info("Plugin data path: ${foundation.pluginDataPath}")
 
@@ -43,8 +46,23 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
       .build()
   }
 
+  override fun onDisable() {
+    onServerStop()
+
+    logger.info("Shutting down JDA")
+    jda.shutdown()
+    while (jda.status != JDA.Status.SHUTDOWN) {
+      Thread.sleep(100)
+    }
+  }
+
   override fun onEvent(e: GenericEvent) {
     when (e) {
+      is ReadyEvent -> {
+        val channel = getChannel() ?: return
+        if (isDev) return
+        channel.sendMessage(":white_check_mark: Server is ready!").queue()
+      }
       is MessageReceivedEvent -> {
         // Prevent this bot from receiving its own messages and creating a feedback loop.
         if (e.author.id == jda.selfUser.id) return
@@ -107,5 +125,11 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
     } else {
       slF4JLogger.error("Not sure what to do here, message != TextComponent: ${message.javaClass}")
     }
+  }
+
+  private fun onServerStop() {
+    val channel = getChannel() ?: return
+    if (isDev) return
+    channel.sendMessage(":octagonal_sign: Server is stopping!").queue()
   }
 }
