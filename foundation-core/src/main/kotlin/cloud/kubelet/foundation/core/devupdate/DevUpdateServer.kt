@@ -96,12 +96,13 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
 
     exchange.respond(200, "Success.")
     plugin.slF4JLogger.info("DevUpdate Started")
-    UpdateService.updatePlugins(plugin.server.consoleSender)
-    plugin.server.scheduler.runTask(plugin) { ->
-      try {
-        plugin.server.shutdown()
-      } catch (e: Exception) {
-        plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
+    UpdateService.updatePlugins(plugin.server.consoleSender) {
+      plugin.server.scheduler.runTask(plugin) { ->
+        try {
+          plugin.server.shutdown()
+        } catch (e: Exception) {
+          plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
+        }
       }
     }
   }
