@@ -39,7 +39,7 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
     }
 
     if (config.token.length < 8) {
-      plugin.slF4JLogger.warn("DevUpdate Token was too short (must be 8 or more characters)")
+      plugin.slF4JLogger.warn("DevUpdateServer Token was too short (must be 8 or more characters)")
       return
     }
 
@@ -50,18 +50,18 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
     server.bind(InetSocketAddress("0.0.0.0", config.port), 0)
     server.start()
     this.server = server
-    plugin.slF4JLogger.info("DevUpdate Server listening on port ${config.port}")
+    plugin.slF4JLogger.info("DevUpdateServer listening on port ${config.port}")
   }
 
   private fun handle(exchange: HttpExchange) {
     val ip = exchange.remoteAddress.address.hostAddress
     if (!config.ipAllowList.contains("*") && !config.ipAllowList.contains(ip)) {
-      plugin.slF4JLogger.warn("DevUpdate Server received request from IP $ip which is not allowed.")
+      plugin.slF4JLogger.warn("DevUpdateServer received request from IP $ip which is not allowed.")
       exchange.close()
       return
     }
 
-    plugin.slF4JLogger.info("DevUpdate Server Request $ip ${exchange.requestMethod} ${exchange.requestURI.path}")
+    plugin.slF4JLogger.info("DevUpdateServer Request $ip ${exchange.requestMethod} ${exchange.requestURI.path}")
     if (exchange.requestMethod != "POST") {
       exchange.respond(405, "Method not allowed.")
       return
@@ -98,11 +98,7 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
     plugin.slF4JLogger.info("DevUpdate Started")
     UpdateService.updatePlugins(plugin.server.consoleSender) {
       plugin.server.scheduler.runTask(plugin) { ->
-        try {
-          plugin.server.shutdown()
-        } catch (e: Exception) {
-          plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
-        }
+        plugin.server.shutdown()
       }
     }
   }
