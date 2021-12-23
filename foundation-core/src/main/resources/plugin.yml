@@ -45,3 +45,7 @@ commands:
     aliases:
       - lb
     permission: foundation.command.leaderboard
+  pstorestats:
+    description: Persistent Store Stats
+    usage: /pstorestats
+    permission: foundation.command.pstorestats
