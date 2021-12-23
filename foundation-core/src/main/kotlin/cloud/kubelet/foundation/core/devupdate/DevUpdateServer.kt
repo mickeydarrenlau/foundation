@@ -2,7 +2,7 @@ package cloud.kubelet.foundation.core.devupdate
 
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
-import cloud.kubelet.foundation.core.service.UpdateService
+import cloud.kubelet.foundation.core.features.update.UpdateService
 import com.charleskorn.kaml.Yaml
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
