@@ -49,6 +49,9 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
         // Prevent this bot from receiving its own messages and creating a feedback loop.
         if (e.author.id == jda.selfUser.id) return
 
+        // Only forward messages from the configured channel.
+        if (e.channel.id != config.channel.id) return
+
         slF4JLogger.debug(
           "${e.guild.name} - ${e.channel.name} - ${e.author.name}: ${e.message.contentDisplay}"
         )
