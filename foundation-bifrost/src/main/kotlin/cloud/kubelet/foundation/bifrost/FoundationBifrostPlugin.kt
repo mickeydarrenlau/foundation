@@ -56,6 +56,9 @@ class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
   }
 
   override fun onDisable() {
+    // Plugin was not initialized, don't do anything.
+    if (!::jda.isInitialized) return
+
     onServerStop()
 
     logger.info("Shutting down JDA")
