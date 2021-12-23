@@ -74,7 +74,6 @@ class PersistentStoreCommand(private val plugin: FoundationCorePlugin) : Command
     alias: String,
     args: Array<out String>
   ): MutableList<String> {
-    println(args.toList())
     return when {
       args.isEmpty() -> {
         allSubCommands
