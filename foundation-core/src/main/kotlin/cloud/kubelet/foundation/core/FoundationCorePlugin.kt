@@ -68,6 +68,11 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     chatLogStore = getPersistentStore("chat-logs")
   }
 
+  override fun onDisable() {
+    persistentStores.values.forEach { store -> store.close() }
+    persistentStores.clear()
+  }
+
   private fun registerCommandExecutor(name: String, executor: CommandExecutor) {
     registerCommandExecutor(listOf(name), executor)
   }

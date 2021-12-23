@@ -17,14 +17,12 @@ fun Server.allPlayerStatisticsOf(
   material: Material? = null,
   entityType: EntityType? = null,
   order: SortOrder = SortOrder.Ascending
-) = allPlayers
-  .map { player ->
-    player to if (material != null) {
-      player.getStatistic(statistic, material)
-    } else if (entityType != null) {
-      player.getStatistic(statistic, entityType)
-    } else {
-      player.getStatistic(statistic)
-    }
+) = allPlayers.map { player ->
+  player to if (material != null) {
+    player.getStatistic(statistic, material)
+  } else if (entityType != null) {
+    player.getStatistic(statistic, entityType)
+  } else {
+    player.getStatistic(statistic)
   }
-  .sortedBy(order) { it.second }
+}.sortedBy(order) { it.second }
