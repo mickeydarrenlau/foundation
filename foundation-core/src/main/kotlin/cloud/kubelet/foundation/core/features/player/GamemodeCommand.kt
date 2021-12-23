@@ -1,11 +1,12 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.player
 
+import org.bukkit.GameMode
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class SpawnCommand : CommandExecutor {
+class GamemodeCommand(private val gameMode: GameMode) : CommandExecutor {
   override fun onCommand(
     sender: CommandSender,
     command: Command,
@@ -17,7 +18,8 @@ class SpawnCommand : CommandExecutor {
       return true
     }
 
-    sender.teleport(sender.world.spawnLocation)
+    sender.gameMode = gameMode
+    sender.sendMessage("Switched gamemode to ${gameMode.name.lowercase()}")
 
     return true
   }

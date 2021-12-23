@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.command
+package cloud.kubelet.foundation.core.features.world
 
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor

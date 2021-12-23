@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.devupdate
+package cloud.kubelet.foundation.core.features.dev
 
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util

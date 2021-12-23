@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.devupdate
+package cloud.kubelet.foundation.core.features.dev
 
 import kotlinx.serialization.Serializable
 

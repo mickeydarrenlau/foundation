@@ -1,7 +1,6 @@
 package cloud.kubelet.foundation.core.features.player
 
 import cloud.kubelet.foundation.core.abstraction.Feature
-import cloud.kubelet.foundation.core.command.GamemodeCommand
 import org.bukkit.GameMode
 
 class PlayerFeature : Feature() {
