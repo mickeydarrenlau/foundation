@@ -2,6 +2,7 @@ package cloud.kubelet.foundation.core.devupdate
 
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
+import cloud.kubelet.foundation.core.service.UpdateService
 import com.charleskorn.kaml.Yaml
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
@@ -85,11 +86,11 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
       }
 
       exchange.respond(200, "Success.")
+      plugin.slF4JLogger.info("DevUpdate Started")
+      UpdateService.updatePlugins(plugin.server.consoleSender)
       plugin.server.scheduler.runTask(plugin) { ->
-        plugin.slF4JLogger.info("DevUpdate Server Restart")
         try {
-          plugin.server.dispatchCommand(plugin.server.consoleSender, "fupdate")
-          plugin.server.dispatchCommand(plugin.server.consoleSender, "stop")
+          plugin.server.shutdown()
         } catch (e: Exception) {
           plugin.slF4JLogger.error("DevUpdate Server failed to update server.", e)
         }
