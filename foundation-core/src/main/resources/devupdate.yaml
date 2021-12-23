@@ -1,0 +1,12 @@
+# Server port to listen on.
+port: 8484
+
+# An authentication token. Should be random and 8 or more characters.
+# If empty, the DevUpdate server is not enabled.
+token: ""
+
+# IP address allow list.
+# If * is specified, all addresses are allowed.
+# Specify IP addresses as a string that should be allowed to update the server.
+ipAllowList:
+  - "*"

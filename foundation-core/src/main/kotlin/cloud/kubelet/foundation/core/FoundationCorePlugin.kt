@@ -1,6 +1,7 @@
 package cloud.kubelet.foundation.core
 
 import cloud.kubelet.foundation.core.command.*
+import cloud.kubelet.foundation.core.devupdate.DevUpdateServer
 import cloud.kubelet.foundation.core.persist.PersistentStore
 import cloud.kubelet.foundation.core.persist.setAllProperties
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -19,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap
 class FoundationCorePlugin : JavaPlugin(), Listener {
   internal val persistentStores = ConcurrentHashMap<String, PersistentStore>()
   private lateinit var _pluginDataPath: Path
+  private lateinit var chatLogStore: PersistentStore
+  private lateinit var devUpdateServer: DevUpdateServer
 
   var pluginDataPath: Path
     /**
@@ -39,8 +42,6 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
    * Fetch a persistent store by name. Make sure the name is path-safe, descriptive and consistent across server runs.
    */
   fun getPersistentStore(name: String) = persistentStores.getOrPut(name) { PersistentStore(this, name) }
-
-  private lateinit var chatLogStore: PersistentStore
 
   override fun onEnable() {
     pluginDataPath = dataFolder.toPath()
@@ -67,11 +68,14 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     log.info("Features:")
     Util.printFeatureStatus(log, "Backup", BACKUP_ENABLED)
     chatLogStore = getPersistentStore("chat-logs")
+    devUpdateServer = DevUpdateServer(this)
+    devUpdateServer.enable()
   }
 
   override fun onDisable() {
     persistentStores.values.forEach { store -> store.close() }
     persistentStores.clear()
+    devUpdateServer.disable()
   }
 
   private fun registerCommandExecutor(name: String, executor: CommandExecutor) {
