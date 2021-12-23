@@ -62,7 +62,9 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
     registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
     registerCommandExecutor(listOf("leaderboard", "lb"), LeaderboardCommand())
-    registerCommandExecutor(listOf("pstore"), PersistentStoreCommand(this))
+    registerCommandExecutor("pstore", PersistentStoreCommand(this))
+    registerCommandExecutor("setspawn", SetSpawnCommand())
+    registerCommandExecutor("spawn", SpawnCommand())
 
     val log = slF4JLogger
     log.info("Features:")

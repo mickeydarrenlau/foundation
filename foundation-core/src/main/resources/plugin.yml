@@ -49,3 +49,11 @@ commands:
     description: Persistent Store Manager
     usage: /pstore
     permission: foundation.command.pstore
+  setspawn:
+    description: Set the spawn of the current world.
+    usage: /setspawn
+    permission: foundation.command.setspawn
+  spawn:
+    description: Teleport to the spawn of the current world.
+    usage: /spawn
+    permission: foundation.command.spawn
