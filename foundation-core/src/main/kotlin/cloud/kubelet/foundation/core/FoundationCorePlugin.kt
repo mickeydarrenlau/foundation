@@ -1,17 +1,22 @@
 package cloud.kubelet.foundation.core
 
-import cloud.kubelet.foundation.core.command.BackupCommand
-import cloud.kubelet.foundation.core.command.GamemodeCommand
-import cloud.kubelet.foundation.core.command.LeaderboardCommand
-import cloud.kubelet.foundation.core.command.UpdateCommand
+import cloud.kubelet.foundation.core.command.*
+import cloud.kubelet.foundation.core.persist.PersistentStore
+import cloud.kubelet.foundation.core.persist.setAllProperties
+import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.GameMode
 import org.bukkit.command.CommandExecutor
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.nio.file.Path
+import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 
 class FoundationCorePlugin : JavaPlugin(), Listener {
+  internal val persistentStores = ConcurrentHashMap<String, PersistentStore>()
   private lateinit var _pluginDataPath: Path
 
   var pluginDataPath: Path
@@ -28,6 +33,13 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     private set(value) {
       _pluginDataPath = value
     }
+
+  /**
+   * Fetch a persistent store by name. Make sure the name is path-safe, descriptive and consistent across server runs.
+   */
+  fun getPersistentStore(name: String) = persistentStores.getOrPut(name) { PersistentStore(this, name) }
+
+  private lateinit var chatLogStore: PersistentStore
 
   override fun onEnable() {
     pluginDataPath = dataFolder.toPath()
@@ -48,10 +60,12 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
     registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
     registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
     registerCommandExecutor(listOf("leaderboard", "lb"), LeaderboardCommand())
+    registerCommandExecutor(listOf("pstorestats"), StoreStatsCommand(this))
 
     val log = slF4JLogger
     log.info("Features:")
     Util.printFeatureStatus(log, "Backup", BACKUP_ENABLED)
+    chatLogStore = getPersistentStore("chat-logs")
   }
 
   private fun registerCommandExecutor(name: String, executor: CommandExecutor) {
@@ -80,6 +94,26 @@ class FoundationCorePlugin : JavaPlugin(), Listener {
       .append(e.message())
     server.sendMessage(component)
   }*/
+
+  @EventHandler
+  private fun logOnChatMessage(e: AsyncChatEvent) {
+    val player = e.player
+    val message = e.message()
+
+    if (message !is TextComponent) {
+      return
+    }
+
+    val content = message.content()
+    chatLogStore.create("ChatMessageEvent") {
+      setAllProperties(
+        "timestamp" to Instant.now().toEpochMilli(),
+        "player.id" to player.identity().uuid().toString(),
+        "player.name" to player.name,
+        "message.content" to content
+      )
+    }
+  }
 
   companion object {
     private const val BACKUPS_DIRECTORY = "backups"

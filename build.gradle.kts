@@ -85,6 +85,10 @@ subprojects {
     implementation("com.charleskorn.kaml:kaml:0.38.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
 
+    // Persistence
+    implementation("org.jetbrains.xodus:xodus-openAPI:1.3.232")
+    implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
+
     // Paper API
     compileOnly("io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT")
   }
