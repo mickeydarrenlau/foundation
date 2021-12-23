@@ -104,7 +104,7 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
   }
 
   fun disable() {
-    server?.stop(0)
+    server?.stop(1)
   }
 
   private fun HttpExchange.respond(code: Int, content: String) {
