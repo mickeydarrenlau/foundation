@@ -8,17 +8,22 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.file.Path
 
 object UpdateUtil {
   private val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
 
   // TODO: Add environment variable override. Document it.
-  private const val manifestUrl =
-    "https://git.gorence.io/lgorence/foundation/-/jobs/artifacts/main/raw/build/manifests/update.json?job=build"
+  private const val basePath =
+    "https://git.gorence.io/lgorence/foundation/-/jobs/artifacts/main/raw"
+  private const val basePathQueryParams = "job=build"
+  private const val manifestPath = "build/manifests/update.json"
 
   fun fetchManifest() = fetchFile(
-    manifestUrl, MapSerializer(String.serializer(), ModuleManifest.serializer()),
+    getUrl(manifestPath), MapSerializer(String.serializer(), ModuleManifest.serializer()),
   )
+
+  fun getUrl(path: String) = "$basePath/$path?$basePathQueryParams"
 
   private inline fun <reified T> fetchFile(url: String, strategy: DeserializationStrategy<T>): T {
     val request = HttpRequest
@@ -36,5 +41,19 @@ object UpdateUtil {
       strategy,
       response.body()
     )
+  }
+
+  fun downloadArtifact(path: String, outPath: Path) {
+    val request = HttpRequest
+      .newBuilder()
+      .GET()
+      .uri(URI.create(getUrl(path)))
+      .build()
+
+    val response = client.send(
+      request,
+      HttpResponse.BodyHandlers.ofFile(outPath)
+    )
+    response.body()
   }
 }

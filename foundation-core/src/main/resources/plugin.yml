@@ -12,7 +12,7 @@ commands:
     usage: /fbackup
     permission: foundation.command.backup
   fupdate:
-    description: List updates to the Foundation plugin
+    description: Update all Foundation plugins
     usage: /fupdate
     permission: foundation.command.update
   survival:
