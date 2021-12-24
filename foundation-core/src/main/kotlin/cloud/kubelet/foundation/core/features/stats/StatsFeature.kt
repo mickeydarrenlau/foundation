@@ -15,7 +15,7 @@ class StatsFeature : Feature() {
   override fun enable() {
     chatLogStore = persistence.value.store("chat-logs")
 
-    registerCommandExecutor("leaderboard", LeaderboardCommand())
+    registerCommandExecutor(listOf("leaderboard", "lb"), LeaderboardCommand())
     registerCommandExecutor("pstore", PersistentStoreCommand(this))
   }
 
