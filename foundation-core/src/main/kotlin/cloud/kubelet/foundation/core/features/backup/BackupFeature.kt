@@ -29,7 +29,9 @@ class BackupFeature : Feature() {
     registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath, config, s3Client))
 
     if (config.schedule.cron.isNotEmpty()) {
-      scheduleId = scheduler.cron("${config.schedule.cron} ?") {
+      // Assume user never wants to modify second. I'm not sure why this is enforced in Quartz.
+      val expr = "0 ${config.schedule.cron}"
+      scheduleId = scheduler.cron(expr) {
         plugin.server.scheduler.runTask(plugin) { ->
           plugin.server.dispatchCommand(plugin.server.consoleSender, "fbackup")
         }

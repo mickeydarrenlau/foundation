@@ -1,8 +1,9 @@
 # Configuration of backup scheduling, expressed by cron expressions.
 schedule:
-  # Cron expression to use for the backup schedule.
+  # Cron expression to use for the backup schedule. This is not standard cron, but rather a subset
+  # that is given to us by the Quartz Scheduler.
   # Examples:
-  # "0 3 * * *"   -> every day at 3 AM
+  # "0 3 * * ?"   -> every day at 3 AM
   # "0 3 * * SUN" -> every Sunday at 3 AM
   cron: ""
 
