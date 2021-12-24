@@ -15,6 +15,7 @@ class PlayerSession(
   override fun store(transaction: Transaction) {
     transaction.apply {
       PlayerSessionTable.insert {
+        it[id] = UUID.randomUUID()
         it[player] = playerUniqueIdentity
         it[name] = playerName
         it[startTime] = startTimeInstant
