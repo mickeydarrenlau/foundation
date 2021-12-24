@@ -1,5 +1,6 @@
-package cloud.kubelet.foundation.core.features.stats
+package cloud.kubelet.foundation.core.features.persist
 
+import cloud.kubelet.foundation.core.features.stats.StatsFeature
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -23,7 +24,7 @@ class PersistentStoreCommand(
 
     when (args[0]) {
       "stats" -> {
-        statsFeature.persistentStores.forEach { (name, store) ->
+        statsFeature.persistence.value.stores.forEach { (name, store) ->
           val counts = store.transact {
             entityTypes.associateWith { type -> getAll(type).size() }.toSortedMap()
           }
@@ -42,7 +43,7 @@ class PersistentStoreCommand(
 
         val storeName = args[1]
         val entityTypeName = args[2]
-        val store = statsFeature.getPersistentStore(storeName)
+        val store = statsFeature.persistence.value.store(storeName)
         store.transact {
           val entities = getAll(entityTypeName).take(3)
           for (entity in entities) {
@@ -61,7 +62,7 @@ class PersistentStoreCommand(
 
         val storeName = args[1]
         val entityTypeName = args[2]
-        val store = statsFeature.getPersistentStore(storeName)
+        val store = statsFeature.persistence.value.store(storeName)
         store.transact {
           store.deleteAllEntities(entityTypeName)
         }

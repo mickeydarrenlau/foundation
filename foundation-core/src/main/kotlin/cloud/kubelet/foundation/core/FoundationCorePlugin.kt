@@ -7,6 +7,7 @@ import cloud.kubelet.foundation.core.features.player.PlayerFeature
 import cloud.kubelet.foundation.core.features.stats.StatsFeature
 import cloud.kubelet.foundation.core.features.update.UpdateFeature
 import cloud.kubelet.foundation.core.features.world.WorldFeature
+import cloud.kubelet.foundation.core.features.persist.PersistenceFeature
 import org.koin.dsl.module
 import java.nio.file.Path
 
@@ -37,6 +38,7 @@ class FoundationCorePlugin : FoundationPlugin() {
   }
 
   override fun createFeatures() = listOf(
+    PersistenceFeature(),
     BackupFeature(),
     DevFeature(),
     PlayerFeature(),

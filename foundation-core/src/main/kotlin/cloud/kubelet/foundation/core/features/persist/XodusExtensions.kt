@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.core.persist
+package cloud.kubelet.foundation.core.features.persist
 
 import jetbrains.exodus.entitystore.Entity
 
