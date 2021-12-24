@@ -15,7 +15,7 @@ class BlockPlace(
   val location: Location,
   val material: Material,
   val timestamp: Instant = Instant.now()
-  ) : HeimdallEvent() {
+) : HeimdallEvent() {
   constructor(event: BlockPlaceEvent) : this(event.player.uniqueId, event.block.location, event.block.type)
 
   override fun store(transaction: Transaction) {

@@ -44,3 +44,13 @@ create table if not exists heimdall.block_places (
 );
 --
 select create_hypertable('heimdall.block_places', 'time', 'player', 4,  if_not_exists => TRUE);
+--
+create table if not exists heimdall.player_sessions (
+    player uuid not null,
+    name text not null,
+    "start" timestamp not null,
+    "end" timestamp not null,
+    PRIMARY KEY (player, start)
+);
+--
+select create_hypertable('heimdall.player_sessions', 'start', 'player', 4,  if_not_exists => TRUE);

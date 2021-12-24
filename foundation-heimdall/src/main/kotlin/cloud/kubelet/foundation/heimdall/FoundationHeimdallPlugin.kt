@@ -7,20 +7,25 @@ import cloud.kubelet.foundation.heimdall.buffer.EventBuffer
 import cloud.kubelet.foundation.heimdall.event.BlockBreak
 import cloud.kubelet.foundation.heimdall.event.BlockPlace
 import cloud.kubelet.foundation.heimdall.event.PlayerPosition
+import cloud.kubelet.foundation.heimdall.event.PlayerSession
 import cloud.kubelet.foundation.heimdall.model.HeimdallConfig
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
-import java.lang.Exception
+import java.time.Instant
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.inputStream
 
 class FoundationHeimdallPlugin : JavaPlugin(), Listener {
@@ -30,6 +35,8 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
 
   private val buffer = EventBuffer()
   private val bufferFlushThread = BufferFlushThread(this, buffer)
+
+  private val playerJoinTimes = ConcurrentHashMap<UUID, Instant>()
 
   override fun onEnable() {
     val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
@@ -91,7 +98,25 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   @EventHandler
   fun onBlockBroken(event: BlockBreakEvent) = buffer.push(BlockBreak(event))
 
+  @EventHandler
+  fun onPlayerJoin(event: PlayerJoinEvent) {
+    playerJoinTimes[event.player.uniqueId] = Instant.now()
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  fun onPlayerQuit(event: PlayerQuitEvent) {
+    val startTime = playerJoinTimes.remove(event.player.uniqueId) ?: return
+    val endTime = Instant.now()
+    buffer.push(PlayerSession(event.player.uniqueId, event.player.name, startTime, endTime))
+  }
+
   override fun onDisable() {
     bufferFlushThread.stop()
+    val endTime = Instant.now()
+    for (playerId in playerJoinTimes.keys().toList()) {
+      val startTime = playerJoinTimes.remove(playerId) ?: continue
+      buffer.push(PlayerSession(playerId, server.getPlayer(playerId)?.name ?: "__unknown__", startTime, endTime))
+    }
+    bufferFlushThread.flush()
   }
 }
