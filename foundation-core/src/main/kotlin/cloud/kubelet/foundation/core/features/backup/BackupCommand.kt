@@ -8,6 +8,8 @@ import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.io.BufferedOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -19,9 +21,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+// TODO: Clean up dependency injection.
 class BackupCommand(
   private val plugin: FoundationCorePlugin,
-  private val backupPath: Path
+  private val backupsPath: Path,
+  private val config: BackupConfig,
+  private val s3Client: S3Client,
 ) : CommandExecutor {
   override fun onCommand(
     sender: CommandSender, command: Command, label: String, args: Array<String>
@@ -47,25 +52,37 @@ class BackupCommand(
     return true
   }
 
-  private fun runBackup(server: Server) {
+  // TODO: Pull backup creation code into a separate service.
+  private fun runBackup(server: Server) = try {
     RUNNING.set(true)
 
     server.sendMessage(Util.formatSystemMessage("Backup started."))
 
-    val backupFile =
-      backupPath.resolve(String.format("backup-%s.zip", Instant.now().toString())).toFile()
+    val backupFileName = String.format("backup-%s.zip", Instant.now().toString())
+    val backupPath = backupsPath.resolve(backupFileName)
+    val backupFile = backupPath.toFile()
 
-    try {
-      FileOutputStream(backupFile).use { zipFileStream ->
-        ZipOutputStream(BufferedOutputStream(zipFileStream)).use { zipStream ->
-          backupPlugins(server, zipStream)
-          backupWorlds(server, zipStream)
-        }
+    FileOutputStream(backupFile).use { zipFileStream ->
+      ZipOutputStream(BufferedOutputStream(zipFileStream)).use { zipStream ->
+        backupPlugins(server, zipStream)
+        backupWorlds(server, zipStream)
       }
-    } finally {
-      RUNNING.set(false)
-      server.sendMessage(Util.formatSystemMessage("Backup finished."))
     }
+
+    // TODO: Pull upload code out into a separate service.
+    if (config.s3.accessKeyId.isNotEmpty()) {
+      s3Client.putObject(
+        PutObjectRequest.builder().apply {
+          bucket(config.s3.bucket)
+          key("${config.s3.baseDirectory}/$backupFileName")
+        }.build(),
+        backupPath
+      )
+    }
+    Unit
+  } finally {
+    RUNNING.set(false)
+    server.sendMessage(Util.formatSystemMessage("Backup finished."))
   }
 
   private fun backupPlugins(server: Server, zipStream: ZipOutputStream) {
@@ -106,7 +123,7 @@ class BackupCommand(
       .filter { path: Path? -> Files.isRegularFile(path) }
       .toList()
     val buffer = ByteArray(1024)
-    val backupsPath = backupPath.toRealPath()
+    val backupsPath = backupsPath.toRealPath()
 
     for (path in paths) {
       val realPath = path.toRealPath()

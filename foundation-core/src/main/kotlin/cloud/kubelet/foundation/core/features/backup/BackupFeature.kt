@@ -1,18 +1,64 @@
 package cloud.kubelet.foundation.core.features.backup
 
 import cloud.kubelet.foundation.core.FoundationCorePlugin
+import cloud.kubelet.foundation.core.Util
 import cloud.kubelet.foundation.core.abstraction.Feature
+import com.charleskorn.kaml.Yaml
+import org.koin.core.KoinApplication
 import org.koin.core.component.inject
+import org.koin.dsl.module
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import java.net.URI
+import kotlin.io.path.inputStream
 
 class BackupFeature : Feature() {
   private val plugin by inject<FoundationCorePlugin>()
+  private val s3Client by inject<S3Client>()
+  private val config by inject<BackupConfig>()
 
   override fun enable() {
     // Create backup directory.
     val backupPath = plugin.pluginDataPath.resolve(BACKUPS_DIRECTORY)
     backupPath.toFile().mkdir()
 
-    registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath))
+    registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath, config, s3Client))
+  }
+
+  override fun module() = module {
+    single {
+      val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
+        plugin.slF4JLogger,
+        plugin.pluginDataPath,
+        "backup.yaml",
+      )
+      return@single Yaml.default.decodeFromStream(
+        BackupConfig.serializer(),
+        configPath.inputStream()
+      )
+    }
+    single {
+      val config = get<BackupConfig>()
+
+      val creds = StaticCredentialsProvider.create(
+        AwsSessionCredentials.create(config.s3.accessKeyId, config.s3.secretAccessKey, "")
+      )
+      val builder = S3Client.builder().credentialsProvider(creds)
+
+      if (config.s3.endpointOverride.isNotEmpty()) {
+        builder.endpointOverride(URI.create(config.s3.endpointOverride))
+      }
+
+      if (config.s3.region.isNotEmpty()) {
+        builder.region(Region.of(config.s3.region))
+      } else {
+        builder.region(Region.US_WEST_1)
+      }
+
+      builder.build()
+    }
   }
 
   companion object {

@@ -24,12 +24,18 @@ abstract class FoundationPlugin : JavaPlugin() {
     features = createFeatures()
     module = createModule()
 
-    // TODO: If we have another plugin using this class, we may need to use context isolation.
+    // TODO: If we have another plugin using Koin, we may need to use context isolation and ensure
+    //  it uses the same context so they can fetch stuff from us.
     //  https://insert-koin.io/docs/reference/koin-core/context-isolation
     pluginApplication = startKoin {
       modules(pluginModule)
       modules(module)
     }
+
+    // This is probably a bit of a hack.
+    pluginApplication.modules(module {
+      single { pluginApplication }
+    })
 
     features.forEach {
       pluginApplication.modules(it.module())

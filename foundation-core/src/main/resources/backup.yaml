@@ -1,0 +1,23 @@
+# Configuration of S3 service to upload back-ups to.
+s3:
+  # The access key ID from your S3-compliant storage provider.
+  # If empty, backups will not be uploaded to S3.
+  accessKeyId: ""
+
+  # The secret access key from your S3-compliant storage provider.
+  secretAccessKey: ""
+
+  # The region the bucket is located in. If using something other than AWS, this field can be set to
+  # any valid region (us-west-1, etc.), or blank which defaults to us-west-1.
+  region: ""
+
+  # An endpoint override, this is typically used for S3-compatible services like Backblaze B2.
+  # If not specified, it will use the AWS region specified.
+  endpointOverride: ""
+
+  # Name of the bucket to upload to.
+  bucket: ""
+
+  # Base directory to store backups in. Value being set to "my-server" will store backups with a
+  # path like bucket-name/my-server/backup-2021-12-21T00:06:41.760568Z.zip
+  baseDirectory: ""
