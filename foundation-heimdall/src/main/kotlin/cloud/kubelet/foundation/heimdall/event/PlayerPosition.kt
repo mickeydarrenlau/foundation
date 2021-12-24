@@ -10,14 +10,15 @@ import java.util.*
 
 class PlayerPosition(
   val playerUniqueIdentity: UUID,
-  val location: Location
+  val location: Location,
+  val timestamp: Instant = Instant.now()
 ) : HeimdallEvent() {
   constructor(event: PlayerMoveEvent) : this(event.player.uniqueId, event.to)
 
   override fun store(transaction: Transaction) {
     transaction.apply {
       PlayerPositionTable.insert {
-        it[time] = Instant.now()
+        it[time] = timestamp
         it[player] = playerUniqueIdentity
         it[world] = location.world.uid
         it[x] = location.x

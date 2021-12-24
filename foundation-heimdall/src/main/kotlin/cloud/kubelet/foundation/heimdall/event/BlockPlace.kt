@@ -13,14 +13,15 @@ import java.util.*
 class BlockPlace(
   val playerUniqueIdentity: UUID,
   val location: Location,
-  val material: Material
-) : HeimdallEvent() {
+  val material: Material,
+  val timestamp: Instant = Instant.now()
+  ) : HeimdallEvent() {
   constructor(event: BlockPlaceEvent) : this(event.player.uniqueId, event.block.location, event.block.type)
 
   override fun store(transaction: Transaction) {
     transaction.apply {
       BlockPlaceTable.insert {
-        it[time] = Instant.now()
+        it[time] = timestamp
         it[player] = playerUniqueIdentity
         it[world] = location.world.uid
         it[block] = material.storageBlockName
