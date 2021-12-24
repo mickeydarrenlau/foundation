@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.insert
 import java.time.Instant
 import java.util.*
 
-class PlayerPositionEvent(
+class PlayerPosition(
   val playerUniqueIdentity: UUID,
   val location: Location
 ) : HeimdallEvent() {

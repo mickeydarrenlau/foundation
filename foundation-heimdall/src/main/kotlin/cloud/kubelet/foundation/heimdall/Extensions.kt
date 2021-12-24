@@ -1,5 +1,7 @@
 package cloud.kubelet.foundation.heimdall
 
+import org.bukkit.Material
+
 fun String.sqlSplitStatements(): List<String> {
   val statements = mutableListOf<String>()
   val buffer = StringBuilder()
@@ -19,3 +21,6 @@ fun String.sqlSplitStatements(): List<String> {
   flush()
   return statements
 }
+
+val Material.storageBlockName: String
+  get() = "${key.namespace}:${key.key}"

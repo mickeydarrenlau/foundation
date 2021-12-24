@@ -4,22 +4,23 @@ import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
 import cloud.kubelet.foundation.heimdall.buffer.BufferFlushThread
 import cloud.kubelet.foundation.heimdall.buffer.EventBuffer
-import cloud.kubelet.foundation.heimdall.event.PlayerPositionEvent
+import cloud.kubelet.foundation.heimdall.event.BlockBreak
+import cloud.kubelet.foundation.heimdall.event.BlockPlace
+import cloud.kubelet.foundation.heimdall.event.PlayerPosition
 import cloud.kubelet.foundation.heimdall.model.HeimdallConfig
-import cloud.kubelet.foundation.heimdall.table.PlayerPositionTable
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.postgresql.Driver
 import java.lang.Exception
-import java.time.Instant
 import kotlin.io.path.inputStream
 
 class FoundationHeimdallPlugin : JavaPlugin(), Listener {
@@ -82,7 +83,13 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   }
 
   @EventHandler
-  fun onPlayerMove(event: PlayerMoveEvent) = buffer.push(PlayerPositionEvent(event))
+  fun onPlayerMove(event: PlayerMoveEvent) = buffer.push(PlayerPosition(event))
+
+  @EventHandler
+  fun onBlockBroken(event: BlockPlaceEvent) = buffer.push(BlockPlace(event))
+
+  @EventHandler
+  fun onBlockBroken(event: BlockBreakEvent) = buffer.push(BlockBreak(event))
 
   override fun onDisable() {
     bufferFlushThread.stop()
