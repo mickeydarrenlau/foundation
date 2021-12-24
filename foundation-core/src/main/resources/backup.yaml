@@ -1,3 +1,11 @@
+# Configuration of backup scheduling, expressed by cron expressions.
+schedule:
+  # Cron expression to use for the backup schedule.
+  # Examples:
+  # "0 3 * * *"   -> every day at 3 AM
+  # "0 3 * * SUN" -> every Sunday at 3 AM
+  cron: ""
+
 # Configuration of S3 service to upload back-ups to.
 s3:
   # The access key ID from your S3-compliant storage provider.

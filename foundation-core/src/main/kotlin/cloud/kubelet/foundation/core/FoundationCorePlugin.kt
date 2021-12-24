@@ -8,6 +8,7 @@ import cloud.kubelet.foundation.core.features.stats.StatsFeature
 import cloud.kubelet.foundation.core.features.update.UpdateFeature
 import cloud.kubelet.foundation.core.features.world.WorldFeature
 import cloud.kubelet.foundation.core.features.persist.PersistenceFeature
+import cloud.kubelet.foundation.core.features.scheduler.SchedulerFeature
 import org.koin.dsl.module
 import java.nio.file.Path
 
@@ -38,6 +39,7 @@ class FoundationCorePlugin : FoundationPlugin() {
   }
 
   override fun createFeatures() = listOf(
+    SchedulerFeature(),
     PersistenceFeature(),
     BackupFeature(),
     DevFeature(),

@@ -10,7 +10,7 @@ import org.koin.dsl.module
 abstract class FoundationPlugin : JavaPlugin() {
   private lateinit var pluginModule: Module
   private lateinit var pluginApplication: KoinApplication
-  private lateinit var features: List<Feature>
+  private lateinit var features: List<CoreFeature>
   private lateinit var module: Module
 
   override fun onEnable() {
@@ -45,7 +45,10 @@ abstract class FoundationPlugin : JavaPlugin() {
       try {
         slF4JLogger.info("Enabling feature: ${it.javaClass.simpleName}")
         it.enable()
-        server.pluginManager.registerEvents(it, this)
+        // TODO: May replace this check with a method in the interface, CoreFeature would no-op.
+        if (it is Feature) {
+          server.pluginManager.registerEvents(it, this)
+        }
       } catch (e: Exception) {
         slF4JLogger.error("Failed to enable feature: ${it.javaClass.simpleName}", e)
       }
@@ -61,5 +64,5 @@ abstract class FoundationPlugin : JavaPlugin() {
   }
 
   protected open fun createModule() = module {}
-  protected abstract fun createFeatures(): List<Feature>
+  protected abstract fun createFeatures(): List<CoreFeature>
 }

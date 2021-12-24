@@ -4,7 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BackupConfig(
+  val schedule: ScheduleConfig = ScheduleConfig(),
   val s3: S3Config = S3Config(),
+)
+
+@Serializable
+data class ScheduleConfig(
+  val cron: String = "",
 )
 
 @Serializable

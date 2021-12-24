@@ -7,13 +7,15 @@ import org.bukkit.event.Listener
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.dsl.module
+import org.quartz.Scheduler
 
-abstract class Feature : KoinComponent, Listener {
+abstract class Feature : CoreFeature, KoinComponent, Listener {
   private val plugin by inject<FoundationCorePlugin>()
+  protected val scheduler by inject<Scheduler>()
 
-  open fun enable() {}
-  open fun disable() {}
-  open fun module() = module {}
+  override fun enable() {}
+  override fun disable() {}
+  override fun module() = module {}
 
   protected fun registerCommandExecutor(name: String, executor: CommandExecutor) {
     registerCommandExecutor(listOf(name), executor)

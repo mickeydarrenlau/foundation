@@ -3,8 +3,9 @@ package cloud.kubelet.foundation.core.features.backup
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
 import cloud.kubelet.foundation.core.abstraction.Feature
+import cloud.kubelet.foundation.core.features.scheduler.cancel
+import cloud.kubelet.foundation.core.features.scheduler.cron
 import com.charleskorn.kaml.Yaml
-import org.koin.core.KoinApplication
 import org.koin.core.component.inject
 import org.koin.dsl.module
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials
@@ -18,6 +19,7 @@ class BackupFeature : Feature() {
   private val plugin by inject<FoundationCorePlugin>()
   private val s3Client by inject<S3Client>()
   private val config by inject<BackupConfig>()
+  private lateinit var scheduleId: String
 
   override fun enable() {
     // Create backup directory.
@@ -25,6 +27,20 @@ class BackupFeature : Feature() {
     backupPath.toFile().mkdir()
 
     registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath, config, s3Client))
+
+    if (config.schedule.cron.isNotEmpty()) {
+      scheduleId = scheduler.cron("${config.schedule.cron} ?") {
+        plugin.server.scheduler.runTask(plugin) { ->
+          plugin.server.dispatchCommand(plugin.server.consoleSender, "fbackup")
+        }
+      }
+    }
+  }
+
+  override fun disable() {
+    if (::scheduleId.isInitialized) {
+      scheduler.cancel(scheduleId)
+    }
   }
 
   override fun module() = module {
