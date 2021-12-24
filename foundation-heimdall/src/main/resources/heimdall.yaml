@@ -1,0 +1,11 @@
+# Whether Heimdall should be enabled for tracking events.
+enabled: false
+
+# Database connection information.
+db:
+  # JDBC URL
+  url: "jdbc:postgresql://localhost/foundation"
+  # JDBC Username
+  username: "foundation"
+  # JDBC Password
+  password: "foundation"

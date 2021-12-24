@@ -13,18 +13,18 @@ import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.hooks.EventListener
+import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.event.Listener as BukkitEventListener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.awt.Color
 import kotlin.io.path.inputStream
 
-class FoundationBifrostPlugin : JavaPlugin(), EventListener, Listener {
+class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventListener {
   private lateinit var config: BifrostConfig
   private lateinit var jda: JDA
   private var isDev = false
