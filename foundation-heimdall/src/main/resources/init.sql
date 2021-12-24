@@ -55,3 +55,14 @@ create table if not exists heimdall.player_sessions (
 );
 --
 select create_hypertable('heimdall.player_sessions', 'start', 'player', 4,  if_not_exists => TRUE);
+--
+create table if not exists heimdall.world_changes (
+    time timestamp not null,
+    player uuid not null,
+    from_world uuid not null,
+    from_world_name text not null,
+    to_world uuid not null,
+    to_world_name text not null
+);
+--
+select create_hypertable('heimdall.world_changes', 'time', 'player', 4,  if_not_exists => TRUE);

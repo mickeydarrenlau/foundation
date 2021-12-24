@@ -4,19 +4,16 @@ import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
 import cloud.kubelet.foundation.heimdall.buffer.BufferFlushThread
 import cloud.kubelet.foundation.heimdall.buffer.EventBuffer
-import cloud.kubelet.foundation.heimdall.event.BlockBreak
-import cloud.kubelet.foundation.heimdall.event.BlockPlace
-import cloud.kubelet.foundation.heimdall.event.PlayerPosition
-import cloud.kubelet.foundation.heimdall.event.PlayerSession
+import cloud.kubelet.foundation.heimdall.event.*
 import cloud.kubelet.foundation.heimdall.model.HeimdallConfig
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -103,11 +100,24 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     playerJoinTimes[event.player.uniqueId] = Instant.now()
   }
 
-  @EventHandler(priority = EventPriority.HIGHEST)
+  @EventHandler
   fun onPlayerQuit(event: PlayerQuitEvent) {
     val startTime = playerJoinTimes.remove(event.player.uniqueId) ?: return
     val endTime = Instant.now()
     buffer.push(PlayerSession(event.player.uniqueId, event.player.name, startTime, endTime))
+  }
+
+  @EventHandler
+  fun onWorldLoad(event: PlayerChangedWorldEvent) {
+    buffer.push(
+      WorldChange(
+        event.player.uniqueId,
+        event.from.uid,
+        event.from.name,
+        event.player.world.uid,
+        event.player.world.name
+      )
+    )
   }
 
   override fun onDisable() {
