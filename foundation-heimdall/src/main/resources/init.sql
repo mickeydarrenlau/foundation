@@ -62,7 +62,39 @@ create table if not exists heimdall.world_changes (
     from_world uuid not null,
     from_world_name text not null,
     to_world uuid not null,
-    to_world_name text not null
+    to_world_name text not null,
+    primary key (time, player)
 );
 --
 select create_hypertable('heimdall.world_changes', 'time', 'player', 4,  if_not_exists => TRUE);
+--
+create table if not exists heimdall.player_deaths (
+    time timestamp not null,
+    player uuid not null,
+    world uuid not null,
+    x double precision not null,
+    y double precision not null,
+    z double precision not null,
+    pitch double precision not null,
+    yaw double precision not null,
+    experience double precision not null,
+    message text null,
+    primary key (time, player)
+);
+--
+select create_hypertable('heimdall.player_deaths', 'time', 'player', 4,  if_not_exists => TRUE);
+--
+create table if not exists heimdall.player_advancements (
+    time timestamp not null,
+    player uuid not null,
+    world uuid not null,
+    x double precision not null,
+    y double precision not null,
+    z double precision not null,
+    pitch double precision not null,
+    yaw double precision not null,
+    advancement text null,
+    primary key (time, player, advancement)
+);
+--
+select create_hypertable('heimdall.player_advancements', 'time', 'player', 4,  if_not_exists => TRUE);

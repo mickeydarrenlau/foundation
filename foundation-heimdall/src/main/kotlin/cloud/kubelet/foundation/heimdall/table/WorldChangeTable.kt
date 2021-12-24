@@ -1,6 +1,6 @@
 package cloud.kubelet.foundation.heimdall.table
 
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
 
 object WorldChangeTable : Table("world_changes") {

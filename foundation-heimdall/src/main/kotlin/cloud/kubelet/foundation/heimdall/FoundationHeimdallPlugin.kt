@@ -9,14 +9,13 @@ import cloud.kubelet.foundation.heimdall.model.HeimdallConfig
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.player.PlayerChangedWorldEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
@@ -34,6 +33,8 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   private val bufferFlushThread = BufferFlushThread(this, buffer)
 
   private val playerJoinTimes = ConcurrentHashMap<UUID, Instant>()
+
+  private val legacyComponentSerializer = LegacyComponentSerializer.builder().build()
 
   override fun onEnable() {
     val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
@@ -108,17 +109,29 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   }
 
   @EventHandler
-  fun onWorldLoad(event: PlayerChangedWorldEvent) {
-    buffer.push(
-      WorldChange(
-        event.player.uniqueId,
-        event.from.uid,
-        event.from.name,
-        event.player.world.uid,
-        event.player.world.name
-      )
-    )
+  fun onPlayerDeath(event: PlayerDeathEvent) {
+    val deathMessage = event.deathMessage()
+    val deathMessageString = if (deathMessage != null) {
+      legacyComponentSerializer.serialize(deathMessage)
+    } else {
+      null
+    }
+    buffer.push(PlayerDeath(event, deathMessageString))
   }
+
+  @EventHandler
+  fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) = buffer.push(PlayerAdvancement(event))
+
+  @EventHandler
+  fun onWorldLoad(event: PlayerChangedWorldEvent) = buffer.push(
+    WorldChange(
+      event.player.uniqueId,
+      event.from.uid,
+      event.from.name,
+      event.player.world.uid,
+      event.player.world.name
+    )
+  )
 
   override fun onDisable() {
     bufferFlushThread.stop()
