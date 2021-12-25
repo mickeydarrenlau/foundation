@@ -34,7 +34,7 @@ class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventB
       transaction(plugin.db) {
         val count = buffer.flush(this)
         if (count > 0) {
-          plugin.slF4JLogger.info("Flushed $count Events")
+          plugin.slF4JLogger.debug("Flushed $count Events")
         }
       }
     } catch (e: Exception) {
