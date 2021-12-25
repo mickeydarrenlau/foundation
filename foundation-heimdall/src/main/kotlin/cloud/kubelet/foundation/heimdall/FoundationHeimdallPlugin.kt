@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.*
 import org.bukkit.plugin.java.JavaPlugin
@@ -132,6 +133,12 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
       event.player.world.name
     )
   )
+
+  @EventHandler
+  fun onEntityDeath(event: EntityDeathEvent) {
+    val killer = event.entity.killer ?: return
+    buffer.push(EntityKill(killer.uniqueId, killer.location, event.entity.uniqueId, event.entityType.key.toString()))
+  }
 
   override fun onDisable() {
     bufferFlushThread.stop()

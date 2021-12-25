@@ -23,10 +23,12 @@ create table if not exists heimdall.block_breaks (
     time timestamp not null,
     player uuid not null,
     world uuid not null,
-    block text not null,
     x double precision not null,
     y double precision not null,
     z double precision not null,
+    pitch double precision not null,
+    yaw double precision not null,
+    block text not null,
     PRIMARY KEY (time, player, world)
 );
 --
@@ -36,10 +38,12 @@ create table if not exists heimdall.block_places (
     time timestamp not null,
     player uuid not null,
     world uuid not null,
-    block text not null,
     x double precision not null,
     y double precision not null,
     z double precision not null,
+    pitch double precision not null,
+    yaw double precision not null,
+    block text not null,
     PRIMARY KEY (time, player, world)
 );
 --
@@ -93,8 +97,24 @@ create table if not exists heimdall.player_advancements (
     z double precision not null,
     pitch double precision not null,
     yaw double precision not null,
-    advancement text null,
+    advancement text not null,
     primary key (time, player, advancement)
 );
 --
 select create_hypertable('heimdall.player_advancements', 'time', 'player', 4,  if_not_exists => TRUE);
+--
+create table if not exists heimdall.entity_kills (
+    time timestamp not null,
+    player uuid not null,
+    entity uuid not null,
+    world uuid not null,
+    x double precision not null,
+    y double precision not null,
+    z double precision not null,
+    pitch double precision not null,
+    yaw double precision not null,
+    entity_type text not null,
+    primary key (time, entity, player)
+);
+--
+select create_hypertable('heimdall.entity_kills', 'time', 'player', 4,  if_not_exists => TRUE);

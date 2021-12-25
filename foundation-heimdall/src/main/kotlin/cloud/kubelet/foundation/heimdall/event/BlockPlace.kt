@@ -1,6 +1,7 @@
 package cloud.kubelet.foundation.heimdall.event
 
 import cloud.kubelet.foundation.heimdall.storageBlockName
+import cloud.kubelet.foundation.heimdall.table.BlockBreakTable
 import cloud.kubelet.foundation.heimdall.table.BlockPlaceTable
 import org.bukkit.Location
 import org.bukkit.Material
@@ -21,13 +22,15 @@ class BlockPlace(
   override fun store(transaction: Transaction) {
     transaction.apply {
       BlockPlaceTable.insert {
-        it[time] = timestamp
-        it[player] = playerUniqueIdentity
-        it[world] = location.world.uid
-        it[block] = material.storageBlockName
-        it[x] = location.x
-        it[y] = location.y
-        it[z] = location.z
+        it[BlockBreakTable.time] = timestamp
+        it[BlockBreakTable.player] = playerUniqueIdentity
+        it[BlockBreakTable.world] = location.world.uid
+        it[BlockBreakTable.x] = location.x
+        it[BlockBreakTable.y] = location.y
+        it[BlockBreakTable.z] = location.z
+        it[BlockBreakTable.pitch] = location.pitch.toDouble()
+        it[BlockBreakTable.yaw] = location.yaw.toDouble()
+        it[BlockBreakTable.block] = material.storageBlockName
       }
     }
   }
