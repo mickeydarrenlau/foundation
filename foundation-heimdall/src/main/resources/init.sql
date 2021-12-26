@@ -118,3 +118,5 @@ create table if not exists heimdall.entity_kills (
 );
 --
 select create_hypertable('heimdall.entity_kills', 'time', 'player', 4,  if_not_exists => TRUE);
+--
+create or replace view heimdall.block_changes as select true as break, * from heimdall.block_breaks union all select false as break, * from heimdall.block_places;

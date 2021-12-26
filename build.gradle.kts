@@ -39,6 +39,9 @@ tasks.create("updateManifests") {
     writer.use {
       val rootPath = rootProject.rootDir.toPath()
       val updateManifest = subprojects.mapNotNull { project ->
+        if (project.name == "foundation-gjallarhorn") {
+          return@mapNotNull null
+        }
         val files = project.tasks.getByName("shadowJar").outputs
         val paths = files.files.map { rootPath.relativize(it.toPath()).toString() }
 
@@ -119,8 +122,10 @@ subprojects {
     }
   }
 
-  tasks.withType<ShadowJar> {
-    archiveClassifier.set("plugin")
+  if (project.name != "foundation-gjallarhorn") {
+    tasks.withType<ShadowJar> {
+      archiveClassifier.set("plugin")
+    }
   }
 
   tasks.assemble {
