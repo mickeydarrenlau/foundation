@@ -1,10 +1,13 @@
 # Configuration of backup scheduling, expressed by cron expressions.
 schedule:
   # Cron expression to use for the backup schedule. This is not standard cron, but rather a subset
-  # that is given to us by the Quartz Scheduler.
+  # that is given to us by the Quartz Scheduler. You may use http://www.cronmaker.com/ as a
+  # reference to build out custom cron expressions that are compatible. It should be noted that
+  # the second field is automatically added to the cron expression, as most typical cron expressions
+  # do not include it.
   # Examples:
   # "0 3 * * ?"   -> every day at 3 AM
-  # "0 3 * * SUN" -> every Sunday at 3 AM
+  # "0 3 ? * SUN" -> every Sunday at 3 AM
   cron: ""
 
 # Configuration of S3 service to upload back-ups to.
