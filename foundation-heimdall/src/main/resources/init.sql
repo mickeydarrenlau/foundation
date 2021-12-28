@@ -1,4 +1,3 @@
---
 create extension if not exists "uuid-ossp";
 --
 create extension if not exists timescaledb;
@@ -119,4 +118,22 @@ create table if not exists heimdall.entity_kills (
 --
 select create_hypertable('heimdall.entity_kills', 'time', 'player', 4,  if_not_exists => TRUE);
 --
-create or replace view heimdall.block_changes as select true as break, * from heimdall.block_breaks union all select false as break, * from heimdall.block_places;
+create or replace view heimdall.block_changes as
+    select true as break, *
+    from heimdall.block_breaks
+    union all
+    select false as break, * from heimdall.block_places;
+--
+create or replace view heimdall.player_names as
+    with unique_player_ids as (
+        select distinct player
+        from heimdall.player_sessions
+    )
+    select player, (
+        select name
+        from heimdall.player_sessions
+        where player = unique_player_ids.player
+        order by "end" desc
+        limit 1
+    ) as name
+    from unique_player_ids;

@@ -1,7 +1,7 @@
 package cloud.kubelet.foundation.gjallarhorn
 
-import java.util.*
 import kotlin.collections.HashMap
+import kotlin.math.absoluteValue
 
 class BlockStateTracker {
   val blocks = HashMap<BlockPosition, BlockState>()
@@ -14,21 +14,22 @@ class BlockStateTracker {
     blocks.remove(position)
   }
 
-  data class BlockState(val type: String)
+  fun calculateZeroBlockOffset(): BlockOffset {
+    val x = blocks.keys.minOf { it.x }
+    val y = blocks.keys.minOf { it.y }
+    val z = blocks.keys.minOf { it.z }
 
-  data class BlockPosition(
-    val x: Long,
-    val y: Long,
-    val z: Long
-  ) {
-    override fun equals(other: Any?): Boolean {
-      if (other !is BlockPosition) {
-        return false
-      }
+    val xOffset = if (x < 0) x.absoluteValue else 0
+    val yOffset = if (y < 0) y.absoluteValue else 0
+    val zOffset = if (z < 0) z.absoluteValue else 0
 
-      return other.x == x && other.y == y && other.z == z
+    return BlockOffset(xOffset, yOffset, zOffset)
+  }
+
+  fun populate(image: BlockStateImage, offset: BlockOffset = BlockOffset.none) {
+    blocks.forEach { (position, state) ->
+      val realPosition = offset.apply(position)
+      image.put(realPosition, state)
     }
-
-    override fun hashCode(): Int = Objects.hash(x, y, z)
   }
 }

@@ -137,7 +137,14 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   @EventHandler
   fun onEntityDeath(event: EntityDeathEvent) {
     val killer = event.entity.killer ?: return
-    buffer.push(EntityKill(killer.uniqueId, killer.location, event.entity.uniqueId, event.entityType.key.toString()))
+    buffer.push(
+      EntityKill(
+        killer.uniqueId,
+        killer.location,
+        event.entity.uniqueId,
+        event.entityType.key.toString()
+      )
+    )
   }
 
   override fun onDisable() {
@@ -145,7 +152,12 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     val endTime = Instant.now()
     for (playerId in playerJoinTimes.keys().toList()) {
       val startTime = playerJoinTimes.remove(playerId) ?: continue
-      buffer.push(PlayerSession(playerId, server.getPlayer(playerId)?.name ?: "__unknown__", startTime, endTime))
+      buffer.push(PlayerSession(
+        playerId,
+        server.getPlayer(playerId)?.name ?: "__unknown__",
+        startTime,
+        endTime
+      ))
     }
     bufferFlushThread.flush()
   }
