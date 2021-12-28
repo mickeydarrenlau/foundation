@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BackupConfig(
   val schedule: ScheduleConfig = ScheduleConfig(),
+  val ignore: List<String> = listOf(
+    "plugins/dynmap/web/**"
+  ),
   val s3: S3Config = S3Config(),
 )
 

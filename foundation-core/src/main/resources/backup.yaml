@@ -10,6 +10,11 @@ schedule:
   # "0 3 ? * SUN" -> every Sunday at 3 AM
   cron: ""
 
+# List of file patterns to ignore and ignore in the backup.
+ignore:
+  # Dynmap web output.
+  - "plugins/dynmap/web/**"
+
 # Configuration of S3 service to upload back-ups to.
 s3:
   # The access key ID from your S3-compliant storage provider.

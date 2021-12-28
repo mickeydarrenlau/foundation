@@ -14,8 +14,10 @@ import java.io.BufferedOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
@@ -119,8 +121,10 @@ class BackupCommand(
   }
 
   private fun addDirectoryToZip(zipStream: ZipOutputStream, directoryPath: Path) {
+    val matchers = config.ignore.map { FileSystems.getDefault().getPathMatcher("glob:$it") }
     val paths = Files.walk(directoryPath)
-      .filter { path: Path? -> Files.isRegularFile(path) }
+      .filter { path: Path -> Files.isRegularFile(path) }
+      .filter { path -> !matchers.any { it.matches(Paths.get(path.normalize().toString())) } }
       .toList()
     val buffer = ByteArray(1024)
     val backupsPath = backupsPath.toRealPath()
