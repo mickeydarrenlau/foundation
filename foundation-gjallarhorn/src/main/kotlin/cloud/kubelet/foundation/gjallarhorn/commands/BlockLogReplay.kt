@@ -1,6 +1,7 @@
 package cloud.kubelet.foundation.gjallarhorn.commands
 
 import cloud.kubelet.foundation.gjallarhorn.*
+import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
 import cloud.kubelet.foundation.heimdall.view.BlockChangeView
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -11,22 +12,26 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.File
 import java.time.Instant
-import javax.imageio.ImageIO
+import java.util.concurrent.atomic.AtomicLong
 
 class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-log") {
   private val db by requireObject<Database>()
   private val timeAsString by option("--time", help = "Replay Time")
-  private val render by option("--render", help = "Enable Render Mode").flag()
+  private val renderTopDown by option("--render-top-down", help = "Render TOp Down Image").flag()
+  private val renderHeightMap by option("--render-height-map", help = "Render Height Map Image").flag()
+
+  private val considerAirBlocks by option("--consider-air-blocks", help = "Enable Air Block Consideration").flag()
 
   override fun run() {
     val filter = compose(
       combine = { a, b -> a and b },
       { timeAsString != null } to { BlockChangeView.time lessEq Instant.parse(timeAsString) }
     )
-    val tracker = BlockStateTracker()
+    val tracker =
+      BlockStateTracker(if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete)
 
+    val blockChangeCounter = AtomicLong()
     transaction(db) {
       BlockChangeView.select(filter).orderBy(BlockChangeView.time).forEach { row ->
         val changeIsBreak = row[BlockChangeView.isBreak]
@@ -41,14 +46,31 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
         } else {
           tracker.place(location, BlockState(block))
         }
+
+        val count = blockChangeCounter.addAndGet(1)
+        if (count % 1000L == 0L) {
+          System.err.println("Calculating Block Changes... $count")
+        }
       }
     }
+    System.err.println("Total Block Changes... ${blockChangeCounter.get()}")
 
-    if (render) {
+    val uniqueBlockPositions = tracker.blocks.size
+    System.err.println("Unique Block Positions... $uniqueBlockPositions")
+
+    val blockZeroOffset = tracker.calculateZeroBlockOffset()
+    System.err.println("Zero Block Offset... $blockZeroOffset")
+
+    if (renderTopDown) {
       val image = BlockStateImage()
-      tracker.populate(image, offset = tracker.calculateZeroBlockOffset())
-      val bufferedImage = image.buildBufferedImage()
-      ImageIO.write(bufferedImage, "png", File("top-down.png"))
+      tracker.populate(image, offset = blockZeroOffset)
+      val bufferedImage = image.buildTopDownImage()
+      bufferedImage.savePngFile("top-down.png")
+    } else if (renderHeightMap) {
+      val image = BlockStateImage()
+      tracker.populate(image, offset = blockZeroOffset)
+      val bufferedImage = image.buildHeightMapImage()
+      bufferedImage.savePngFile("height-map.png")
     } else {
       println("x,y,z,block")
       for ((position, block) in tracker.blocks) {

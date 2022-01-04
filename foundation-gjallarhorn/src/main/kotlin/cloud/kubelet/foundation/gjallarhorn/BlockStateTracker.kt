@@ -1,9 +1,8 @@
 package cloud.kubelet.foundation.gjallarhorn
 
-import kotlin.collections.HashMap
 import kotlin.math.absoluteValue
 
-class BlockStateTracker {
+class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete) {
   val blocks = HashMap<BlockPosition, BlockState>()
 
   fun place(position: BlockPosition, state: BlockState) {
@@ -11,7 +10,11 @@ class BlockStateTracker {
   }
 
   fun delete(position: BlockPosition) {
-    blocks.remove(position)
+    if (mode == BlockTrackMode.AirOnDelete) {
+      blocks[position] = BlockState("minecraft:air")
+    } else {
+      blocks.remove(position)
+    }
   }
 
   fun calculateZeroBlockOffset(): BlockOffset {
