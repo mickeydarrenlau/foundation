@@ -4,6 +4,7 @@ import cloud.kubelet.foundation.gjallarhorn.util.ColorGradient
 import cloud.kubelet.foundation.gjallarhorn.util.FloatClamp
 import cloud.kubelet.foundation.gjallarhorn.util.RandomColorKey
 import java.awt.Color
+import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import java.util.*
 
@@ -18,8 +19,7 @@ class BlockStateImage {
     }[position.y] = state
   }
 
-  fun buildTopDownImage(expanse: BlockExpanse): BufferedImage {
-    val colorKey = RandomColorKey()
+  fun buildTopDownImage(expanse: BlockExpanse, randomColorKey: RandomColorKey): BufferedImage {
     return buildPixelQuadImage(expanse) { x, z ->
       val maybeYBlocks = blocks[x]?.get(z)
       if (maybeYBlocks == null) {
@@ -32,7 +32,7 @@ class BlockStateImage {
         return@buildPixelQuadImage
       }
 
-      val color = colorKey.map(maxBlockState.type)
+      val color = randomColorKey.map(maxBlockState.type)
       setPixelQuad(x, z, color.rgb)
     }
   }
@@ -59,16 +59,20 @@ class BlockStateImage {
     }
 
   private fun BufferedImage.setPixelQuad(x: Long, z: Long, rgb: Int) {
-    setRGB(x.toInt() * 2, z.toInt() * 2, rgb)
-    setRGB((x.toInt() * 2) + 1, z.toInt() * 2, rgb)
-    setRGB(x.toInt() * 2, (z.toInt() * 2) + 1, rgb)
-    setRGB((x.toInt() * 2) + 1, (z.toInt() * 2) + 1, rgb)
+    drawSquare(x * quadImageSize, z * quadImageSize, quadImageSize.toLong(), rgb)
+  }
+
+  private fun BufferedImage.drawSquare(x: Long, y: Long, side: Long, rgb: Int) {
+    val graphics = createGraphics()
+    graphics.color = Color(rgb)
+    graphics.fill(Rectangle(x.toInt(), y.toInt(), side.toInt(), side.toInt()))
+    graphics.dispose()
   }
 
   private fun buildPixelQuadImage(expanse: BlockExpanse, callback: BufferedImage.(Long, Long) -> Unit): BufferedImage {
     val width = expanse.size.x
     val height = expanse.size.z
-    val bufferedImage = BufferedImage(width.toInt() * 2, height.toInt() * 2, BufferedImage.TYPE_4BYTE_ABGR)
+    val bufferedImage = BufferedImage(width.toInt() * quadImageSize, height.toInt() * quadImageSize, BufferedImage.TYPE_4BYTE_ABGR)
 
     for (x in 0 until width) {
       for (z in 0 until height) {
@@ -76,5 +80,9 @@ class BlockStateImage {
       }
     }
     return bufferedImage
+  }
+
+  companion object {
+    const val quadImageSize = 4
   }
 }

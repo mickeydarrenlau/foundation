@@ -1,11 +1,12 @@
 package cloud.kubelet.foundation.gjallarhorn.util
 
 import java.awt.Color
+import java.util.concurrent.ConcurrentHashMap
 
 class RandomColorKey {
-  private val colors = mutableMapOf<String, Color>()
+  private val colors = ConcurrentHashMap<String, Color>()
 
-  fun map(key: String) = colors.getOrPut(key) { findUniqueColor() }
+  fun map(key: String) = colors.computeIfAbsent(key) { findUniqueColor() }
 
   private fun findUniqueColor(): Color {
     var random = randomColor()
