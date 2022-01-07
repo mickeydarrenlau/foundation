@@ -72,7 +72,8 @@ class BlockStateImage {
   private fun buildPixelQuadImage(expanse: BlockExpanse, callback: BufferedImage.(Long, Long) -> Unit): BufferedImage {
     val width = expanse.size.x
     val height = expanse.size.z
-    val bufferedImage = BufferedImage(width.toInt() * quadImageSize, height.toInt() * quadImageSize, BufferedImage.TYPE_4BYTE_ABGR)
+    val bufferedImage =
+      BufferedImage(width.toInt() * quadImageSize, height.toInt() * quadImageSize, BufferedImage.TYPE_4BYTE_ABGR)
 
     for (x in 0 until width) {
       for (z in 0 until height) {

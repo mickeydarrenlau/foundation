@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.gjallarhorn
+package cloud.kubelet.foundation.gjallarhorn.util
 
 import org.jetbrains.exposed.sql.Op
 

@@ -1,6 +1,6 @@
 package cloud.kubelet.foundation.gjallarhorn.commands
 
-import cloud.kubelet.foundation.gjallarhorn.compose
+import cloud.kubelet.foundation.gjallarhorn.util.compose
 import cloud.kubelet.foundation.gjallarhorn.render.*
 import cloud.kubelet.foundation.gjallarhorn.util.RandomColorKey
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
+import com.github.ajalt.clikt.parameters.types.int
 import jetbrains.exodus.kotlin.notNull
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
@@ -28,9 +29,13 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
   private val db by requireObject<Database>()
   private val exactTimeAsString by option("--time", help = "Replay Time")
   private val timelapseMode by option("--timelapse", help = "Timelapse Mode").enum<TimelapseMode> { it.id }
+  private val timelapseIntervalLimit by option("--timelapse-limit", help = "Timelapse Limit Intervals").int()
   private val render by option("--render", help = "Render Top Down Image").enum<RenderType> { it.id }.required()
 
   private val considerAirBlocks by option("--consider-air-blocks", help = "Enable Air Block Consideration").flag()
+
+  private val fromCoordinate by option("--trim-from", help = "Trim From Coordinate")
+  private val toCoordinate by option("--trim-to", help = "Trim To Coordinate")
 
   private val logger = LoggerFactory.getLogger(BlockLogReplay::class.java)
 
@@ -43,11 +48,15 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
         row[minTimeColumn]!! to row[maxTimeColumn]!!
       }
 
-      val intervals = mutableListOf<Instant>()
+      var intervals = mutableListOf<Instant>()
       var current = start
       while (!current.isAfter(end)) {
         intervals.add(current)
         current = current.plus(timelapseMode!!.interval)
+      }
+
+      if (timelapseIntervalLimit != null) {
+        intervals = intervals.takeLast(timelapseIntervalLimit!!).toMutableList()
       }
 
       val trackerPool = ScheduledThreadPoolExecutor(8)
@@ -69,14 +78,14 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       logger.info("State Tracking Completed")
       val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
       val globalBlockOffset = BlockPosition.maxOf(allBlockOffsets.asSequence())
-      val allBlockMaxes = trackers.map { it.value.calculateZeroBlockOffset() }
+      val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
       val globalBlockMax = BlockPosition.maxOf(allBlockMaxes.asSequence())
       val globalBlockExpanse = BlockExpanse.offsetAndMax(globalBlockOffset, globalBlockMax)
 
       logger.info("Calculations Completed")
 
       val renderState = render.createState()
-      val renderPool = ScheduledThreadPoolExecutor(8)
+      val renderPool = ScheduledThreadPoolExecutor(16)
       for ((i, tracker) in trackers.entries) {
         renderPool.submit {
           val count = trackers.size.toString().length
@@ -139,11 +148,30 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
 
     val uniqueBlockPositions = tracker.blocks.size
     logger.info("Job $job Unique Block Positions... $uniqueBlockPositions")
+    maybeTrimState(tracker)
     return tracker
   }
 
+  fun maybeTrimState(tracker: BlockStateTracker) {
+    if (fromCoordinate == null || toCoordinate == null) {
+      return
+    }
+
+    val from = fromCoordinate!!.split(",").map { it.toLong() }
+    val to = toCoordinate!!.split(",").map { it.toLong() }
+
+    val fromBlock = BlockPosition(from[0], 0, from[1])
+    val toBlock = BlockPosition(to[0], 0, to[1])
+
+    tracker.trimOutsideXAndZRange(fromBlock, toBlock)
+  }
+
   @Suppress("unused")
-  enum class RenderType(val id: String, val createState: () -> Any, val renderBufferedImage: (Any, BlockStateImage, BlockExpanse) -> BufferedImage) {
+  enum class RenderType(
+    val id: String,
+    val createState: () -> Any,
+    val renderBufferedImage: (Any, BlockStateImage, BlockExpanse) -> BufferedImage
+  ) {
     TopDown("top-down",
       { TopDownState(RandomColorKey()) },
       { state, image, expanse -> image.buildTopDownImage(expanse, (state as TopDownState).randomColorKey) }),

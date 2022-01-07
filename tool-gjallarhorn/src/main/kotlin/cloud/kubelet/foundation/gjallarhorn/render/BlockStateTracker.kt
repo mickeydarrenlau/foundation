@@ -17,6 +17,17 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     }
   }
 
+  fun trimOutsideXAndZRange(min: BlockPosition, max: BlockPosition) {
+    val blockPositionsToRemove = blocks.keys.filter {
+      it.x < min.x ||
+          it.z < min.z ||
+          it.x > max.x ||
+          it.z > max.z
+    }.toList()
+
+    blockPositionsToRemove.forEach { blocks.remove(it) }
+  }
+
   fun calculateZeroBlockOffset(): BlockPosition {
     val x = blocks.keys.minOf { it.x }
     val y = blocks.keys.minOf { it.y }

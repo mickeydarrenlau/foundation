@@ -25,6 +25,7 @@ class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
       jdbcUrl = jdbcConnectionUrl
       username = jdbcConnectionUsername
       password = jdbcConnectionPassword
+      minimumIdle = dbPoolSize / 2
       maximumPoolSize = dbPoolSize
     })
     val db = Database.connect(pool)

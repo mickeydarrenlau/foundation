@@ -1,6 +1,6 @@
 package cloud.kubelet.foundation.gjallarhorn.commands
 
-import cloud.kubelet.foundation.gjallarhorn.compose
+import cloud.kubelet.foundation.gjallarhorn.util.compose
 import cloud.kubelet.foundation.heimdall.table.PlayerPositionTable
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
