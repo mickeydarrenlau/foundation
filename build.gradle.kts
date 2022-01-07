@@ -10,6 +10,9 @@ plugins {
   id("com.github.johnrengelman.shadow") version "7.1.1" apply false
 }
 
+fun Project.isFoundationPlugin() = name.startsWith("foundation-")
+fun Project.isFoundationTool() = !isFoundationPlugin()
+
 // Disable the JAR task for the root project.
 tasks["jar"].enabled = false
 
@@ -39,7 +42,7 @@ tasks.create("updateManifests") {
     writer.use {
       val rootPath = rootProject.rootDir.toPath()
       val updateManifest = subprojects.mapNotNull { project ->
-        if (project.name == "foundation-gjallarhorn") {
+        if (project.isFoundationTool()) {
           return@mapNotNull null
         }
         val files = project.tasks.getByName("shadowJar").outputs
@@ -122,7 +125,7 @@ subprojects {
     }
   }
 
-  if (project.name != "foundation-gjallarhorn") {
+  if (project.isFoundationTool()) {
     tasks.withType<ShadowJar> {
       archiveClassifier.set("plugin")
     }

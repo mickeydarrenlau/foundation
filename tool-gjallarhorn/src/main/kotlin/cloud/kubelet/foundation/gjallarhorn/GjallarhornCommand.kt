@@ -12,7 +12,7 @@ class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
   private val jdbcConnectionUsername by option("-u", "--connection-username", help = "JDBC Connection Username")
     .default("jdbc:postgresql://localhost/foundation")
 
-  private val jdbcConnectionPassword by option("-p", "--connection-password", help = "JDBC Connection Passowrd")
+  private val jdbcConnectionPassword by option("-p", "--connection-password", help = "JDBC Connection Password")
     .default("jdbc:postgresql://localhost/foundation")
 
   override fun run() {

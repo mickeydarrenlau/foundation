@@ -4,5 +4,5 @@ include(
   ":foundation-core",
   ":foundation-bifrost",
   ":foundation-heimdall",
-  ":foundation-gjallarhorn",
+  ":tool-gjallarhorn",
 )

@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.gjallarhorn
+package cloud.kubelet.foundation.gjallarhorn.render
 
 import kotlinx.serialization.Serializable
 

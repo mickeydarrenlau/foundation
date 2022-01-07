@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.gjallarhorn
+package cloud.kubelet.foundation.gjallarhorn.render
 
 import cloud.kubelet.foundation.gjallarhorn.util.ColorGradient
 import cloud.kubelet.foundation.gjallarhorn.util.FloatClamp
@@ -18,9 +18,9 @@ class BlockStateImage {
     }[position.y] = state
   }
 
-  fun buildTopDownImage(): BufferedImage {
+  fun buildTopDownImage(expanse: BlockExpanse): BufferedImage {
     val colorKey = RandomColorKey()
-    return buildPixelQuadImage { x, z ->
+    return buildPixelQuadImage(expanse) { x, z ->
       val maybeYBlocks = blocks[x]?.get(z)
       if (maybeYBlocks == null) {
         setPixelQuad(x, z, Color.white.rgb)
@@ -37,16 +37,16 @@ class BlockStateImage {
     }
   }
 
-  fun buildHeightMapImage(): BufferedImage {
+  fun buildHeightMapImage(expanse: BlockExpanse): BufferedImage {
     val yMin = blocks.minOf { xSection -> xSection.value.minOf { zSection -> zSection.value.minOf { it.key } } }
     val yMax = blocks.maxOf { xSection -> xSection.value.maxOf { zSection -> zSection.value.maxOf { it.key } } }
     val clamp = FloatClamp(yMin, yMax)
 
-    return buildHeatMapImage(clamp) { x, z -> blocks[x]?.get(z)?.maxOf { it.key } }
+    return buildHeatMapImage(expanse, clamp) { x, z -> blocks[x]?.get(z)?.maxOf { it.key } }
   }
 
-  fun buildHeatMapImage(clamp: FloatClamp, calculate: (Long, Long) -> Long?): BufferedImage =
-    buildPixelQuadImage { x, z ->
+  fun buildHeatMapImage(expanse: BlockExpanse, clamp: FloatClamp, calculate: (Long, Long) -> Long?): BufferedImage =
+    buildPixelQuadImage(expanse) { x, z ->
       val value = calculate(x, z)
       val color = if (value != null) {
         val floatValue = clamp.convert(value)
@@ -65,13 +65,13 @@ class BlockStateImage {
     setRGB((x.toInt() * 2) + 1, (z.toInt() * 2) + 1, rgb)
   }
 
-  private fun buildPixelQuadImage(callback: BufferedImage.(Long, Long) -> Unit): BufferedImage {
-    val xMax = blocks.keys.maxOf { it }
-    val zMax = blocks.maxOf { xSection -> xSection.value.maxOf { zSection -> zSection.key } }
-    val bufferedImage = BufferedImage(xMax.toInt() * 2, zMax.toInt() * 2, BufferedImage.TYPE_4BYTE_ABGR)
+  private fun buildPixelQuadImage(expanse: BlockExpanse, callback: BufferedImage.(Long, Long) -> Unit): BufferedImage {
+    val width = expanse.size.x
+    val height = expanse.size.z
+    val bufferedImage = BufferedImage(width.toInt() * 2, height.toInt() * 2, BufferedImage.TYPE_4BYTE_ABGR)
 
-    for (x in 0 until xMax) {
-      for (z in 0 until zMax) {
+    for (x in 0 until width) {
+      for (z in 0 until height) {
         callback(bufferedImage, x, z)
       }
     }

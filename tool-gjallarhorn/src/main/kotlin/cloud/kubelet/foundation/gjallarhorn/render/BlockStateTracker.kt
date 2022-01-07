@@ -1,4 +1,4 @@
-package cloud.kubelet.foundation.gjallarhorn
+package cloud.kubelet.foundation.gjallarhorn.render
 
 import kotlin.math.absoluteValue
 
@@ -17,7 +17,7 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     }
   }
 
-  fun calculateZeroBlockOffset(): BlockOffset {
+  fun calculateZeroBlockOffset(): BlockPosition {
     val x = blocks.keys.minOf { it.x }
     val y = blocks.keys.minOf { it.y }
     val z = blocks.keys.minOf { it.z }
@@ -26,12 +26,21 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     val yOffset = if (y < 0) y.absoluteValue else 0
     val zOffset = if (z < 0) z.absoluteValue else 0
 
-    return BlockOffset(xOffset, yOffset, zOffset)
+    return BlockPosition(xOffset, yOffset, zOffset)
   }
 
-  fun populate(image: BlockStateImage, offset: BlockOffset = BlockOffset.none) {
+  fun calculateMaxBlock(): BlockPosition {
+    val x = blocks.keys.maxOf { it.x }
+    val y = blocks.keys.maxOf { it.y }
+    val z = blocks.keys.maxOf { it.z }
+    return BlockPosition(x, y, z)
+  }
+
+  fun isEmpty() = blocks.isEmpty()
+
+  fun populateStateImage(image: BlockStateImage, offset: BlockPosition = BlockPosition.zero) {
     blocks.forEach { (position, state) ->
-      val realPosition = offset.apply(position)
+      val realPosition = offset.applyAsOffset(position)
       image.put(realPosition, state)
     }
   }
