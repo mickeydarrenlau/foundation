@@ -12,7 +12,7 @@ abstract class BlockHeatMapRenderer(quadPixelSize: Int = defaultQuadPixelSize) :
     clamp: FloatClamp,
     calculate: (Long, Long) -> Long?
   ): BufferedImage =
-    buildPixelQuadImage(expanse) { x, z ->
+    buildPixelQuadImage(expanse) { graphics, x, z ->
       val value = calculate(x, z)
       val color = if (value != null) {
         val floatValue = clamp.convert(value)
@@ -21,6 +21,6 @@ abstract class BlockHeatMapRenderer(quadPixelSize: Int = defaultQuadPixelSize) :
         Color.white
       }
 
-      setPixelQuad(x, z, color.rgb)
+      setPixelQuad(graphics, x, z, color.rgb)
     }
 }

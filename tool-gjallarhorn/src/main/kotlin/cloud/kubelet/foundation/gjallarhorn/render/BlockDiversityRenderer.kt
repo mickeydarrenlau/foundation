@@ -10,19 +10,19 @@ class BlockDiversityRenderer(val expanse: BlockExpanse, quadPixelSize: Int = def
   BlockGridRenderer(quadPixelSize) {
   private val randomColorKey = RandomColorKey()
 
-  override fun render(map: BlockMap): BufferedImage = buildPixelQuadImage(expanse) { x, z ->
+  override fun render(map: BlockMap): BufferedImage = buildPixelQuadImage(expanse) { graphics, x, z ->
     val maybeYBlocks = map.blocks[x]?.get(z)
     if (maybeYBlocks == null) {
-      setPixelQuad(x, z, Color.white.rgb)
+      setPixelQuad(graphics, x, z, Color.white.rgb)
       return@buildPixelQuadImage
     }
     val maxBlockState = maybeYBlocks.maxByOrNull { it.key }?.value
     if (maxBlockState == null) {
-      setPixelQuad(x, z, Color.white.rgb)
+      setPixelQuad(graphics, x, z, Color.white.rgb)
       return@buildPixelQuadImage
     }
 
     val color = randomColorKey.map(maxBlockState.type)
-    setPixelQuad(x, z, color.rgb)
+    setPixelQuad(graphics, x, z, color.rgb)
   }
 }
