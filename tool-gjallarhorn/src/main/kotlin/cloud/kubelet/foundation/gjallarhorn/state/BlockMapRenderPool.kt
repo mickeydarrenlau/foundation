@@ -59,6 +59,9 @@ class BlockMapRenderPool<T>(
     val sliced = changelog.slice(slice)
     val tracker = BlockLogTracker(blockTrackMode)
     tracker.replay(sliced)
+    if (tracker.isEmpty()) {
+      return
+    }
     trackers[slice] = tracker
   }
 
