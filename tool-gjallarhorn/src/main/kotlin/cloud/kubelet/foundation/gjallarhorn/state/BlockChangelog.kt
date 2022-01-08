@@ -29,7 +29,7 @@ class BlockChangelog(
         val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
 
         val fromBlock = if (changeIsBreak) {
-          BlockState(block)
+          BlockState.cached(block)
         } else {
           BlockState.AirBlock
         }
@@ -37,7 +37,7 @@ class BlockChangelog(
         val toBlock = if (changeIsBreak) {
           BlockState.AirBlock
         } else {
-          BlockState(block)
+          BlockState.cached(block)
         }
 
         BlockChange(

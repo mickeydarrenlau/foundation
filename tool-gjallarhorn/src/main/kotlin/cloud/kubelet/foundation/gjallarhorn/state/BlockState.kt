@@ -1,10 +1,13 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
-import kotlinx.serialization.Serializable
+import java.util.concurrent.ConcurrentHashMap
 
-@Serializable
-data class BlockState(val type: String) {
+class BlockState(val type: String) {
   companion object {
-    val AirBlock = BlockState("minecraft:air")
+    private val cache = ConcurrentHashMap<String, BlockState>()
+
+    val AirBlock: BlockState = cached("minecraft:air")
+
+    fun cached(type: String): BlockState = cache.computeIfAbsent(type) { BlockState(type) }
   }
 }
