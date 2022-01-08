@@ -11,7 +11,7 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
 
   fun delete(position: BlockCoordinate) {
     if (mode == BlockTrackMode.AirOnDelete) {
-      blocks[position] = BlockState("minecraft:air")
+      blocks[position] = BlockState.AirBlock
     } else {
       blocks.remove(position)
     }
