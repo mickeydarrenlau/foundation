@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
-class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-log") {
+class BlockChangeCommand : CliktCommand("Block Changes", name = "block-changes") {
   private val db by requireObject<Database>()
   private val exactTimeAsString by option("--time", help = "Replay Time")
   private val timelapseMode by option("--timelapse", help = "Timelapse Mode").enum<TimelapseMode> { it.id }
@@ -36,7 +36,7 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
   private val fromCoordinate by option("--trim-from", help = "Trim From Coordinate")
   private val toCoordinate by option("--trim-to", help = "Trim To Coordinate")
 
-  private val logger = LoggerFactory.getLogger(BlockLogReplay::class.java)
+  private val logger = LoggerFactory.getLogger(BlockChangeCommand::class.java)
 
   override fun run() {
     if (timelapseMode != null) {
@@ -72,9 +72,9 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       }
       logger.info("State Tracking Completed")
       val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
-      val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets.asSequence())
+      val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets)
       val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
-      val globalBlockMax = BlockCoordinate.maxOf(allBlockMaxes.asSequence())
+      val globalBlockMax = BlockCoordinate.maxOf(allBlockMaxes)
       val globalBlockExpanse = BlockExpanse.offsetAndMax(globalBlockOffset, globalBlockMax)
 
       logger.info("Calculations Completed")

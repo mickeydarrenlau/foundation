@@ -26,7 +26,7 @@ data class BlockCoordinate(
   companion object {
     val zero = BlockCoordinate(0, 0, 0)
 
-    fun maxOf(coordinates: Sequence<BlockCoordinate>): BlockCoordinate {
+    fun maxOf(coordinates: List<BlockCoordinate>): BlockCoordinate {
       val x = coordinates.maxOf { it.x }
       val y = coordinates.maxOf { it.y }
       val z = coordinates.maxOf { it.z }
