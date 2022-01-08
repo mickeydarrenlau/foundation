@@ -6,7 +6,8 @@ import cloud.kubelet.foundation.gjallarhorn.util.RandomColorKey
 import java.awt.Color
 import java.awt.image.BufferedImage
 
-class BlockDiversityRenderer(val expanse: BlockExpanse, quadPixelSize: Int = defaultQuadPixelSize) : BlockGridRenderer(quadPixelSize) {
+class BlockDiversityRenderer(val expanse: BlockExpanse, quadPixelSize: Int = defaultQuadPixelSize) :
+  BlockGridRenderer(quadPixelSize) {
   private val randomColorKey = RandomColorKey()
 
   override fun render(map: BlockMap): BufferedImage = buildPixelQuadImage(expanse) { x, z ->

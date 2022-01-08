@@ -57,4 +57,12 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
     }
     return map
   }
+
+  fun replay(changelog: BlockChangelog) = changelog.changes.forEach { change ->
+    if (change.type == BlockChangeType.Break) {
+      delete(change.location)
+    } else {
+      place(change.location, change.to)
+    }
+  }
 }

@@ -14,17 +14,15 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
-import jetbrains.exodus.kotlin.notNull
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.and
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
 
 class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-log") {
   private val db by requireObject<Database>()
@@ -42,13 +40,8 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
 
   override fun run() {
     if (timelapseMode != null) {
-      val (start, end) = transaction(db) {
-        val minTimeColumn = BlockChangeView.time.min().notNull
-        val maxTimeColumn = BlockChangeView.time.max().notNull
-        val row = BlockChangeView.slice(minTimeColumn, maxTimeColumn).selectAll().single()
-        row[minTimeColumn]!! to row[maxTimeColumn]!!
-      }
-
+      val changelog = BlockChangelog.query(db)
+      val (start, end) = changelog.changeTimeRange
       var intervals = mutableListOf<Instant>()
       var current = start
       while (!current.isAfter(end)) {
@@ -65,7 +58,8 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       for (time in intervals) {
         trackerPool.submit {
           val index = intervals.indexOf(time) + 1
-          val tracker = buildTrackerState(time, "Timelapse-${index}")
+          val tracker =
+            buildTrackerState(changelog.slice(time.minus(timelapseMode!!.interval) to time), "Timelapse-${index}")
           if (tracker.isEmpty()) {
             return@submit
           }
@@ -102,51 +96,33 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       logger.info("Rendering Completed")
     } else {
       val time = if (exactTimeAsString != null) Instant.parse(exactTimeAsString) else null
-      val tracker = buildTrackerState(time, "Single-Time")
+      val filter = compose(
+        combine = { a, b -> a and b },
+        { time != null } to { BlockChangeView.time lessEq time!! }
+      )
+      val changelog = BlockChangelog.query(db, filter)
+      val tracker = buildTrackerState(changelog, "Single-Time")
       val expanse = BlockExpanse.offsetAndMax(tracker.calculateZeroBlockOffset(), tracker.calculateMaxBlock())
       saveRenderImage(render.create(expanse), tracker, expanse)
     }
   }
 
-  fun saveRenderImage(renderer: BlockImageRenderer, tracker: BlockLogTracker, expanse: BlockExpanse, suffix: String = "") {
+  fun saveRenderImage(
+    renderer: BlockImageRenderer,
+    tracker: BlockLogTracker,
+    expanse: BlockExpanse,
+    suffix: String = ""
+  ) {
     val map = tracker.buildBlockMap(expanse.offset)
     val image = renderer.render(map)
     image.savePngFile("${render.id}${suffix}.png")
   }
 
-  fun buildTrackerState(time: Instant?, job: String): BlockLogTracker {
-    val filter = compose(
-      combine = { a, b -> a and b },
-      { time != null } to { BlockChangeView.time lessEq time!! }
-    )
-
+  fun buildTrackerState(changelog: BlockChangelog, job: String): BlockLogTracker {
     val tracker =
       BlockLogTracker(if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete)
-
-    val blockChangeCounter = AtomicLong()
-    transaction(db) {
-      BlockChangeView.select(filter).orderBy(BlockChangeView.time).forEach { row ->
-        val changeIsBreak = row[BlockChangeView.isBreak]
-        val x = row[BlockChangeView.x]
-        val y = row[BlockChangeView.y]
-        val z = row[BlockChangeView.z]
-        val block = row[BlockChangeView.block]
-
-        val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
-        if (changeIsBreak) {
-          tracker.delete(location)
-        } else {
-          tracker.place(location, BlockState(block))
-        }
-
-        val count = blockChangeCounter.addAndGet(1)
-        if (count % 1000L == 0L) {
-          logger.info("Job $job Calculating Block Changes... $count")
-        }
-      }
-    }
-    logger.info("Job $job Total Block Changes... ${blockChangeCounter.get()}")
-
+    tracker.replay(changelog)
+    logger.info("Job $job Total Block Changes... ${changelog.changes.size}")
     val uniqueBlockPositions = tracker.blocks.size
     logger.info("Job $job Unique Block Positions... $uniqueBlockPositions")
     maybeTrimState(tracker)

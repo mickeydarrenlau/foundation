@@ -7,7 +7,11 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 
 abstract class BlockHeatMapRenderer(quadPixelSize: Int = defaultQuadPixelSize) : BlockGridRenderer(quadPixelSize) {
-  protected fun buildHeatMapImage(expanse: BlockExpanse, clamp: FloatClamp, calculate: (Long, Long) -> Long?): BufferedImage =
+  protected fun buildHeatMapImage(
+    expanse: BlockExpanse,
+    clamp: FloatClamp,
+    calculate: (Long, Long) -> Long?
+  ): BufferedImage =
     buildPixelQuadImage(expanse) { x, z ->
       val value = calculate(x, z)
       val color = if (value != null) {
