@@ -3,26 +3,18 @@ package cloud.kubelet.foundation.gjallarhorn.util
 import java.awt.Color
 import kotlin.math.max
 
-class ColorGradient {
-  data class ColorPoint(
-    val r: Float,
-    val g: Float,
-    val b: Float,
-    val value: Float
-  ) {
-    fun toColor() = Color(
-      FloatClamp.ColorRgbComponent.convert(r).toInt(),
-      FloatClamp.ColorRgbComponent.convert(g).toInt(),
-      FloatClamp.ColorRgbComponent.convert(b).toInt()
-    )
+class ColorGradient constructor() {
+  constructor(vararg points: ColorGradientPoint) : this() {
+    for (point in points) {
+      addColorPoint(point)
+    }
   }
 
-  private val points = mutableListOf<ColorPoint>()
+  private val points = mutableListOf<ColorGradientPoint>()
 
-  fun addColorPoint(red: Float, green: Float, blue: Float, value: Float) {
-    val point = ColorPoint(red, green, blue, value)
+  fun addColorPoint(point: ColorGradientPoint) {
     for (x in 0 until points.size) {
-      if (value < points[x].value) {
+      if (point.value < points[x].value) {
         points.add(x, point)
         return
       }
@@ -32,7 +24,7 @@ class ColorGradient {
 
   fun getColorAtValue(value: Float): Color {
     if (points.isEmpty()) {
-      return ColorPoint(0f, 0f, 0f, value).toColor()
+      return ColorGradientPoint(0f, 0f, 0f, value).toColor()
     }
 
     for (x in 0 until points.size) {
@@ -41,7 +33,7 @@ class ColorGradient {
         val previous = points[max(0, x - 1)]
         val diff = previous.value - current.value
         val fractionBetween = if (diff == 0f) 0f else (value - current.value) / diff
-        return ColorPoint(
+        return ColorGradientPoint(
           (previous.r - current.r) * fractionBetween + current.r,
           (previous.g - current.g) * fractionBetween + current.g,
           (previous.b - current.b) * fractionBetween + current.b,
@@ -54,12 +46,12 @@ class ColorGradient {
   }
 
   companion object {
-    val HeatMap = ColorGradient().apply {
-      addColorPoint(0f, 0f, 1f, 0.0f)
-      addColorPoint(0f, 1f, 1f, 0.25f)
-      addColorPoint(0f, 1f, 0f, 0.5f)
-      addColorPoint(1f, 1f, 0f, 0.75f)
-      addColorPoint(1f, 0f, 0f, 1.0f)
-    }
+    val HeatMap = ColorGradient(
+      ColorGradientPoint(0f, 0f, 1f, 0.0f),
+      ColorGradientPoint(0f, 1f, 1f, 0.25f),
+      ColorGradientPoint(0f, 1f, 0f, 0.5f),
+      ColorGradientPoint(1f, 1f, 0f, 0.75f),
+      ColorGradientPoint(1f, 0f, 0f, 1.0f)
+    )
   }
 }
