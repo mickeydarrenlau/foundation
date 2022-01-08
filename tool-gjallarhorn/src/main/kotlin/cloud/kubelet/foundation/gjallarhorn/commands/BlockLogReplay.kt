@@ -183,6 +183,7 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
   @Suppress("unused")
   enum class TimelapseMode(val id: String, val interval: Duration) {
     ByHour("hours", Duration.ofHours(1)),
-    ByDay("days", Duration.ofDays(1))
+    ByDay("days", Duration.ofDays(1)),
+    ByFifteenMinutes("fifteen-minutes", Duration.ofMinutes(15))
   }
 }
