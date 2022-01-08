@@ -18,7 +18,7 @@ import java.awt.image.BufferedImage
 import java.time.Duration
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-class BlockChangeCommand : CliktCommand("Block Changes", name = "block-changes") {
+class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name = "block-change-timelapse") {
   private val db by requireObject<Database>()
   private val timelapseIntervalLimit by option("--timelapse-limit", help = "Timelapse Limit Intervals").int()
   private val timelapseMode by option("--timelapse", help = "Timelapse Mode").enum<TimelapseMode> { it.id }.required()
@@ -29,7 +29,7 @@ class BlockChangeCommand : CliktCommand("Block Changes", name = "block-changes")
   private val fromCoordinate by option("--trim-from", help = "Trim From Coordinate")
   private val toCoordinate by option("--trim-to", help = "Trim To Coordinate")
 
-  private val logger = LoggerFactory.getLogger(BlockChangeCommand::class.java)
+  private val logger = LoggerFactory.getLogger(BlockChangeTimelapseCommand::class.java)
 
   override fun run() {
     val threadPoolExecutor = ScheduledThreadPoolExecutor(8)
