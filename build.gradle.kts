@@ -125,7 +125,7 @@ subprojects {
     }
   }
 
-  if (project.isFoundationTool()) {
+  if (project.isFoundationPlugin()) {
     tasks.withType<ShadowJar> {
       archiveClassifier.set("plugin")
     }
