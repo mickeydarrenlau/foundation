@@ -1,8 +1,10 @@
 package cloud.kubelet.foundation.gjallarhorn.commands
 
+import cloud.kubelet.foundation.gjallarhorn.render.BlockDiversityRenderer
+import cloud.kubelet.foundation.gjallarhorn.render.BlockHeightMapRenderer
+import cloud.kubelet.foundation.gjallarhorn.render.BlockImageRenderer
+import cloud.kubelet.foundation.gjallarhorn.state.*
 import cloud.kubelet.foundation.gjallarhorn.util.compose
-import cloud.kubelet.foundation.gjallarhorn.render.*
-import cloud.kubelet.foundation.gjallarhorn.util.RandomColorKey
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
 import cloud.kubelet.foundation.heimdall.view.BlockChangeView
 import com.github.ajalt.clikt.core.CliktCommand
@@ -17,7 +19,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
-import java.awt.image.BufferedImage
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -60,7 +61,7 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       }
 
       val trackerPool = ScheduledThreadPoolExecutor(8)
-      val trackers = ConcurrentHashMap<Int, BlockStateTracker>()
+      val trackers = ConcurrentHashMap<Int, BlockLogTracker>()
       for (time in intervals) {
         trackerPool.submit {
           val index = intervals.indexOf(time) + 1
@@ -77,19 +78,20 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       }
       logger.info("State Tracking Completed")
       val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
-      val globalBlockOffset = BlockPosition.maxOf(allBlockOffsets.asSequence())
+      val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets.asSequence())
       val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
-      val globalBlockMax = BlockPosition.maxOf(allBlockMaxes.asSequence())
+      val globalBlockMax = BlockCoordinate.maxOf(allBlockMaxes.asSequence())
       val globalBlockExpanse = BlockExpanse.offsetAndMax(globalBlockOffset, globalBlockMax)
 
       logger.info("Calculations Completed")
 
-      val renderState = render.createState()
+      val renderer = render.create(globalBlockExpanse)
       val renderPool = ScheduledThreadPoolExecutor(16)
+      val imagePadCount = trackers.size.toString().length
       for ((i, tracker) in trackers.entries) {
         renderPool.submit {
-          val count = trackers.size.toString().length
-          saveRenderImage(renderState, tracker, globalBlockExpanse, "-${i.toString().padStart(count, '0')}")
+          val suffix = "-${i.toString().padStart(imagePadCount, '0')}"
+          saveRenderImage(renderer, tracker, globalBlockExpanse, suffix)
           logger.info("Rendered Timelapse $i")
         }
       }
@@ -102,25 +104,24 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
       val time = if (exactTimeAsString != null) Instant.parse(exactTimeAsString) else null
       val tracker = buildTrackerState(time, "Single-Time")
       val expanse = BlockExpanse.offsetAndMax(tracker.calculateZeroBlockOffset(), tracker.calculateMaxBlock())
-      saveRenderImage(render.createState(), tracker, expanse)
+      saveRenderImage(render.create(expanse), tracker, expanse)
     }
   }
 
-  fun saveRenderImage(renderState: Any, tracker: BlockStateTracker, expanse: BlockExpanse, suffix: String = "") {
-    val state = BlockStateImage()
-    tracker.populateStateImage(state, expanse.offset)
-    val image = render.renderBufferedImage(renderState, state, expanse)
+  fun saveRenderImage(renderer: BlockImageRenderer, tracker: BlockLogTracker, expanse: BlockExpanse, suffix: String = "") {
+    val map = tracker.buildBlockMap(expanse.offset)
+    val image = renderer.render(map)
     image.savePngFile("${render.id}${suffix}.png")
   }
 
-  fun buildTrackerState(time: Instant?, job: String): BlockStateTracker {
+  fun buildTrackerState(time: Instant?, job: String): BlockLogTracker {
     val filter = compose(
       combine = { a, b -> a and b },
       { time != null } to { BlockChangeView.time lessEq time!! }
     )
 
     val tracker =
-      BlockStateTracker(if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete)
+      BlockLogTracker(if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete)
 
     val blockChangeCounter = AtomicLong()
     transaction(db) {
@@ -131,7 +132,7 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
         val z = row[BlockChangeView.z]
         val block = row[BlockChangeView.block]
 
-        val location = BlockPosition(x.toLong(), y.toLong(), z.toLong())
+        val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
         if (changeIsBreak) {
           tracker.delete(location)
         } else {
@@ -152,7 +153,7 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
     return tracker
   }
 
-  fun maybeTrimState(tracker: BlockStateTracker) {
+  fun maybeTrimState(tracker: BlockLogTracker) {
     if (fromCoordinate == null || toCoordinate == null) {
       return
     }
@@ -160,8 +161,8 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
     val from = fromCoordinate!!.split(",").map { it.toLong() }
     val to = toCoordinate!!.split(",").map { it.toLong() }
 
-    val fromBlock = BlockPosition(from[0], 0, from[1])
-    val toBlock = BlockPosition(to[0], 0, to[1])
+    val fromBlock = BlockCoordinate(from[0], 0, from[1])
+    val toBlock = BlockCoordinate(to[0], 0, to[1])
 
     tracker.trimOutsideXAndZRange(fromBlock, toBlock)
   }
@@ -169,16 +170,11 @@ class BlockLogReplay : CliktCommand("Replay Block Logs", name = "replay-block-lo
   @Suppress("unused")
   enum class RenderType(
     val id: String,
-    val createState: () -> Any,
-    val renderBufferedImage: (Any, BlockStateImage, BlockExpanse) -> BufferedImage
+    val create: (BlockExpanse) -> BlockImageRenderer
   ) {
-    TopDown("top-down",
-      { TopDownState(RandomColorKey()) },
-      { state, image, expanse -> image.buildTopDownImage(expanse, (state as TopDownState).randomColorKey) }),
-    HeightMap("height-map", { }, { _, image, expanse -> image.buildHeightMapImage(expanse) })
+    BlockDiversity("block-diversity", { expanse -> BlockDiversityRenderer(expanse) }),
+    HeightMap("height-map", { expanse -> BlockHeightMapRenderer(expanse) })
   }
-
-  class TopDownState(val randomColorKey: RandomColorKey)
 
   @Suppress("unused")
   enum class TimelapseMode(val id: String, val interval: Duration) {

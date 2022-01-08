@@ -1,15 +1,15 @@
-package cloud.kubelet.foundation.gjallarhorn.render
+package cloud.kubelet.foundation.gjallarhorn.state
 
 import kotlin.math.absoluteValue
 
-class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete) {
-  val blocks = HashMap<BlockPosition, BlockState>()
+class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete) {
+  val blocks = HashMap<BlockCoordinate, BlockState>()
 
-  fun place(position: BlockPosition, state: BlockState) {
+  fun place(position: BlockCoordinate, state: BlockState) {
     blocks[position] = state
   }
 
-  fun delete(position: BlockPosition) {
+  fun delete(position: BlockCoordinate) {
     if (mode == BlockTrackMode.AirOnDelete) {
       blocks[position] = BlockState("minecraft:air")
     } else {
@@ -17,7 +17,7 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     }
   }
 
-  fun trimOutsideXAndZRange(min: BlockPosition, max: BlockPosition) {
+  fun trimOutsideXAndZRange(min: BlockCoordinate, max: BlockCoordinate) {
     val blockPositionsToRemove = blocks.keys.filter {
       it.x < min.x ||
           it.z < min.z ||
@@ -28,7 +28,7 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     blockPositionsToRemove.forEach { blocks.remove(it) }
   }
 
-  fun calculateZeroBlockOffset(): BlockPosition {
+  fun calculateZeroBlockOffset(): BlockCoordinate {
     val x = blocks.keys.minOf { it.x }
     val y = blocks.keys.minOf { it.y }
     val z = blocks.keys.minOf { it.z }
@@ -37,22 +37,24 @@ class BlockStateTracker(private val mode: BlockTrackMode = BlockTrackMode.Remove
     val yOffset = if (y < 0) y.absoluteValue else 0
     val zOffset = if (z < 0) z.absoluteValue else 0
 
-    return BlockPosition(xOffset, yOffset, zOffset)
+    return BlockCoordinate(xOffset, yOffset, zOffset)
   }
 
-  fun calculateMaxBlock(): BlockPosition {
+  fun calculateMaxBlock(): BlockCoordinate {
     val x = blocks.keys.maxOf { it.x }
     val y = blocks.keys.maxOf { it.y }
     val z = blocks.keys.maxOf { it.z }
-    return BlockPosition(x, y, z)
+    return BlockCoordinate(x, y, z)
   }
 
   fun isEmpty() = blocks.isEmpty()
 
-  fun populateStateImage(image: BlockStateImage, offset: BlockPosition = BlockPosition.zero) {
+  fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): BlockMap {
+    val map = BlockMap()
     blocks.forEach { (position, state) ->
       val realPosition = offset.applyAsOffset(position)
-      image.put(realPosition, state)
+      map.put(realPosition, state)
     }
+    return map
   }
 }
