@@ -5,17 +5,16 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
 
 class BlockChangelog(
   val changes: List<BlockChange>
 ) {
-  fun slice(range: Pair<Instant, Instant>): BlockChangelog = BlockChangelog(changes.filter {
-    it.time >= range.first &&
-        it.time <= range.second
+  fun slice(slice: BlockChangelogSlice): BlockChangelog = BlockChangelog(changes.filter {
+    it.time >= slice.first &&
+        it.time <= slice.second
   })
 
-  val changeTimeRange: Pair<Instant, Instant>
+  val changeTimeRange: BlockChangelogSlice
     get() = changes.minOf { it.time } to changes.maxOf { it.time }
 
   companion object {
