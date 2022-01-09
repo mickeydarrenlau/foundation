@@ -10,12 +10,15 @@ class BlockChangelog(
   val changes: List<BlockChange>
 ) {
   fun slice(slice: BlockChangelogSlice): BlockChangelog = BlockChangelog(changes.filter {
-    it.time >= slice.first &&
-        it.time <= slice.second
+    slice.isTimeWithin(it.time)
   })
 
+  fun countRelativeChangesInSlice(slice: BlockChangelogSlice): Int = changes.count {
+    slice.isRelativeWithin(it.time)
+  }
+
   val changeTimeRange: BlockChangelogSlice
-    get() = changes.minOf { it.time } to changes.maxOf { it.time }
+    get() = BlockChangelogSlice(changes.minOf { it.time }, changes.maxOf { it.time })
 
   companion object {
     fun query(db: Database, filter: Op<Boolean> = Op.TRUE): BlockChangelog = transaction(db) {

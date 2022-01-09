@@ -14,6 +14,9 @@ import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import org.jetbrains.exposed.sql.Database
 import org.slf4j.LoggerFactory
+import java.awt.Color
+import java.awt.Font
+import java.awt.font.TextLayout
 import java.awt.image.BufferedImage
 import java.time.Duration
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -22,6 +25,15 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   private val db by requireObject<Database>()
   private val timelapseIntervalLimit by option("--timelapse-limit", help = "Timelapse Limit Intervals").int()
   private val timelapseMode by option("--timelapse", help = "Timelapse Mode").enum<TimelapseMode> { it.id }.required()
+  private val timelapseSpeedChangeThreshold by option(
+    "--timelapse-change-speed-threshold",
+    help = "Timelapse Change Speed Threshold"
+  ).int()
+  private val timelapseSpeedChangeMinimumIntervalSeconds by option(
+    "--timelapse-change-speed-minimum-interval-seconds",
+    help = "Timelapse Change Speed Minimum Interval Seconds"
+  ).int()
+
   private val render by option("--render", help = "Render Top Down Image").enum<RenderType> { it.id }.required()
 
   private val considerAirBlocks by option("--consider-air-blocks", help = "Enable Air Block Consideration").flag()
@@ -32,10 +44,20 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   private val logger = LoggerFactory.getLogger(BlockChangeTimelapseCommand::class.java)
 
   override fun run() {
-    val threadPoolExecutor = ScheduledThreadPoolExecutor(8)
+    val threadPoolExecutor = ScheduledThreadPoolExecutor(16)
     val changelog = BlockChangelog.query(db)
     val timelapse = BlockMapTimelapse<BufferedImage>(maybeBuildTrim())
-    val slices = timelapse.calculateChangelogSlices(changelog, timelapseMode.interval, timelapseIntervalLimit)
+    var slices = timelapse.calculateChangelogSlices(changelog, timelapseMode.interval, timelapseIntervalLimit)
+
+    if (timelapseSpeedChangeThreshold != null && timelapseSpeedChangeMinimumIntervalSeconds != null) {
+      val minimumInterval = Duration.ofSeconds(timelapseSpeedChangeMinimumIntervalSeconds!!.toLong())
+      val blockChangeThreshold = timelapseSpeedChangeThreshold!!
+
+      slices = timelapse.splitChangelogSlicesWithThreshold(changelog, blockChangeThreshold, minimumInterval, slices)
+    }
+
+    logger.info("Timelapse Slices: ${slices.size} slices")
+
     val imagePadCount = slices.size.toString().length
     val pool = BlockMapRenderPool(
       changelog = changelog,
@@ -44,10 +66,20 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       rendererFactory = { expanse -> render.create(expanse) },
       threadPoolExecutor = threadPoolExecutor
     ) { slice, result ->
+      val speed = slice.relative.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
+      val graphics = result.createGraphics()
+      val font = Font.decode("Arial Black").deriveFont(36.0f)
+      graphics.color = Color.black
+      graphics.font = font
+      val context = graphics.fontRenderContext
+      val layout =
+        TextLayout("${slice.to} @ ${speed}x (1 frame = ${slice.relative.toSeconds()} seconds)", font, context)
+      layout.draw(graphics, 60f, 60f)
+      graphics.dispose()
       val index = slices.indexOf(slice) + 1
       val suffix = "-${index.toString().padStart(imagePadCount, '0')}"
       result.savePngFile("${render.id}${suffix}.png")
-      logger.info("Rendered Timelapse $index")
+      logger.info("Rendered Timelapse Slice $index")
     }
 
     pool.render(slices)

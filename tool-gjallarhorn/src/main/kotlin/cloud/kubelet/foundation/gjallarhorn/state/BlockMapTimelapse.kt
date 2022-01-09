@@ -19,7 +19,26 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
     if (limit != null) {
       intervals = intervals.takeLast(limit).toMutableList()
     }
-    return intervals.map { start to it }
+    return intervals.map { BlockChangelogSlice(start, it, interval) }
+  }
+
+  fun splitChangelogSlicesWithThreshold(
+    changelog: BlockChangelog,
+    targetChangeThreshold: Int,
+    minimumTimeInterval: Duration,
+    slices: List<BlockChangelogSlice>
+  ): List<BlockChangelogSlice> {
+    return slices.flatMap { slice ->
+      val count = changelog.countRelativeChangesInSlice(slice)
+      if (count < targetChangeThreshold ||
+        slice.relative < minimumTimeInterval
+      ) {
+        return@flatMap listOf(slice)
+      }
+
+      val split = slice.split()
+      return@flatMap splitChangelogSlicesWithThreshold(changelog, targetChangeThreshold, minimumTimeInterval, split)
+    }
   }
 
   override fun buildRenderJobs(
