@@ -59,14 +59,13 @@ class BlockMapRenderPool<T>(
     val sliced = changelog.slice(slice)
     val tracker = BlockLogTracker(blockTrackMode)
     tracker.replay(sliced)
-    if (tracker.isEmpty()) {
-      return
+    if (tracker.isNotEmpty()) {
+      trackers[slice] = tracker
     }
-    trackers[slice] = tracker
   }
 
   interface RenderPoolDelegate<T> {
-    fun buildRenderJobs(pool: BlockMapRenderPool<T>, trackers: Map<BlockChangelogSlice, BlockLogTracker>)
+    fun buildRenderJobs(pool: BlockMapRenderPool<T>, trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>)
   }
 
   companion object {

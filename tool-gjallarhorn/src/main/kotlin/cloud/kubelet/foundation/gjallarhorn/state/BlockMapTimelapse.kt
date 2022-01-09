@@ -19,10 +19,25 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
     if (limit != null) {
       intervals = intervals.takeLast(limit).toMutableList()
     }
-    return intervals.map { it.minus(interval) to it }
+    return intervals.map { start to it }
   }
 
-  override fun buildRenderJobs(pool: BlockMapRenderPool<T>, trackers: Map<BlockChangelogSlice, BlockLogTracker>) {
+  override fun buildRenderJobs(
+    pool: BlockMapRenderPool<T>,
+    trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>
+  ) {
+    if (trim != null) {
+      trackers.values.forEach { tracker ->
+        tracker.trimOutsideXAndZRange(trim.first, trim.second)
+      }
+    }
+
+    for ((slice, tracker) in trackers.entries.toList()) {
+      if (tracker.isEmpty()) {
+        trackers.remove(slice)
+      }
+    }
+
     val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
     val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets)
     val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
@@ -31,8 +46,8 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
 
     val renderer = pool.rendererFactory(globalBlockExpanse)
     for ((slice, tracker) in trackers) {
-      if (trim != null) {
-        tracker.trimOutsideXAndZRange(trim.first, trim.second)
+      if (tracker.isEmpty()) {
+        continue
       }
 
       pool.submitRenderJob(slice) {
