@@ -2,6 +2,7 @@ package cloud.kubelet.foundation.gjallarhorn.state
 
 import java.time.Duration
 import java.time.Instant
+import java.util.stream.Stream
 
 class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = null) :
   BlockMapRenderPool.RenderPoolDelegate<T> {
@@ -28,35 +29,23 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
     minimumTimeInterval: Duration,
     slices: List<BlockChangelogSlice>
   ): List<BlockChangelogSlice> {
-    return slices.flatMap { slice ->
+    return slices.parallelStream().flatMap { slice ->
       val count = changelog.countRelativeChangesInSlice(slice)
       if (count < targetChangeThreshold ||
         slice.relative < minimumTimeInterval
       ) {
-        return@flatMap listOf(slice)
+        return@flatMap Stream.of(slice)
       }
 
       val split = slice.split()
-      return@flatMap splitChangelogSlicesWithThreshold(changelog, targetChangeThreshold, minimumTimeInterval, split)
-    }
+      return@flatMap splitChangelogSlicesWithThreshold(changelog, targetChangeThreshold, minimumTimeInterval, split).parallelStream()
+    }.toList()
   }
 
   override fun buildRenderJobs(
     pool: BlockMapRenderPool<T>,
     trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>
   ) {
-    if (trim != null) {
-      trackers.values.forEach { tracker ->
-        tracker.trimOutsideXAndZRange(trim.first, trim.second)
-      }
-    }
-
-    for ((slice, tracker) in trackers.entries.toList()) {
-      if (tracker.isEmpty()) {
-        trackers.remove(slice)
-      }
-    }
-
     val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
     val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets)
     val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
@@ -65,14 +54,16 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
 
     val renderer = pool.rendererFactory(globalBlockExpanse)
     for ((slice, tracker) in trackers) {
-      if (tracker.isEmpty()) {
-        continue
-      }
-
       pool.submitRenderJob(slice) {
         val map = tracker.buildBlockMap(globalBlockExpanse.offset)
         renderer.render(map)
       }
+    }
+  }
+
+  override fun postProcessTracker(tracker: BlockLogTracker) {
+    if (trim != null) {
+      tracker.trimOutsideXAndZRange(trim.first, trim.second)
     }
   }
 }

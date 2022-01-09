@@ -2,13 +2,14 @@ package cloud.kubelet.foundation.gjallarhorn.render
 
 import cloud.kubelet.foundation.gjallarhorn.state.BlockExpanse
 import cloud.kubelet.foundation.gjallarhorn.state.BlockMap
-import cloud.kubelet.foundation.gjallarhorn.util.RandomColorKey
+import cloud.kubelet.foundation.gjallarhorn.util.BlockColorKey
+import cloud.kubelet.foundation.gjallarhorn.util.defaultBlockColorMap
 import java.awt.Color
 import java.awt.image.BufferedImage
 
 class BlockDiversityRenderer(val expanse: BlockExpanse, quadPixelSize: Int = defaultQuadPixelSize) :
   BlockGridRenderer(quadPixelSize) {
-  private val randomColorKey = RandomColorKey()
+  private val blockColorKey = BlockColorKey(defaultBlockColorMap)
 
   override fun render(map: BlockMap): BufferedImage = buildPixelQuadImage(expanse) { graphics, x, z ->
     val maybeYBlocks = map.blocks[x]?.get(z)
@@ -22,7 +23,7 @@ class BlockDiversityRenderer(val expanse: BlockExpanse, quadPixelSize: Int = def
       return@buildPixelQuadImage
     }
 
-    val color = randomColorKey.map(maxBlockState.type)
+    val color = blockColorKey.map(maxBlockState.type)
     setPixelQuad(graphics, x, z, color.rgb)
   }
 }

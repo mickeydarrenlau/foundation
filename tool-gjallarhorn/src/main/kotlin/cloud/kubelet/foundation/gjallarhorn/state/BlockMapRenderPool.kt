@@ -16,12 +16,12 @@ class BlockMapRenderPool<T>(
   private val playbackJobFutures = ConcurrentHashMap<BlockChangelogSlice, Future<*>>()
   private val renderJobFutures = ConcurrentHashMap<BlockChangelogSlice, Future<*>>()
 
-  fun submitPlaybackJob(slice: BlockChangelogSlice) {
+  fun submitPlaybackJob(id: String, slice: BlockChangelogSlice) {
     val future = threadPoolExecutor.submit {
       try {
-        runPlaybackSlice(slice)
+        runPlaybackSlice(id, slice)
       } catch (e: Exception) {
-        logger.error("Failed to run playback job for slice $slice", e)
+        logger.error("Failed to run playback job for slice $id", e)
       }
     }
     playbackJobFutures[slice] = future
@@ -41,7 +41,7 @@ class BlockMapRenderPool<T>(
 
   fun render(slices: List<BlockChangelogSlice>) {
     for (slice in slices) {
-      submitPlaybackJob(slice)
+      submitPlaybackJob((slices.indexOf(slice) + 1).toString(), slice)
     }
 
     for (future in playbackJobFutures.values) {
@@ -55,16 +55,22 @@ class BlockMapRenderPool<T>(
     }
   }
 
-  private fun runPlaybackSlice(slice: BlockChangelogSlice) {
+  private fun runPlaybackSlice(id: String, slice: BlockChangelogSlice) {
+    val start = System.currentTimeMillis()
     val sliced = changelog.slice(slice)
     val tracker = BlockLogTracker(blockTrackMode)
     tracker.replay(sliced)
+    delegate.postProcessTracker(tracker)
     if (tracker.isNotEmpty()) {
       trackers[slice] = tracker
     }
+    val end = System.currentTimeMillis()
+    val timeInMilliseconds = end - start
+    logger.info("Playback Completed for Slice $id in ${timeInMilliseconds}ms")
   }
 
   interface RenderPoolDelegate<T> {
+    fun postProcessTracker(tracker: BlockLogTracker)
     fun buildRenderJobs(pool: BlockMapRenderPool<T>, trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>)
   }
 
