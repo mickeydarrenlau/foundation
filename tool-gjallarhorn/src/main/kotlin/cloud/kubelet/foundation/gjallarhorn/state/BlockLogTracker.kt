@@ -17,17 +17,6 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
     }
   }
 
-  fun trimOutsideXAndZRange(min: BlockCoordinate, max: BlockCoordinate) {
-    val blockPositionsToRemove = blocks.keys.filter {
-      it.x < min.x ||
-          it.z < min.z ||
-          it.x > max.x ||
-          it.z > max.z
-    }.toList()
-
-    blockPositionsToRemove.forEach { blocks.remove(it) }
-  }
-
   fun calculateZeroBlockOffset(): BlockCoordinate {
     val x = blocks.keys.minOf { it.x }
     val y = blocks.keys.minOf { it.y }
@@ -48,7 +37,7 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   }
 
   fun isEmpty() = blocks.isEmpty()
-  fun isNotEmpty() = blocks.isNotEmpty()
+  fun isNotEmpty() = !isEmpty()
 
   fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): BlockMap {
     val map = BlockMap()

@@ -4,7 +4,9 @@ import cloud.kubelet.foundation.gjallarhorn.render.BlockDiversityRenderer
 import cloud.kubelet.foundation.gjallarhorn.render.BlockHeightMapRenderer
 import cloud.kubelet.foundation.gjallarhorn.render.BlockImageRenderer
 import cloud.kubelet.foundation.gjallarhorn.state.*
+import cloud.kubelet.foundation.gjallarhorn.util.compose
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
+import cloud.kubelet.foundation.heimdall.view.BlockChangeView
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.flag
@@ -13,6 +15,9 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.and
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.awt.Font
@@ -45,8 +50,19 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
 
   override fun run() {
     val threadPoolExecutor = ScheduledThreadPoolExecutor(16)
-    val changelog = BlockChangelog.query(db)
-    val timelapse = BlockMapTimelapse<BufferedImage>(maybeBuildTrim())
+
+    val trim = maybeBuildTrim()
+    val filter = compose(
+      combine = { a, b -> a and b },
+    { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x },
+      { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z },
+      { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x },
+      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z }
+    )
+
+    val changelog = BlockChangelog.query(db, filter)
+    logger.info("Block Changelog: ${changelog.changes.size} changes")
+    val timelapse = BlockMapTimelapse<BufferedImage>()
     var slices = timelapse.calculateChangelogSlices(changelog, timelapseMode.interval, timelapseIntervalLimit)
 
     if (timelapseSpeedChangeThreshold != null && timelapseSpeedChangeMinimumIntervalSeconds != null) {

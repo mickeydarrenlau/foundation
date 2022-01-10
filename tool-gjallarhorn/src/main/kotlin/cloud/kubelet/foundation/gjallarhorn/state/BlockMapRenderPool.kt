@@ -60,7 +60,6 @@ class BlockMapRenderPool<T>(
     val sliced = changelog.slice(slice)
     val tracker = BlockLogTracker(blockTrackMode)
     tracker.replay(sliced)
-    delegate.postProcessTracker(tracker)
     if (tracker.isNotEmpty()) {
       trackers[slice] = tracker
     }
@@ -70,7 +69,6 @@ class BlockMapRenderPool<T>(
   }
 
   interface RenderPoolDelegate<T> {
-    fun postProcessTracker(tracker: BlockLogTracker)
     fun buildRenderJobs(pool: BlockMapRenderPool<T>, trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>)
   }
 

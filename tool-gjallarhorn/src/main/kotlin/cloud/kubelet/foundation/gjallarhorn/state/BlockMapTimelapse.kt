@@ -4,7 +4,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.stream.Stream
 
-class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = null) :
+class BlockMapTimelapse<T> :
   BlockMapRenderPool.RenderPoolDelegate<T> {
   fun calculateChangelogSlices(
     changelog: BlockChangelog, interval: Duration, limit: Int? = null
@@ -46,6 +46,10 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
     pool: BlockMapRenderPool<T>,
     trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>
   ) {
+    if (trackers.isEmpty()) {
+      return
+    }
+
     val allBlockOffsets = trackers.map { it.value.calculateZeroBlockOffset() }
     val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets)
     val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
@@ -58,12 +62,6 @@ class BlockMapTimelapse<T>(val trim: Pair<BlockCoordinate, BlockCoordinate>? = n
         val map = tracker.buildBlockMap(globalBlockExpanse.offset)
         renderer.render(map)
       }
-    }
-  }
-
-  override fun postProcessTracker(tracker: BlockLogTracker) {
-    if (trim != null) {
-      tracker.trimOutsideXAndZRange(trim.first, trim.second)
     }
   }
 }
