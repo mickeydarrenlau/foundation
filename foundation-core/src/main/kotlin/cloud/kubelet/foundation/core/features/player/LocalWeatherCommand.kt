@@ -1,6 +1,5 @@
 package cloud.kubelet.foundation.core.features.player
 
-import org.bukkit.GameMode
 import org.bukkit.WeatherType
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -45,6 +44,7 @@ class LocalWeatherCommand : CommandExecutor, TabCompleter {
     args: Array<out String>
   ): List<String> = when {
     args.isEmpty() -> weatherTypes.keys.toList()
+    args.size == 1 -> weatherTypes.filterKeys { it.startsWith(args[0]) }.keys.toList()
     else -> listOf()
   }
 }

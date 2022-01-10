@@ -60,3 +60,5 @@ commands:
   localweather:
     description: Set the player's local weather in the client.
     usage: /localweather <type>
+    aliases:
+      - lw
