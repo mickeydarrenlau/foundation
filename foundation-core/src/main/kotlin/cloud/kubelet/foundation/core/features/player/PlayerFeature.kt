@@ -9,5 +9,6 @@ class PlayerFeature : Feature() {
     registerCommandExecutor(listOf("creative", "c"), GamemodeCommand(GameMode.CREATIVE))
     registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
     registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
+    registerCommandExecutor(listOf("localweather", "lw"), LocalWeatherCommand())
   }
 }

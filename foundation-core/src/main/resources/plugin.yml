@@ -57,3 +57,6 @@ commands:
     description: Teleport to the spawn of the current world.
     usage: /spawn
     permission: foundation.command.spawn
+  localweather:
+    description: Set the player's local weather in the client.
+    usage: /localweather <type>
