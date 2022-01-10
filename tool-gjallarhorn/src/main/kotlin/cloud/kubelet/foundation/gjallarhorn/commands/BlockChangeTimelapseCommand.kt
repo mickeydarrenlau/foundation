@@ -59,6 +59,7 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     logger.info("Timelapse Slices: ${slices.size} slices")
 
     val imagePadCount = slices.size.toString().length
+
     val pool = BlockMapRenderPool(
       changelog = changelog,
       blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
@@ -68,12 +69,13 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     ) { slice, result ->
       val speed = slice.relative.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
       val graphics = result.createGraphics()
-      val font = Font.decode("Arial Black").deriveFont(36.0f)
+      val font = Font.decode("Arial Black").deriveFont(24.0f)
       graphics.color = Color.black
       graphics.font = font
       val context = graphics.fontRenderContext
+      val text = String.format("%s @ %.4f speed (1 frame = %s sec)", slice.to, speed, slice.relative.toSeconds())
       val layout =
-        TextLayout("${slice.to} @ ${speed}x (1 frame = ${slice.relative.toSeconds()} seconds)", font, context)
+        TextLayout(text, font, context)
       layout.draw(graphics, 60f, 60f)
       graphics.dispose()
       val index = slices.indexOf(slice) + 1

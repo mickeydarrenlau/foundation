@@ -25,7 +25,7 @@ abstract class BlockGridRenderer(val quadPixelSize: Int = defaultQuadPixelSize) 
     val widthInPixels = widthInBlocks.toInt() * quadPixelSize
     val heightInPixels = heightInBlocks.toInt() * quadPixelSize
     val bufferedImage =
-      BufferedImage(widthInPixels, heightInPixels, BufferedImage.TYPE_4BYTE_ABGR)
+      BufferedImage(widthInPixels, heightInPixels, BufferedImage.TYPE_3BYTE_BGR)
 
     val graphics = bufferedImage.createGraphics()
     for (x in 0 until widthInBlocks) {

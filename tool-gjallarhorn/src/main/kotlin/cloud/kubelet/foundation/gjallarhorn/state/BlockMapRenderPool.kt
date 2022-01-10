@@ -66,7 +66,7 @@ class BlockMapRenderPool<T>(
     }
     val end = System.currentTimeMillis()
     val timeInMilliseconds = end - start
-    logger.info("Playback Completed for Slice $id in ${timeInMilliseconds}ms")
+    logger.debug("Playback Completed for Slice $id in ${timeInMilliseconds}ms")
   }
 
   interface RenderPoolDelegate<T> {
