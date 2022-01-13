@@ -5,9 +5,7 @@ import java.io.FileWriter
 
 plugins {
   java
-  id("org.jetbrains.kotlin.jvm") version "1.6.10" apply false
-  id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10" apply false
-  id("com.github.johnrengelman.shadow") version "7.1.1" apply false
+  id("foundation-gradle")
 }
 
 fun Project.isFoundationPlugin() = name.startsWith("foundation-")
@@ -23,6 +21,7 @@ allprojects {
       name = "papermc-repo"
       url = uri("https://papermc.io/repo/repository/maven-public/")
     }
+
     maven {
       name = "sonatype"
       url = uri("https://oss.sonatype.org/content/groups/public/")
@@ -134,4 +133,9 @@ subprojects {
   tasks.assemble {
     dependsOn("shadowJar")
   }
+}
+
+tasks.setupPaperServer {
+  minecraftServerPath = "server"
+  paperVersionGroup = "1.18"
 }
