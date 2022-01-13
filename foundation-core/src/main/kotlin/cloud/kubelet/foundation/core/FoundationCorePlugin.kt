@@ -3,6 +3,7 @@ package cloud.kubelet.foundation.core
 import cloud.kubelet.foundation.core.abstraction.FoundationPlugin
 import cloud.kubelet.foundation.core.features.backup.BackupFeature
 import cloud.kubelet.foundation.core.features.dev.DevFeature
+import cloud.kubelet.foundation.core.features.endergrief.EndergriefFeature
 import cloud.kubelet.foundation.core.features.player.PlayerFeature
 import cloud.kubelet.foundation.core.features.stats.StatsFeature
 import cloud.kubelet.foundation.core.features.update.UpdateFeature
@@ -47,6 +48,7 @@ class FoundationCorePlugin : FoundationPlugin() {
     StatsFeature(),
     UpdateFeature(),
     WorldFeature(),
+    EndergriefFeature(),
   )
 
   override fun createModule() = module {

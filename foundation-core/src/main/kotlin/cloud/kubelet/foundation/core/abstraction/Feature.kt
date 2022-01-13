@@ -10,7 +10,7 @@ import org.koin.dsl.module
 import org.quartz.Scheduler
 
 abstract class Feature : CoreFeature, KoinComponent, Listener {
-  private val plugin by inject<FoundationCorePlugin>()
+  protected val plugin by inject<FoundationCorePlugin>()
   protected val scheduler by inject<Scheduler>()
 
   override fun enable() {}

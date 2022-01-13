@@ -16,7 +16,6 @@ import java.net.URI
 import kotlin.io.path.inputStream
 
 class BackupFeature : Feature() {
-  private val plugin by inject<FoundationCorePlugin>()
   private val s3Client by inject<S3Client>()
   private val config by inject<BackupConfig>()
   private lateinit var scheduleId: String
