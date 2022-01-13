@@ -1,0 +1,14 @@
+# Configuration that allows fine-tuning of various gameplay aspects.
+
+# Settings which affect mob entities.
+mobs:
+  # Disable the ability for an Enderman to pick up blocks.
+  # When set to true, an Enderman cannot pick up or place blocks. :(
+  # When set to false, an Enderman is allowed to pick up blocks.
+  disableEndermanGriefing: false
+
+  # Disable freeze damage that occurs to all mobs.
+  # Note: This does not impact players, that is still controlled with the freezeDamage game-rule.
+  # When set to true, mobs will not take damage from freezing.
+  # When set to false, mobs take damage from freezing.
+  disableFreezeDamage: false

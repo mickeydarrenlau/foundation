@@ -3,13 +3,13 @@ package cloud.kubelet.foundation.core
 import cloud.kubelet.foundation.core.abstraction.FoundationPlugin
 import cloud.kubelet.foundation.core.features.backup.BackupFeature
 import cloud.kubelet.foundation.core.features.dev.DevFeature
-import cloud.kubelet.foundation.core.features.endergrief.EndergriefFeature
+import cloud.kubelet.foundation.core.features.gameplay.GameplayFeature
+import cloud.kubelet.foundation.core.features.persist.PersistenceFeature
 import cloud.kubelet.foundation.core.features.player.PlayerFeature
+import cloud.kubelet.foundation.core.features.scheduler.SchedulerFeature
 import cloud.kubelet.foundation.core.features.stats.StatsFeature
 import cloud.kubelet.foundation.core.features.update.UpdateFeature
 import cloud.kubelet.foundation.core.features.world.WorldFeature
-import cloud.kubelet.foundation.core.features.persist.PersistenceFeature
-import cloud.kubelet.foundation.core.features.scheduler.SchedulerFeature
 import org.koin.dsl.module
 import java.nio.file.Path
 
@@ -44,11 +44,11 @@ class FoundationCorePlugin : FoundationPlugin() {
     PersistenceFeature(),
     BackupFeature(),
     DevFeature(),
+    GameplayFeature(),
     PlayerFeature(),
     StatsFeature(),
     UpdateFeature(),
     WorldFeature(),
-    EndergriefFeature(),
   )
 
   override fun createModule() = module {
