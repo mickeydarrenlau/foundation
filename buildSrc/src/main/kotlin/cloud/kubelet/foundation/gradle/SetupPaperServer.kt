@@ -3,34 +3,35 @@ package cloud.kubelet.foundation.gradle
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
+import org.gradle.kotlin.dsl.getByType
+import java.io.File
 import java.nio.file.Files
 
 open class SetupPaperServer : DefaultTask() {
-  @get:Input
-  lateinit var paperVersionGroup: String
+  init {
+    outputs.upToDateWhen { false }
+  }
 
   @get:Input
-  lateinit var minecraftServerPath: String
+  @set:Option(option = "update", description = "Update Paper Server")
+  var shouldUpdatePaperServer = false
+
+  private val paperVersionClient = PaperVersionClient()
 
   @TaskAction
   fun downloadPaperTask() {
-    val minecraftServerDirectory = project.file(minecraftServerPath)
-    val client = PaperVersionClient()
-    val builds = client.getVersionBuilds(paperVersionGroup)
-    val build = builds.last()
-    val download = build.downloads["application"]!!
-    val url = client.resolveDownloadUrl(build, download)
+    val foundation = project.extensions.getByType<FoundationExtension>()
+    val minecraftServerDirectory = project.file(foundation.minecraftServerPath.get())
 
     if (!minecraftServerDirectory.exists()) {
       minecraftServerDirectory.mkdirs()
     }
 
-    ant.invokeMethod(
-      "get", mapOf(
-        "src" to url.toString(),
-        "dest" to project.file("${minecraftServerPath}/paper.jar").absolutePath
-      )
-    )
+    val paperJarFile = project.file("${foundation.minecraftServerPath.get()}/paper.jar")
+    if (!paperJarFile.exists() || shouldUpdatePaperServer) {
+      downloadLatestBuild(foundation.paperVersionGroup.get(), paperJarFile)
+    }
 
     val paperPluginsDirectory = minecraftServerDirectory.resolve("plugins")
 
@@ -51,5 +52,21 @@ open class SetupPaperServer : DefaultTask() {
 
       Files.createSymbolicLink(pluginLinkFile.toPath(), pluginJarFile.toPath())
     }
+  }
+
+  private fun downloadLatestBuild(paperVersionGroup: String, paperJarFile: File) {
+    val builds = paperVersionClient.getVersionBuilds(paperVersionGroup)
+    val build = builds.last()
+    val download = build.downloads["application"]!!
+    val url = paperVersionClient.resolveDownloadUrl(build, download)
+
+    ant.invokeMethod(
+      "get", mapOf(
+        "src" to url.toString(),
+        "dest" to paperJarFile.absolutePath
+      )
+    )
+
+    logger.lifecycle("Installed Paper Server ${build.version} build ${build.build}")
   }
 }

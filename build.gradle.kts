@@ -135,7 +135,7 @@ subprojects {
   }
 }
 
-tasks.setupPaperServer {
-  minecraftServerPath = "server"
-  paperVersionGroup = "1.18"
+foundation {
+  minecraftServerPath.set("server")
+  paperVersionGroup.set("1.18")
 }

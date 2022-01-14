@@ -2,9 +2,13 @@ package cloud.kubelet.foundation.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.create
 
 class FoundationGradlePlugin : Plugin<Project> {
   override fun apply(project: Project) {
-    project.tasks.create("setupPaperServer", SetupPaperServer::class.java)
+    project.extensions.create<FoundationExtension>("foundation")
+    val setupPaperServer = project.tasks.create<SetupPaperServer>("setupPaperServer")
+    val runPaperServer = project.tasks.create<RunPaperServer>("runPaperServer")
+    runPaperServer.dependsOn(setupPaperServer)
   }
 }
