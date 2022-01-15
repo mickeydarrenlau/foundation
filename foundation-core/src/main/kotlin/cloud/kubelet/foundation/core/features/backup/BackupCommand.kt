@@ -138,7 +138,7 @@ class BackupCommand(
       .filter { path: Path -> Files.isRegularFile(path) }
       .filter { path -> !matchers.any { it.matches(Paths.get(path.normalize().toString())) } }
       .toList()
-    val buffer = ByteArray(1024)
+    val buffer = ByteArray(16 * 1024)
     val backupsPath = backupsPath.toRealPath()
 
     for (path in paths) {
