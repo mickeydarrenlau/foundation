@@ -17,3 +17,12 @@ dependencies {
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
+
+gradlePlugin {
+  plugins {
+    create("foundation") {
+      id = "cloud.kubelet.foundation.gradle"
+      implementationClass = "cloud.kubelet.foundation.gradle.FoundationGradlePlugin"
+    }
+  }
+}

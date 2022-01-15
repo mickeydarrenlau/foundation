@@ -59,7 +59,7 @@ open class SetupPaperServer : DefaultTask() {
     val build = builds.last()
     val download = build.downloads["application"]!!
     val url = paperVersionClient.resolveDownloadUrl(build, download)
-    val downloader = SmartDownload(paperJarFile.toPath(), url, download.sha256)
+    val downloader = SmartDownloader(paperJarFile.toPath(), url, download.sha256)
     if (downloader.download()) {
       logger.lifecycle("Installed Paper Server ${build.version} build ${build.build}")
     } else {

@@ -5,7 +5,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
 
-class SmartDownload(val localFilePath: Path, val remoteDownloadUrl: URI, val sha256: String) {
+class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val sha256: String) {
   fun download(): Boolean {
     if (!checkLocalFileHash()) {
       downloadRemoteFile()

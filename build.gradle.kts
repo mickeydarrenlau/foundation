@@ -5,7 +5,7 @@ import java.io.FileWriter
 
 plugins {
   java
-  id("foundation-gradle")
+  id("cloud.kubelet.foundation.gradle")
 }
 
 fun Project.isFoundationPlugin() = name.startsWith("foundation-")
