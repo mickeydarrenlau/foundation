@@ -59,14 +59,11 @@ open class SetupPaperServer : DefaultTask() {
     val build = builds.last()
     val download = build.downloads["application"]!!
     val url = paperVersionClient.resolveDownloadUrl(build, download)
-
-    ant.invokeMethod(
-      "get", mapOf(
-        "src" to url.toString(),
-        "dest" to paperJarFile.absolutePath
-      )
-    )
-
-    logger.lifecycle("Installed Paper Server ${build.version} build ${build.build}")
+    val downloader = SmartDownload(paperJarFile.toPath(), url, download.sha256)
+    if (downloader.download()) {
+      logger.lifecycle("Installed Paper Server ${build.version} build ${build.build}")
+    } else {
+      logger.lifecycle("Paper Server ${build.version} build ${build.build} is up-to-date")
+    }
   }
 }
