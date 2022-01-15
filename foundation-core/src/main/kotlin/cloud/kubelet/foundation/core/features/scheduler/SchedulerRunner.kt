@@ -5,7 +5,8 @@ import org.quartz.JobExecutionContext
 
 class SchedulerRunner : Job {
   override fun execute(context: JobExecutionContext) {
-    val f = context.jobDetail.jobDataMap["function"] as () -> Unit
-    f()
+    @Suppress("UNCHECKED_CAST")
+    val function = context.jobDetail.jobDataMap["function"] as () -> Unit
+    function()
   }
 }
