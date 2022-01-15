@@ -57,4 +57,9 @@ object Util {
 
     return outPath
   }
+
+  fun isPlatformWindows(): Boolean {
+    val os = System.getProperty("os.name")
+    return os != null && os.lowercase().startsWith("windows")
+  }
 }

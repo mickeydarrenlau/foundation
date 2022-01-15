@@ -42,25 +42,28 @@ class BackupCommand(
       return true
     }
 
-    try {
-      val server = sender.server
-      server.scheduler.runTaskAsynchronously(plugin, Runnable {
-        runBackup(server)
-      })
-    } catch (e: Exception) {
-      sender.sendMessage(String.format("Failed to backup: %s", e.message))
+    val server = sender.server
+    server.scheduler.runTaskAsynchronously(plugin) { ->
+      runBackup(server, sender)
     }
-
     return true
   }
 
   // TODO: Pull backup creation code into a separate service.
-  private fun runBackup(server: Server) = try {
+  private fun runBackup(server: Server, sender: CommandSender? = null) = try {
     RUNNING.set(true)
 
-    server.sendMessage(Util.formatSystemMessage("Backup started."))
+    server.scheduler.runTask(plugin) { ->
+      server.sendMessage(Util.formatSystemMessage("Backup started."))
+    }
 
-    val backupFileName = String.format("backup-%s.zip", Instant.now().toString())
+    val backupTime = Instant.now()
+    val backupIdentifier = if (Util.isPlatformWindows()) {
+      backupTime.toEpochMilli().toString()
+    } else {
+      backupTime.toString()
+    }
+    val backupFileName = String.format("backup-%s.zip", backupIdentifier)
     val backupPath = backupsPath.resolve(backupFileName)
     val backupFile = backupPath.toFile()
 
@@ -82,9 +85,18 @@ class BackupCommand(
       )
     }
     Unit
+  } catch (e: Exception) {
+    if (sender != null) {
+      server.scheduler.runTask(plugin) { ->
+        sender.sendMessage(String.format("Failed to backup: %s", e.message))
+      }
+    }
+    plugin.slF4JLogger.warn("Failed to backup.", e)
   } finally {
     RUNNING.set(false)
-    server.sendMessage(Util.formatSystemMessage("Backup finished."))
+    server.scheduler.runTask(plugin) { ->
+      server.sendMessage(Util.formatSystemMessage("Backup finished."))
+    }
   }
 
   private fun backupPlugins(server: Server, zipStream: ZipOutputStream) {
@@ -92,7 +104,7 @@ class BackupCommand(
       addDirectoryToZip(zipStream, server.pluginsFolder.toPath())
     } catch (e: IOException) {
       // TODO: Add error handling.
-      e.printStackTrace()
+      plugin.slF4JLogger.warn("Failed to backup plugins.", e)
     }
   }
 
