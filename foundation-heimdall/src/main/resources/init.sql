@@ -18,6 +18,14 @@ create table if not exists heimdall.player_positions (
 --
 select create_hypertable('heimdall.player_positions', 'time', 'player', 4,  if_not_exists => TRUE);
 --
+alter table heimdall.player_positions set (
+    timescaledb.compress,
+    timescaledb.compress_segmentby = 'player,world',
+    timescaledb.compress_orderby = 'time'
+);
+--
+select add_compression_policy('heimdall.player_positions', interval '3 days', if_not_exists => true);
+--
 create table if not exists heimdall.block_breaks (
     time timestamp not null,
     player uuid not null,
