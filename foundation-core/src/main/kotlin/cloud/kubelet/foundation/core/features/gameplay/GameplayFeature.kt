@@ -17,12 +17,6 @@ import kotlin.io.path.inputStream
 class GameplayFeature : Feature() {
   private val config by inject<GameplayConfig>()
 
-  override fun enable() {
-  }
-
-  override fun disable() {
-  }
-
   override fun module() = module {
     single {
       val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(

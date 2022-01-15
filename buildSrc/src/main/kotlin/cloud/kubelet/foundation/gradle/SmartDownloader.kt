@@ -7,7 +7,7 @@ import java.security.MessageDigest
 
 class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val sha256: String) {
   fun download(): Boolean {
-    if (!checkLocalFileHash()) {
+    if (checkLocalFileHash() == HashResult.ValidHash) {
       downloadRemoteFile()
       return true
     }
@@ -19,14 +19,14 @@ class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val s
     val remoteFileStream = url.openStream()
     val localFileStream = Files.newOutputStream(localFilePath)
     remoteFileStream.transferTo(localFileStream)
-    if (!checkLocalFileHash()) {
-      throw RuntimeException("Download of ${remoteDownloadUrl} did not result in valid hash.")
+    if (checkLocalFileHash() != HashResult.ValidHash) {
+      throw RuntimeException("Download of $remoteDownloadUrl did not result in valid hash.")
     }
   }
 
-  private fun checkLocalFileHash(): Boolean {
+  private fun checkLocalFileHash(): HashResult {
     if (!Files.exists(localFilePath)) {
-      return false
+      return HashResult.DoesNotExist
     }
 
     val digest = MessageDigest.getInstance("SHA-256")
@@ -45,7 +45,11 @@ class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val s
 
     val sha256Bytes = digest.digest()
     val localSha256Hash = bytesToHex(sha256Bytes)
-    return localSha256Hash.equals(sha256, ignoreCase = true)
+    return if (localSha256Hash.equals(sha256, ignoreCase = true)) {
+      HashResult.ValidHash
+    } else {
+      HashResult.InvalidHash
+    }
   }
 
   private fun bytesToHex(hash: ByteArray): String {
@@ -58,5 +62,11 @@ class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val s
       hexString.append(hex)
     }
     return hexString.toString()
+  }
+
+  enum class HashResult {
+    DoesNotExist,
+    InvalidHash,
+    ValidHash
   }
 }
