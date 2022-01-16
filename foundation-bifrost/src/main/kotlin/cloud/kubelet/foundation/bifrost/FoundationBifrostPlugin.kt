@@ -9,12 +9,13 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.MessageBuilder
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -28,7 +29,7 @@ import org.bukkit.event.Listener as BukkitEventListener
 
 class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventListener {
   private lateinit var config: BifrostConfig
-  private lateinit var jda: JDA
+  private var jda: JDA? = null
   private var isDev = false
 
   override fun onEnable() {
@@ -44,12 +45,11 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     )
     config = Yaml.default.decodeFromStream(BifrostConfig.serializer(), configPath.inputStream())
 
+    server.pluginManager.registerEvents(this, this)
     if (config.authentication.token.isEmpty()) {
-      slF4JLogger.warn("Token empty, will not start Bifrost.")
+      slF4JLogger.warn("Token empty, Bifrost will not connect to Discord.")
       return
     }
-
-    server.pluginManager.registerEvents(this, this)
 
     jda = JDABuilder
       .createDefault(config.authentication.token)
@@ -59,13 +59,13 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
 
   override fun onDisable() {
     // Plugin was not initialized, don't do anything.
-    if (!::jda.isInitialized) return
+    if (jda == null) return
 
     onServerStop()
 
     logger.info("Shutting down JDA")
-    jda.shutdown()
-    while (jda.status != JDA.Status.SHUTDOWN) {
+    jda?.shutdown()
+    while (jda != null && jda!!.status != JDA.Status.SHUTDOWN) {
       Thread.sleep(100)
     }
   }
@@ -78,7 +78,7 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
       is MessageReceivedEvent -> {
         if (!config.channel.bridge) return
         // Prevent this bot from receiving its own messages and creating a feedback loop.
-        if (e.author.id == jda.selfUser.id) return
+        if (e.author.id == jda?.selfUser?.id) return
 
         // Only forward messages from the configured channel.
         if (e.channel.id != config.channel.id) return
@@ -91,8 +91,12 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     }
   }
 
-  private fun getChannel(): TextChannel? {
-    val channel = jda.getTextChannelById(config.channel.id)
+  private fun getTextChannel(): TextChannel? {
+    if (jda == null) {
+      return null
+    }
+
+    val channel = jda?.getTextChannelById(config.channel.id)
     if (channel == null) {
       slF4JLogger.error("Failed to retrieve channel ${config.channel.id}")
     }
@@ -104,69 +108,70 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     setEmbeds(EmbedBuilder().apply(f).build())
   }
 
+  private fun sendChannelMessage(message: Message, debug: () -> String) {
+    val channel = getTextChannel()
+    channel?.sendMessage(message)?.queue()
+
+    if (config.enableDebugLog) {
+      slF4JLogger.info("Send '${debug()}' to Discord")
+    }
+  }
+
+  private fun sendChannelMessage(message: String): Unit = sendChannelMessage(message {
+    setContent(message)
+  }) { message }
+
+  private fun sendEmbedMessage(color: Color, message: String): Unit = sendChannelMessage(message {
+    embed {
+      setAuthor(message)
+      setColor(color)
+    }
+  }) { "[rgb:${color.rgb}] $message" }
+
   @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerJoin(e: PlayerJoinEvent) {
     if (!config.channel.sendPlayerJoin) return
-    val channel = getChannel() ?: return
 
-    channel.sendMessage(message {
-      embed {
-        setAuthor("${e.player.name} joined the server")
-        setColor(Color.GREEN)
-      }
-    }).queue()
+    sendEmbedMessage(Color.GREEN, "${e.player.name} joined the server")
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerQuit(e: PlayerQuitEvent) {
     if (!config.channel.sendPlayerQuit) return
-    val channel = getChannel() ?: return
 
-    channel.sendMessage(message {
-      embed {
-        setAuthor("${e.player.name} left the server")
-        setColor(Color.RED)
-      }
-    }).queue()
+    sendEmbedMessage(Color.RED, "${e.player.name} left the server")
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerChat(e: AsyncChatEvent) {
     if (!config.channel.bridge) return
-    val channel = getChannel() ?: return
     val message = e.message()
 
-    if (message is TextComponent) {
-      channel.sendMessage("${e.player.name}: ${message.content()}").queue()
-    } else {
-      slF4JLogger.error("Not sure what to do here, message != TextComponent: ${message.javaClass}")
-    }
+    val messageAsText = LegacyComponentSerializer.legacySection().serialize(message)
+    sendChannelMessage("${e.player.name}: $messageAsText")
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerDeath(e: PlayerDeathEvent) {
     if (!config.channel.sendPlayerDeath) return
-    val channel = getChannel() ?: return
-
-    channel.sendMessage(message {
-      embed {
-        setAuthor("${e.player.name} died")
-        setColor(Color.RED)
-      }
-    }).queue()
+    val deathMessage = e.deathMessage()
+    val message = if (deathMessage != null) {
+      LegacyComponentSerializer.legacySection().serialize(deathMessage)
+    } else {
+      "died"
+    }
+    sendEmbedMessage(Color.YELLOW, "${e.player.name} $message")
   }
 
   private fun onDiscordReady() {
     if (!config.channel.sendStart) return
-    val channel = getChannel() ?: return
     if (isDev) return
-    channel.sendMessage(":white_check_mark: Server is ready!").queue()
+    sendChannelMessage(":white_check_mark: Server is ready!")
   }
 
   private fun onServerStop() {
     if (!config.channel.sendShutdown) return
-    val channel = getChannel() ?: return
     if (isDev) return
-    channel.sendMessage(":octagonal_sign: Server is stopping!").queue()
+    sendChannelMessage(":octagonal_sign: Server is stopping!")
   }
 }

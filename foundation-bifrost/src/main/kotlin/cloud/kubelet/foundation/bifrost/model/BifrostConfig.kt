@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class BifrostConfig(
   val authentication: BifrostAuthentication,
   val channel: BifrostChannel,
+  val enableDebugLog: Boolean = false
 )
 
 @Serializable
