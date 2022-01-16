@@ -13,16 +13,18 @@ import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener as BukkitEventListener
+import org.bukkit.event.EventPriority
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.awt.Color
 import kotlin.io.path.inputStream
+import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
+import org.bukkit.event.Listener as BukkitEventListener
 
 class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventListener {
   private lateinit var config: BifrostConfig
@@ -102,7 +104,7 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     setEmbeds(EmbedBuilder().apply(f).build())
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerJoin(e: PlayerJoinEvent) {
     if (!config.channel.sendPlayerJoin) return
     val channel = getChannel() ?: return
@@ -115,7 +117,7 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     }).queue()
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerQuit(e: PlayerQuitEvent) {
     if (!config.channel.sendPlayerQuit) return
     val channel = getChannel() ?: return
@@ -128,7 +130,7 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     }).queue()
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerChat(e: AsyncChatEvent) {
     if (!config.channel.bridge) return
     val channel = getChannel() ?: return
@@ -139,6 +141,19 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     } else {
       slF4JLogger.error("Not sure what to do here, message != TextComponent: ${message.javaClass}")
     }
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  private fun onPlayerDeath(e: PlayerDeathEvent) {
+    if (!config.channel.sendPlayerDeath) return
+    val channel = getChannel() ?: return
+
+    channel.sendMessage(message {
+      embed {
+        setAuthor("${e.player.name} died")
+        setColor(Color.RED)
+      }
+    }).queue()
   }
 
   private fun onDiscordReady() {

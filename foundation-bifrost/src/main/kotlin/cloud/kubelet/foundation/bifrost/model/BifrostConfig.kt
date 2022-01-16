@@ -21,4 +21,5 @@ data class BifrostChannel(
   val sendShutdown: Boolean = true,
   val sendPlayerJoin: Boolean = true,
   val sendPlayerQuit: Boolean = true,
+  val sendPlayerDeath: Boolean = true
 )
