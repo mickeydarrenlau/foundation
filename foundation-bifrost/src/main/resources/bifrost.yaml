@@ -18,3 +18,4 @@ channel:
   sendShutdown: true
   sendPlayerJoin: true
   sendPlayerQuit: true
+  sendPlayerDeath: true
