@@ -18,6 +18,7 @@ channel:
   sendShutdown: true
   sendPlayerJoin: true
   sendPlayerQuit: true
+  sendPlayerDeath: true
 
 # Enables logging of what is sent to Discord.
 enableDebugLog: false
