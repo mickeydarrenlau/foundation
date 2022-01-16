@@ -5,13 +5,18 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
 
-class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val sha256: String) {
+class SmartDownloader(
+  private val localFilePath: Path,
+  private val remoteDownloadUrl: URI,
+  private val sha256: String
+) {
   fun download(): Boolean {
-    if (checkLocalFileHash() == HashResult.ValidHash) {
+    val hashResult = checkLocalFileHash()
+    if (hashResult != HashResult.ValidHash) {
       downloadRemoteFile()
-      return true
+      return false
     }
-    return false
+    return true
   }
 
   private fun downloadRemoteFile() {
@@ -19,7 +24,8 @@ class SmartDownloader(val localFilePath: Path, val remoteDownloadUrl: URI, val s
     val remoteFileStream = url.openStream()
     val localFileStream = Files.newOutputStream(localFilePath)
     remoteFileStream.transferTo(localFileStream)
-    if (checkLocalFileHash() != HashResult.ValidHash) {
+    val hashResult = checkLocalFileHash()
+    if (hashResult != HashResult.ValidHash) {
       throw RuntimeException("Download of $remoteDownloadUrl did not result in valid hash.")
     }
   }
