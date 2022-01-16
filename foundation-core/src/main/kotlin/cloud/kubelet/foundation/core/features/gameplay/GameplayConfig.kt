@@ -11,4 +11,5 @@ data class GameplayConfig(
 data class MobsConfig(
   val disableEndermanGriefing: Boolean,
   val disableFreezeDamage: Boolean,
+  val allowLeads: Boolean,
 )

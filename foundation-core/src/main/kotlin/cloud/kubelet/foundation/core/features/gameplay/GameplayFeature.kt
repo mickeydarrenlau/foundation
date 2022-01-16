@@ -4,12 +4,17 @@ import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
 import cloud.kubelet.foundation.core.abstraction.Feature
 import com.charleskorn.kaml.Yaml
+import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Mob
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.inventory.ItemStack
 import org.koin.core.component.inject
 import org.koin.dsl.module
 import kotlin.io.path.inputStream
@@ -48,6 +53,39 @@ class GameplayFeature : Feature() {
       if (event.entity.type == EntityType.ENDERMAN) {
         event.isCancelled = true
       }
+    }
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  private fun onPlayerInteractEntity(event: PlayerInteractEntityEvent) {
+    val mainHandItem = event.player.inventory.itemInMainHand
+    val hasLead = mainHandItem.type == Material.LEAD
+    val isLivingEntity = event.rightClicked is LivingEntity
+
+    // If leads are allowed on all mobs, then start leading the mob.
+    if (config.mobs.allowLeads && hasLead && isLivingEntity) {
+      val livingEntity = event.rightClicked as LivingEntity
+
+      // Something to do with Bukkit, leashes must happen after the event.
+      Bukkit.getScheduler().runTask(plugin) { ->
+        // If the entity is already leashed, don't do anything.
+        if (livingEntity.isLeashed
+        ) return@runTask
+
+        val leashSuccess = livingEntity.setLeashHolder(event.player)
+
+        if (leashSuccess) {
+          val newStack = if (mainHandItem.amount == 1) {
+            null
+          } else {
+            ItemStack(mainHandItem.type, mainHandItem.amount - 1)
+          }
+          event.player.inventory.setItemInMainHand(newStack)
+        }
+      }
+
+      event.isCancelled = true
+      return
     }
   }
 }

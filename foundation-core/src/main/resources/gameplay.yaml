@@ -12,3 +12,8 @@ mobs:
   # When set to true, mobs will not take damage from freezing.
   # When set to false, mobs take damage from freezing.
   disableFreezeDamage: false
+
+  # Allow leads on all mobs.
+  # When set to true, all mobs can have leads attached to them.
+  # When set to false, only specific mobs can have leads attached to them.
+  allowLeads: false
