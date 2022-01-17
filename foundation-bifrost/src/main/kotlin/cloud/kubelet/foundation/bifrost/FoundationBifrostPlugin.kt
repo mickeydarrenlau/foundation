@@ -171,6 +171,11 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
       return
     }
 
+    val advancementDisplay = e.advancement.display ?: return
+    if (!advancementDisplay.doesAnnounceToChat()) {
+      return
+    }
+
     val display = AdvancementTitleCache.of(e.advancement) ?: return
     sendEmbedMessage(Color.CYAN, "${e.player.name} completed the advancement '${display}'")
   }
