@@ -19,6 +19,7 @@ channel:
   sendPlayerJoin: true
   sendPlayerQuit: true
   sendPlayerDeath: true
+  sendPlayerAdvancement: true
 
 # Enables logging of what is sent to Discord.
 enableDebugLog: false

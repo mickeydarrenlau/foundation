@@ -11,7 +11,7 @@ class FoundationGradlePlugin : Plugin<Project> {
     project.afterEvaluate { ->
       setupPaperServer.dependsOn(*project.subprojects
         .filter { it.name.startsWith("foundation-") }
-        .map { it.tasks.getByName("build") }
+        .map { it.tasks.getByName("shadowJar") }
         .toTypedArray()
       )
     }

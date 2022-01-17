@@ -3,6 +3,7 @@ package cloud.kubelet.foundation.bifrost
 import cloud.kubelet.foundation.bifrost.model.BifrostConfig
 import cloud.kubelet.foundation.core.FoundationCorePlugin
 import cloud.kubelet.foundation.core.Util
+import cloud.kubelet.foundation.core.util.AdvancementTitleCache
 import com.charleskorn.kaml.Yaml
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.dv8tion.jda.api.EmbedBuilder
@@ -19,6 +20,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
@@ -160,6 +162,17 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
       deathMessage = "${e.player.name} died"
     }
     sendEmbedMessage(Color.YELLOW, deathMessage)
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  private fun onPlayerAdvancementDone(e: PlayerAdvancementDoneEvent) {
+    if (!config.channel.sendPlayerAdvancement) return
+    if (e.advancement.key.key.contains("recipe/")) {
+      return
+    }
+
+    val display = AdvancementTitleCache.of(e.advancement) ?: return
+    sendEmbedMessage(Color.CYAN, "${e.player.name} completed the advancement '${display}'")
   }
 
   private fun onDiscordReady() {
