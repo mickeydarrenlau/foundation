@@ -154,13 +154,12 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
   @EventHandler(priority = EventPriority.MONITOR)
   private fun onPlayerDeath(e: PlayerDeathEvent) {
     if (!config.channel.sendPlayerDeath) return
-    val deathMessage = e.deathMessage()
-    val message = if (deathMessage != null) {
-      LegacyComponentSerializer.legacySection().serialize(deathMessage)
-    } else {
-      "died"
+    @Suppress("DEPRECATION")
+    var deathMessage = e.deathMessage
+    if (deathMessage == null || deathMessage.isBlank()) {
+      deathMessage = "${e.player.name} died"
     }
-    sendEmbedMessage(Color.YELLOW, "${e.player.name} $message")
+    sendEmbedMessage(Color.YELLOW, deathMessage)
   }
 
   private fun onDiscordReady() {
