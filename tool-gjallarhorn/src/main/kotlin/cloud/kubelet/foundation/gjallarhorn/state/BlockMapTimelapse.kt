@@ -1,50 +1,14 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
-import java.time.Duration
-import java.time.Instant
-import java.util.stream.Stream
-
 class BlockMapTimelapse<T> :
-  BlockMapRenderPool.RenderPoolDelegate<T> {
-  fun calculateChangelogSlices(
-    changelog: BlockChangelog, interval: Duration, limit: Int? = null
-  ): List<BlockChangelogSlice> {
-    val (start, end) = changelog.changeTimeRange
-    var intervals = mutableListOf<Instant>()
-    var current = start
-    while (!current.isAfter(end)) {
-      intervals.add(current)
-      current = current.plus(interval)
-    }
-
-    if (limit != null) {
-      intervals = intervals.takeLast(limit).toMutableList()
-    }
-    return intervals.map { BlockChangelogSlice(start, it, interval) }
+  BlockMapRenderPoolDelegate<T> {
+  override fun onSinglePlaybackComplete(pool: BlockMapRenderPool<T>, slice: ChangelogSlice, tracker: BlockLogTracker) {
+    throw UnsupportedOperationException()
   }
 
-  fun splitChangelogSlicesWithThreshold(
-    changelog: BlockChangelog,
-    targetChangeThreshold: Int,
-    minimumTimeInterval: Duration,
-    slices: List<BlockChangelogSlice>
-  ): List<BlockChangelogSlice> {
-    return slices.parallelStream().flatMap { slice ->
-      val count = changelog.countRelativeChangesInSlice(slice)
-      if (count < targetChangeThreshold ||
-        slice.relative < minimumTimeInterval
-      ) {
-        return@flatMap Stream.of(slice)
-      }
-
-      val split = slice.split()
-      return@flatMap splitChangelogSlicesWithThreshold(changelog, targetChangeThreshold, minimumTimeInterval, split).parallelStream()
-    }.toList()
-  }
-
-  override fun buildRenderJobs(
+  override fun onAllPlaybackComplete(
     pool: BlockMapRenderPool<T>,
-    trackers: MutableMap<BlockChangelogSlice, BlockLogTracker>
+    trackers: Map<ChangelogSlice, BlockLogTracker>
   ) {
     if (trackers.isEmpty()) {
       return
@@ -56,7 +20,7 @@ class BlockMapTimelapse<T> :
     val globalBlockMax = BlockCoordinate.maxOf(allBlockMaxes)
     val globalBlockExpanse = BlockExpanse.offsetAndMax(globalBlockOffset, globalBlockMax)
 
-    val renderer = pool.rendererFactory(globalBlockExpanse)
+    val renderer = pool.createRendererFunction(globalBlockExpanse)
     for ((slice, tracker) in trackers) {
       pool.submitRenderJob(slice) {
         val map = tracker.buildBlockMap(globalBlockExpanse.offset)

@@ -63,13 +63,13 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     val changelog = BlockChangelog.query(db, filter)
     logger.info("Block Changelog: ${changelog.changes.size} changes")
     val timelapse = BlockMapTimelapse<BufferedImage>()
-    var slices = timelapse.calculateChangelogSlices(changelog, timelapseMode.interval, timelapseIntervalLimit)
+    var slices = changelog.calculateChangelogSlices(timelapseMode.interval, timelapseIntervalLimit)
 
     if (timelapseSpeedChangeThreshold != null && timelapseSpeedChangeMinimumIntervalSeconds != null) {
       val minimumInterval = Duration.ofSeconds(timelapseSpeedChangeMinimumIntervalSeconds!!.toLong())
       val blockChangeThreshold = timelapseSpeedChangeThreshold!!
 
-      slices = timelapse.splitChangelogSlicesWithThreshold(changelog, blockChangeThreshold, minimumInterval, slices)
+      slices = changelog.splitChangelogSlicesWithThreshold(blockChangeThreshold, minimumInterval, slices)
     }
 
     logger.info("Timelapse Slices: ${slices.size} slices")
@@ -80,7 +80,7 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       changelog = changelog,
       blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
       delegate = timelapse,
-      rendererFactory = { expanse -> render.create(expanse) },
+      createRendererFunction = { expanse -> render.create(expanse) },
       threadPoolExecutor = threadPoolExecutor
     ) { slice, result ->
       val speed = slice.relative.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
