@@ -21,6 +21,6 @@ abstract class BlockHeatMapRenderer(quadPixelSize: Int = defaultQuadPixelSize) :
         Color.white
       }
 
-      setPixelQuad(graphics, x, z, color.rgb)
+      setPixelQuad(graphics, x, z, color)
     }
 }

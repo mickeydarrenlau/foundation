@@ -3,7 +3,6 @@ package cloud.kubelet.foundation.gjallarhorn.state
 class BlockMapTimelapse<T> :
   BlockMapRenderPoolDelegate<T> {
   override fun onSinglePlaybackComplete(pool: BlockMapRenderPool<T>, slice: ChangelogSlice, tracker: BlockLogTracker) {
-    throw UnsupportedOperationException()
   }
 
   override fun onAllPlaybackComplete(
@@ -24,7 +23,7 @@ class BlockMapTimelapse<T> :
     for ((slice, tracker) in trackers) {
       pool.submitRenderJob(slice) {
         val map = tracker.buildBlockMap(globalBlockExpanse.offset)
-        renderer.render(map)
+        renderer.render(slice, map)
       }
     }
   }

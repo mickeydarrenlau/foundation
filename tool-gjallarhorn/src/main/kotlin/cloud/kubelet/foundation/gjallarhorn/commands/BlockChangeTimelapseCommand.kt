@@ -2,6 +2,7 @@ package cloud.kubelet.foundation.gjallarhorn.commands
 
 import cloud.kubelet.foundation.gjallarhorn.render.BlockDiversityRenderer
 import cloud.kubelet.foundation.gjallarhorn.render.BlockHeightMapRenderer
+import cloud.kubelet.foundation.gjallarhorn.render.PlayerLocationShareRenderer
 import cloud.kubelet.foundation.gjallarhorn.render.BlockImageRenderer
 import cloud.kubelet.foundation.gjallarhorn.state.*
 import cloud.kubelet.foundation.gjallarhorn.util.compose
@@ -80,7 +81,7 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       changelog = changelog,
       blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
       delegate = timelapse,
-      createRendererFunction = { expanse -> render.create(expanse) },
+      createRendererFunction = { expanse -> render.create(expanse, db) },
       threadPoolExecutor = threadPoolExecutor
     ) { slice, result ->
       val speed = slice.relative.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
@@ -120,10 +121,11 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   @Suppress("unused")
   enum class RenderType(
     val id: String,
-    val create: (BlockExpanse) -> BlockImageRenderer
+    val create: (BlockExpanse, Database) -> BlockImageRenderer
   ) {
-    BlockDiversity("block-diversity", { expanse -> BlockDiversityRenderer(expanse) }),
-    HeightMap("height-map", { expanse -> BlockHeightMapRenderer(expanse) })
+    BlockDiversity("block-diversity", { expanse, _ -> BlockDiversityRenderer(expanse) }),
+    HeightMap("height-map", { expanse, _ -> BlockHeightMapRenderer(expanse) }),
+    PlayerPosition("player-position", { expanse, db -> PlayerLocationShareRenderer(expanse, db) })
   }
 
   @Suppress("unused")

@@ -7,9 +7,11 @@ data class ChangelogSlice(val from: Instant, val to: Instant, val relative: Dura
   constructor(from: Instant, to: Instant) : this(from, to, Duration.ofMillis(to.toEpochMilli() - from.toEpochMilli()))
 
   val relativeChangeStart: Instant = to.minus(relative)
+  val range: ClosedRange<Instant> = from..to
+  val relativeChangeRange: ClosedRange<Instant> = relativeChangeStart..to
 
-  fun isTimeWithin(time: Instant) = time in from..to
-  fun isRelativeWithin(time: Instant) = time in relativeChangeStart..to
+  fun isTimeWithin(time: Instant) = time in range
+  fun isRelativeWithin(time: Instant) = time in relativeChangeRange
 
   fun split(): List<ChangelogSlice> {
     val half = relative.dividedBy(2)
