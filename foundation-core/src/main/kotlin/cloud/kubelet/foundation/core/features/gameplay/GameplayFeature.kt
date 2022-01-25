@@ -69,8 +69,10 @@ class GameplayFeature : Feature() {
       // Something to do with Bukkit, leashes must happen after the event.
       Bukkit.getScheduler().runTask(plugin) { ->
         // If the entity is already leashed, don't do anything.
-        if (livingEntity.isLeashed
-        ) return@runTask
+        if (livingEntity.isLeashed) return@runTask
+
+        // Interacted with the entity, don't despawn it.
+        livingEntity.removeWhenFarAway = false
 
         val leashSuccess = livingEntity.setLeashHolder(event.player)
 
