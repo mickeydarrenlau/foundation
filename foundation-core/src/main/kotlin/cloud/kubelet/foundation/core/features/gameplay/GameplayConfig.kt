@@ -4,12 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GameplayConfig(
-  val mobs: MobsConfig,
+  val mobs: MobsConfig = MobsConfig(),
 )
 
 @Serializable
 data class MobsConfig(
-  val disableEndermanGriefing: Boolean,
-  val disableFreezeDamage: Boolean,
-  val allowLeads: Boolean,
+  val disableEndermanGriefing: Boolean = false,
+  val disableFreezeDamage: Boolean = false,
+  val allowLeads: Boolean = false,
 )
