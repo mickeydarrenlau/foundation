@@ -1,0 +1,10 @@
+# Kicks players idle for longer than a set amount of time.
+anti-idle:
+  # Whether anti-idle kicking is enabled.
+  enabled: false
+
+  # Number of seconds the player is idle before kick.
+  idleDuration: 3600
+
+  # List of usernames to ignore.
+  ignore: []

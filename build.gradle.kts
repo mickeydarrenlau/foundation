@@ -87,6 +87,7 @@ subprojects {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+    // Core libraries.
     implementation("io.insert-koin:koin-core:3.1.4")
     testImplementation("io.insert-koin:koin-test:3.1.4")
 

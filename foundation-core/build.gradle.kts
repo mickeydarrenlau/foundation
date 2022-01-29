@@ -3,4 +3,5 @@ dependencies {
 
   implementation("software.amazon.awssdk:s3:2.17.102")
   implementation("org.quartz-scheduler:quartz:2.3.2")
+  implementation("com.google.guava:guava:31.0.1-jre")
 }
