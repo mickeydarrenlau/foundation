@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage
 
 abstract class BlockGridRenderer(val quadPixelSize: Int = defaultQuadPixelSize) : BlockImageRenderer {
   protected fun setPixelQuad(graphics: Graphics2D, x: Long, z: Long, color: Color) {
+    if (globalQuadPixelNoop) {
+      return
+    }
     drawSquare(graphics, x * quadPixelSize, z * quadPixelSize, quadPixelSize.toLong(), color)
   }
 
@@ -39,5 +42,6 @@ abstract class BlockGridRenderer(val quadPixelSize: Int = defaultQuadPixelSize) 
 
   companion object {
     const val defaultQuadPixelSize = 4
+    var globalQuadPixelNoop = false
   }
 }

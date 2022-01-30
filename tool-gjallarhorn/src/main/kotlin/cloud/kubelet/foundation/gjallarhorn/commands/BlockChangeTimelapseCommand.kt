@@ -1,15 +1,13 @@
 package cloud.kubelet.foundation.gjallarhorn.commands
 
-import cloud.kubelet.foundation.gjallarhorn.render.BlockDiversityRenderer
-import cloud.kubelet.foundation.gjallarhorn.render.BlockHeightMapRenderer
-import cloud.kubelet.foundation.gjallarhorn.render.PlayerLocationShareRenderer
-import cloud.kubelet.foundation.gjallarhorn.render.BlockImageRenderer
+import cloud.kubelet.foundation.gjallarhorn.render.*
 import cloud.kubelet.foundation.gjallarhorn.state.*
 import cloud.kubelet.foundation.gjallarhorn.util.compose
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
 import cloud.kubelet.foundation.heimdall.view.BlockChangeView
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -25,6 +23,7 @@ import java.awt.Font
 import java.awt.font.TextLayout
 import java.awt.image.BufferedImage
 import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name = "block-change-timelapse") {
@@ -47,15 +46,33 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   private val fromCoordinate by option("--trim-from", help = "Trim From Coordinate")
   private val toCoordinate by option("--trim-to", help = "Trim To Coordinate")
 
+  private val parallelPoolSize by option("--pool-size", help = "Task Pool Size").int().default(8)
+  private val inMemoryRender by option("--in-memory-render", help = "Render Images to Memory").flag()
+  private val shouldRenderLoop by option("--loop-render", help = "Loop Render").flag()
+  private val quadPixelNoop by option("--quad-pixel-noop", help = "Disable Quad Pixel Render").flag()
+
   private val logger = LoggerFactory.getLogger(BlockChangeTimelapseCommand::class.java)
 
   override fun run() {
-    val threadPoolExecutor = ScheduledThreadPoolExecutor(16)
+    if (quadPixelNoop) {
+      BlockGridRenderer.globalQuadPixelNoop = true
+    }
+    val threadPoolExecutor = ScheduledThreadPoolExecutor(parallelPoolSize)
+    if (shouldRenderLoop) {
+      while (true) {
+        perform(threadPoolExecutor)
+      }
+    } else {
+      perform(threadPoolExecutor)
+    }
+    threadPoolExecutor.shutdown()
+  }
 
+  private fun perform(threadPoolExecutor: ScheduledThreadPoolExecutor) {
     val trim = maybeBuildTrim()
     val filter = compose(
       combine = { a, b -> a and b },
-    { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x },
+      { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x },
       { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z },
       { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x },
       { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z }
@@ -77,6 +94,12 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
 
     val imagePadCount = slices.size.toString().length
 
+    val inMemoryPool = if (inMemoryRender) {
+      ConcurrentHashMap<ChangelogSlice, BufferedImage>()
+    } else {
+      null
+    }
+
     val pool = BlockMapRenderPool(
       changelog = changelog,
       blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
@@ -96,16 +119,19 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       layout.draw(graphics, 60f, 60f)
       graphics.dispose()
       val index = slices.indexOf(slice) + 1
-      val suffix = "-${index.toString().padStart(imagePadCount, '0')}"
-      result.savePngFile("${render.id}${suffix}.png")
+      if (inMemoryRender) {
+        inMemoryPool?.put(slice, result)
+      } else {
+        val suffix = "-${index.toString().padStart(imagePadCount, '0')}"
+        result.savePngFile("${render.id}${suffix}.png")
+      }
       logger.info("Rendered Timelapse Slice $index")
     }
 
     pool.render(slices)
-    threadPoolExecutor.shutdown()
   }
 
-  fun maybeBuildTrim(): Pair<BlockCoordinate, BlockCoordinate>? {
+  private fun maybeBuildTrim(): Pair<BlockCoordinate, BlockCoordinate>? {
     if (fromCoordinate == null || toCoordinate == null) {
       return null
     }

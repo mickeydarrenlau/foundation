@@ -2,7 +2,9 @@ package cloud.kubelet.foundation.gjallarhorn.state
 
 import cloud.kubelet.foundation.gjallarhorn.render.BlockMapRenderer
 import org.slf4j.LoggerFactory
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Future
+import java.util.concurrent.ThreadPoolExecutor
 
 class BlockMapRenderPool<T>(
   val changelog: BlockChangelog,
@@ -51,7 +53,11 @@ class BlockMapRenderPool<T>(
     delegate.onAllPlaybackComplete(this, trackers)
 
     for (future in renderJobFutures.values) {
-      future.get()
+      try {
+        future.get()
+      } catch (e: Exception) {
+        logger.error("Failed to render slice.", e)
+      }
     }
   }
 

@@ -39,8 +39,8 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   fun isEmpty() = blocks.isEmpty()
   fun isNotEmpty() = !isEmpty()
 
-  fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): BlockMap {
-    val map = BlockMap()
+  fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): BlockStateMap {
+    val map = BlockStateMap()
     blocks.forEach { (position, state) ->
       val realPosition = offset.applyAsOffset(position)
       map.put(realPosition, state)
