@@ -107,13 +107,13 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       createRendererFunction = { expanse -> render.create(expanse, db) },
       threadPoolExecutor = threadPoolExecutor
     ) { slice, result ->
-      val speed = slice.relative.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
+      val speed = slice.sliceRelativeDuration.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
       val graphics = result.createGraphics()
       val font = Font.decode("Arial Black").deriveFont(24.0f)
       graphics.color = Color.black
       graphics.font = font
       val context = graphics.fontRenderContext
-      val text = String.format("%s @ %.4f speed (1 frame = %s sec)", slice.to, speed, slice.relative.toSeconds())
+      val text = String.format("%s @ %.4f speed (1 frame = %s sec)", slice.sliceEndTime, speed, slice.sliceRelativeDuration.toSeconds())
       val layout =
         TextLayout(text, font, context)
       layout.draw(graphics, 60f, 60f)

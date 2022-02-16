@@ -13,11 +13,11 @@ class BlockChangelog(
   val changes: List<BlockChange>
 ) {
   fun slice(slice: ChangelogSlice): BlockChangelog = BlockChangelog(changes.filter {
-    slice.isTimeWithin(it.time)
+    slice.isTimeWithinFullRange(it.time)
   })
 
   fun countRelativeChangesInSlice(slice: ChangelogSlice): Int = changes.count {
-    slice.isRelativeWithin(it.time)
+    slice.isTimeWithinSliceRange(it.time)
   }
 
   val changeTimeRange: ChangelogSlice
@@ -46,7 +46,7 @@ class BlockChangelog(
     return slices.parallelStream().flatMap { slice ->
       val count = countRelativeChangesInSlice(slice)
       if (count < targetChangeThreshold ||
-        slice.relative < minimumTimeInterval
+        slice.sliceRelativeDuration < minimumTimeInterval
       ) {
         return@flatMap Stream.of(slice)
       }

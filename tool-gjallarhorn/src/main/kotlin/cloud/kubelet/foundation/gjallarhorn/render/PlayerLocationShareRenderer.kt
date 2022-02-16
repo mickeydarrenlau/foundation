@@ -19,8 +19,8 @@ class PlayerLocationShareRenderer(
   private val colorKey = BlockColorKey(mapOf())
 
   override fun render(slice: ChangelogSlice, map: BlockStateMap): BufferedImage {
-    val start = slice.relativeChangeRange.start
-    val end = slice.relativeChangeRange.endInclusive
+    val start = slice.sliceChangeRange.start
+    val end = slice.sliceChangeRange.endInclusive
 
     val playerSparseMap = BlockCoordinateSparseMap<MutableList<UUID>>()
     val allPlayerIds = HashSet<UUID>()
