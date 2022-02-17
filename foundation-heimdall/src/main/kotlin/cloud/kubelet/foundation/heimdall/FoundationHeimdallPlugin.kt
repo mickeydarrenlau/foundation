@@ -6,6 +6,7 @@ import cloud.kubelet.foundation.heimdall.buffer.BufferFlushThread
 import cloud.kubelet.foundation.heimdall.buffer.EventBuffer
 import cloud.kubelet.foundation.heimdall.event.*
 import cloud.kubelet.foundation.heimdall.model.HeimdallConfig
+import cloud.kubelet.foundation.heimdall.export.ExportChunksCommand
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -38,6 +39,9 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   private val legacyComponentSerializer = LegacyComponentSerializer.builder().build()
 
   override fun onEnable() {
+    val exportChunksCommand = getCommand("export_all_chunks") ?: throw Exception("Failed to get export_all_chunks command")
+    exportChunksCommand.setExecutor(ExportChunksCommand(this))
+
     val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
 
     val configPath = Util.copyDefaultConfig<FoundationHeimdallPlugin>(

@@ -8,3 +8,8 @@ depend:
   - Foundation
 authors:
   - kubelet
+commands:
+  export_all_chunks:
+    description: Export All Chunks
+    usage: /export_all_chunks
+    permission: foundation.heimdall.command.export_all_chunks

@@ -20,11 +20,12 @@ class BlockChangelog(
     slice.isTimeWithinSliceRange(it.time)
   }
 
-  val changeTimeRange: ChangelogSlice
+  val fullTimeSlice: ChangelogSlice
     get() = ChangelogSlice(changes.minOf { it.time }, changes.maxOf { it.time })
 
   fun calculateChangelogSlices(interval: Duration, limit: Int? = null): List<ChangelogSlice> {
-    val (start, end) = changeTimeRange
+    val start = fullTimeSlice.rootStartTime
+    val end = fullTimeSlice.sliceEndTime
     var intervals = mutableListOf<Instant>()
     var current = start
     while (!current.isAfter(end)) {
