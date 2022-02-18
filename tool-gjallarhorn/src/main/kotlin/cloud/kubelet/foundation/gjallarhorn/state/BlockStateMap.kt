@@ -1,3 +1,3 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
-class BlockStateMap : BlockCoordinateSparseMap<BlockState>()
+typealias BlockStateMap = BlockCoordinateStore<BlockState>

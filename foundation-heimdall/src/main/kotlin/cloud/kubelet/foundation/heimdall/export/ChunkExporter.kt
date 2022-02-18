@@ -8,7 +8,6 @@ import org.bukkit.Server
 import org.bukkit.World
 import org.bukkit.plugin.Plugin
 import java.io.File
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.GZIPOutputStream
 
 class ChunkExporter(private val plugin: Plugin, private val server: Server, val world: World) {
@@ -21,29 +20,14 @@ class ChunkExporter(private val plugin: Plugin, private val server: Server, val 
   }
 
   private fun exportChunkListAsync(chunks: List<Chunk>) {
-    val listOfChunks = chunks.toMutableList()
-    doExportChunkList(listOfChunks, AtomicBoolean(false))
-  }
-
-  private fun doExportChunkList(chunks: MutableList<Chunk>, check: AtomicBoolean) {
-    check.set(false)
-    val chunk = chunks.removeFirstOrNull()
-    if (chunk == null) {
-      plugin.slF4JLogger.info("Chunk Export Complete")
-      return
-    }
-
-    val snapshot = chunk.chunkSnapshot
-    server.scheduler.runTaskAsynchronously(plugin) { ->
-      saveChunkSnapshotAndScheduleNext(snapshot, chunks, check)
-    }
-  }
-
-  private fun saveChunkSnapshotAndScheduleNext(snapshot: ChunkSnapshot, chunks: MutableList<Chunk>, check: AtomicBoolean) {
-    exportChunkSnapshot(snapshot)
-    if (!check.getAndSet(true)) {
-      plugin.server.scheduler.runTask(plugin) { -> doExportChunkList(chunks, check) }
-    }
+    plugin.slF4JLogger.info("Exporting ${chunks.size} Chunks")
+    val snapshots = chunks.map { it.chunkSnapshot }
+    Thread {
+      for (snapshot in snapshots) {
+        exportChunkSnapshot(snapshot)
+      }
+      plugin.slF4JLogger.info("Exported ${chunks.size} Chunks")
+    }.start()
   }
 
   private fun exportChunkSnapshot(snapshot: ChunkSnapshot) {

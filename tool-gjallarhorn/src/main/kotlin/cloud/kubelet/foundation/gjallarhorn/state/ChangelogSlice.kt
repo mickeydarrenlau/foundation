@@ -22,4 +22,8 @@ data class ChangelogSlice(val rootStartTime: Instant, val sliceEndTime: Instant,
       ChangelogSlice(rootStartTime, sliceEndTime, half)
     )
   }
+
+  companion object {
+    val none = ChangelogSlice(Instant.MIN, Instant.MIN, Duration.ZERO)
+  }
 }

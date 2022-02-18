@@ -1,9 +1,10 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.absoluteValue
 
-class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete) {
-  val blocks = HashMap<BlockCoordinate, BlockState>()
+class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete, isConcurrent: Boolean = false) {
+  internal val blocks: MutableMap<BlockCoordinate, BlockState> = if (isConcurrent) ConcurrentHashMap() else mutableMapOf()
 
   fun place(position: BlockCoordinate, state: BlockState) {
     blocks[position] = state
@@ -39,8 +40,8 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   fun isEmpty() = blocks.isEmpty()
   fun isNotEmpty() = !isEmpty()
 
-  fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): BlockStateMap {
-    val map = BlockStateMap()
+  fun buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero): SparseBlockStateMap {
+    val map = SparseBlockStateMap()
     blocks.forEach { (position, state) ->
       val realPosition = offset.applyAsOffset(position)
       map.put(realPosition, state)
@@ -55,4 +56,6 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
       place(change.location, change.to)
     }
   }
+
+  fun get(position: BlockCoordinate): BlockState? = blocks[position]
 }

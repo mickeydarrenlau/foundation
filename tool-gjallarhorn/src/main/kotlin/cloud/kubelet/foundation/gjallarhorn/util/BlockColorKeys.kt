@@ -13,5 +13,6 @@ val defaultBlockColorMap = mapOf<String, Color>(
   "minecraft:stone_brick_stairs" to Color.decode("#b8a18c"),
   "minecraft:dirt_path" to Color.decode("#8f743d"),
   "minecraft:deepslate_tiles" to Color.decode("#49494b"),
-  "minecraft:spruce_planks" to Color.decode("#60492d")
+  "minecraft:spruce_planks" to Color.decode("#60492d"),
+  "minecraft:water" to Color.decode("#1f54ff")
 )

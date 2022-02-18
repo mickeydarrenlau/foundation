@@ -39,7 +39,7 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     help = "Timelapse Change Speed Minimum Interval Seconds"
   ).int()
 
-  private val render by option("--render", help = "Render Top Down Image").enum<RenderType> { it.id }.required()
+  private val render by option("--render", help = "Render Top Down Image").enum<ImageRenderType> { it.id }.required()
 
   private val considerAirBlocks by option("--consider-air-blocks", help = "Enable Air Block Consideration").flag()
 
@@ -142,16 +142,6 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     val fromBlock = BlockCoordinate(from[0], 0, from[1])
     val toBlock = BlockCoordinate(to[0], 0, to[1])
     return fromBlock to toBlock
-  }
-
-  @Suppress("unused")
-  enum class RenderType(
-    val id: String,
-    val create: (BlockExpanse, Database) -> BlockImageRenderer
-  ) {
-    BlockDiversity("block-diversity", { expanse, _ -> BlockDiversityRenderer(expanse) }),
-    HeightMap("height-map", { expanse, _ -> BlockHeightMapRenderer(expanse) }),
-    PlayerPosition("player-position", { expanse, db -> PlayerLocationShareRenderer(expanse, db) })
   }
 
   @Suppress("unused")
