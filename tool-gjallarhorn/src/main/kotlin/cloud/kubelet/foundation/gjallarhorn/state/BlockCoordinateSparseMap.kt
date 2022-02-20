@@ -5,10 +5,10 @@ import cloud.kubelet.foundation.gjallarhorn.util.minOfAll
 import java.util.*
 import kotlin.math.absoluteValue
 
-open class BlockCoordinateSparseMap<T> : BlockCoordinateStore<T> {
-  private var internalBlocks = TreeMap<Long, TreeMap<Long, TreeMap<Long, T>>>()
+open class BlockCoordinateSparseMap<T>(blocks: Map<Long, Map<Long, Map<Long, T>>> = mutableMapOf()) : BlockCoordinateStore<T> {
+  private var internalBlocks = blocks
 
-  val blocks: TreeMap<Long, TreeMap<Long, TreeMap<Long, T>>>
+  val blocks: Map<Long, Map<Long, Map<Long, T>>>
     get() = internalBlocks
 
   override fun get(position: BlockCoordinate): T? = internalBlocks[position.x]?.get(position.z)?.get(position.z)
@@ -16,11 +16,11 @@ open class BlockCoordinateSparseMap<T> : BlockCoordinateStore<T> {
   override fun getXSection(x: Long): Map<Long, Map<Long, T>>? = internalBlocks[x]
 
   override fun put(position: BlockCoordinate, value: T) {
-    internalBlocks.getOrPut(position.x) {
-      TreeMap()
-    }.getOrPut(position.z) {
-      TreeMap()
-    }[position.y] = value
+    (((internalBlocks as MutableMap).getOrPut(position.x) {
+      mutableMapOf()
+    } as MutableMap).getOrPut(position.z) {
+      mutableMapOf()
+    } as MutableMap)[position.y] = value
   }
 
   override fun createOrModify(position: BlockCoordinate, create: () -> T, modify: (T) -> Unit) {
@@ -52,11 +52,11 @@ open class BlockCoordinateSparseMap<T> : BlockCoordinateStore<T> {
   }
 
   fun applyCoordinateOffset(offset: BlockCoordinate) {
-    val root = TreeMap<Long, TreeMap<Long, TreeMap<Long, T>>>()
+    val root = mutableMapOf<Long, MutableMap<Long, MutableMap<Long, T>>>()
     internalBlocks = internalBlocks.map { xSection ->
-      val zSectionMap = TreeMap<Long, TreeMap<Long, T>>()
+      val zSectionMap = mutableMapOf<Long, MutableMap<Long, T>>()
       (xSection.key + offset.x) to xSection.value.map { zSection ->
-        val ySectionMap = TreeMap<Long, T>()
+        val ySectionMap = mutableMapOf<Long, T>()
         (zSection.key + offset.z) to zSection.value.mapKeys {
           (it.key + offset.y)
         }.toMap(ySectionMap)

@@ -1,7 +1,9 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
 import java.util.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BlockCoordinate(
   val x: Long,
   val y: Long,

@@ -1,3 +1,7 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
-class SparseBlockStateMap : BlockCoordinateSparseMap<BlockState>()
+import kotlinx.serialization.Serializable
+
+@Serializable(SparseBlockStateMapSerializer::class)
+class SparseBlockStateMap(blocks: Map<Long, Map<Long, Map<Long, BlockState>>> = mutableMapOf()) :
+  BlockCoordinateSparseMap<BlockState>(blocks)

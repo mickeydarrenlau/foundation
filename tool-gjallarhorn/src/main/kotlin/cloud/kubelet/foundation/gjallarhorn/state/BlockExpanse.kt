@@ -1,6 +1,9 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
-class BlockExpanse(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class BlockExpanse(
   val offset: BlockCoordinate,
   val size: BlockCoordinate
 ) {

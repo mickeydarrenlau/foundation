@@ -1,8 +1,10 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
+import kotlinx.serialization.Serializable
 import java.util.concurrent.ConcurrentHashMap
 
-class BlockState(val type: String) {
+@Serializable(BlockStateSerializer::class)
+data class BlockState(val type: String) {
   companion object {
     private val cache = ConcurrentHashMap<String, BlockState>()
 
