@@ -14,8 +14,11 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 
 class ChunkExportLoader(val map: SparseBlockStateMap? = null, val tracker: BlockLogTracker? = null) {
-  fun loadAllChunksForWorld(path: Path, world: String, fast: Boolean = false) {
-    val chunkFiles = path.listDirectoryEntries("${world}_chunk_*.json.gz")
+  fun loadAllChunksForWorld(path: Path, world: String, fast: Boolean = false, limit: Int? = null) {
+    var chunkFiles = path.listDirectoryEntries("${world}_chunk_*.json.gz")
+    if (limit != null) {
+      chunkFiles = chunkFiles.take(limit)
+    }
     if (fast) {
       chunkFiles.parallelStream().forEach { loadChunkFile(it, id = chunkFiles.indexOf(it)) }
     } else {

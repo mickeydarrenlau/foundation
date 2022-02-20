@@ -1,5 +1,7 @@
 package cloud.kubelet.foundation.gjallarhorn.state
 
+import cloud.kubelet.foundation.gjallarhorn.util.maxOfAll
+import cloud.kubelet.foundation.gjallarhorn.util.minOfAll
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.absoluteValue
 
@@ -23,10 +25,7 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   }
 
   fun calculateZeroBlockOffset(): BlockCoordinate {
-    val x = blocks.keys.minOf { it.x }
-    val y = blocks.keys.minOf { it.y }
-    val z = blocks.keys.minOf { it.z }
-
+    val (x, y, z) = blocks.keys.minOfAll(3) { listOf(it.x, it.y, it.z) }
     val xOffset = if (x < 0) x.absoluteValue else 0
     val yOffset = if (y < 0) y.absoluteValue else 0
     val zOffset = if (z < 0) z.absoluteValue else 0
@@ -35,9 +34,7 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   }
 
   fun calculateMaxBlock(): BlockCoordinate {
-    val x = blocks.keys.maxOf { it.x }
-    val y = blocks.keys.maxOf { it.y }
-    val z = blocks.keys.maxOf { it.z }
+    val (x, y, z) = blocks.keys.maxOfAll(3) { listOf(it.x, it.y, it.z) }
     return BlockCoordinate(x, y, z)
   }
 

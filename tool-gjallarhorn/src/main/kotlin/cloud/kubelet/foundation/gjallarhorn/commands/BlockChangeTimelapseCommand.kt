@@ -104,7 +104,7 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
       changelog = changelog,
       blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
       delegate = timelapse,
-      createRendererFunction = { expanse -> render.create(expanse, db) },
+      createRendererFunction = { expanse -> render.createNewRenderer(expanse, db) },
       threadPoolExecutor = threadPoolExecutor
     ) { slice, result ->
       val speed = slice.sliceRelativeDuration.toSeconds().toDouble() / timelapseMode.interval.toSeconds().toDouble()
