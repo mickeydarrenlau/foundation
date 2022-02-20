@@ -1,6 +1,7 @@
 package cloud.kubelet.foundation.gjallarhorn.export
 
 import cloud.kubelet.foundation.gjallarhorn.state.BlockCoordinate
+import cloud.kubelet.foundation.gjallarhorn.state.BlockLogTracker
 import cloud.kubelet.foundation.gjallarhorn.state.BlockState
 import cloud.kubelet.foundation.gjallarhorn.state.SparseBlockStateMap
 import cloud.kubelet.foundation.heimdall.export.ExportedChunk
@@ -12,7 +13,7 @@ import java.util.zip.GZIPInputStream
 import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 
-class ChunkExportLoader(val map: SparseBlockStateMap) {
+class ChunkExportLoader(val map: SparseBlockStateMap? = null, val tracker: BlockLogTracker? = null) {
   fun loadAllChunksForWorld(path: Path, world: String, fast: Boolean = false) {
     val chunkFiles = path.listDirectoryEntries("${world}_chunk_*.json.gz")
     if (fast) {
@@ -30,6 +31,7 @@ class ChunkExportLoader(val map: SparseBlockStateMap) {
     val chunk = Json.decodeFromStream(ExportedChunk.serializer(), gzipInputStream)
 
     var blockCount = 0L
+    val allBlocks = if (tracker != null) mutableMapOf<BlockCoordinate, BlockState>() else null
     for (section in chunk.sections) {
       val x = (chunk.x * 16) + section.x
       val z = (chunk.z * 16) + section.z
@@ -40,10 +42,18 @@ class ChunkExportLoader(val map: SparseBlockStateMap) {
 
         val coordinate = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
         val state = BlockState.cached(block.type)
-        map.put(coordinate, state)
+        map?.put(coordinate, state)
+        if (allBlocks != null) {
+          allBlocks[coordinate] = state
+        }
         blockCount++
       }
     }
+
+    if (allBlocks != null) {
+      tracker?.placeAll(allBlocks)
+    }
+
     logger.info("($id) Chunk X=${chunk.x} Z=${chunk.z} had $blockCount blocks")
   }
 

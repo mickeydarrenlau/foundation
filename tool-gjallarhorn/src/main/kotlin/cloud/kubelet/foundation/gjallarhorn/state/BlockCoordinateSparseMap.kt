@@ -57,8 +57,8 @@ open class BlockCoordinateSparseMap<T> : BlockCoordinateStore<T> {
       val zSectionMap = TreeMap<Long, TreeMap<Long, T>>()
       (xSection.key + offset.x) to xSection.value.map { zSection ->
         val ySectionMap = TreeMap<Long, T>()
-        (zSection.key + offset.z) to zSection.value.map { ySection ->
-          (ySection.key + offset.y) to ySection.value
+        (zSection.key + offset.z) to zSection.value.mapKeys {
+          (it.key + offset.y)
         }.toMap(ySectionMap)
       }.toMap(zSectionMap)
     }.toMap(root)

@@ -5,7 +5,7 @@ class BlockExpanse(
   val size: BlockCoordinate
 ) {
   companion object {
-    fun offsetAndMax(offset: BlockCoordinate, max: BlockCoordinate) = BlockExpanse(
+    fun zeroOffsetAndMax(offset: BlockCoordinate, max: BlockCoordinate) = BlockExpanse(
       offset,
       offset.applyAsOffset(max)
     )

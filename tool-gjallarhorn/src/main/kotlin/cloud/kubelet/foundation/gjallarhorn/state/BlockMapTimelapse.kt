@@ -17,7 +17,7 @@ class BlockMapTimelapse<T> :
     val globalBlockOffset = BlockCoordinate.maxOf(allBlockOffsets)
     val allBlockMaxes = trackers.map { it.value.calculateMaxBlock() }
     val globalBlockMax = BlockCoordinate.maxOf(allBlockMaxes)
-    val globalBlockExpanse = BlockExpanse.offsetAndMax(globalBlockOffset, globalBlockMax)
+    val globalBlockExpanse = BlockExpanse.zeroOffsetAndMax(globalBlockOffset, globalBlockMax)
 
     val renderer = pool.createRendererFunction(globalBlockExpanse)
     for ((slice, tracker) in trackers) {

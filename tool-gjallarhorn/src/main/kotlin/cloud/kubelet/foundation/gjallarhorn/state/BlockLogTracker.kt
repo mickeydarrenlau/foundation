@@ -10,6 +10,10 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
     blocks[position] = state
   }
 
+  fun placeAll(map: Map<BlockCoordinate, BlockState>) {
+    blocks.putAll(map)
+  }
+
   fun delete(position: BlockCoordinate) {
     if (mode == BlockTrackMode.AirOnDelete) {
       blocks[position] = BlockState.AirBlock

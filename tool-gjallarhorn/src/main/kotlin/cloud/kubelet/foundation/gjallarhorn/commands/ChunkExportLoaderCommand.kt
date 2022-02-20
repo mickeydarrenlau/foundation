@@ -2,8 +2,8 @@ package cloud.kubelet.foundation.gjallarhorn.commands
 
 import cloud.kubelet.foundation.gjallarhorn.export.ChunkExportLoader
 import cloud.kubelet.foundation.gjallarhorn.state.BlockExpanse
+import cloud.kubelet.foundation.gjallarhorn.state.BlockLogTracker
 import cloud.kubelet.foundation.gjallarhorn.state.ChangelogSlice
-import cloud.kubelet.foundation.gjallarhorn.state.SparseBlockStateMap
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -22,12 +22,12 @@ class ChunkExportLoaderCommand : CliktCommand("Chunk Export Loader", name = "chu
   private val render by option("--render", help = "Render Top Down Image").enum<ImageRenderType> { it.id }
 
   override fun run() {
-    val map = SparseBlockStateMap()
-    val loader = ChunkExportLoader(map)
+    val tracker = BlockLogTracker(isConcurrent = true)
+    val loader = ChunkExportLoader(tracker = tracker)
     loader.loadAllChunksForWorld(exportDirectoryPath, world, fast = true)
     if (render != null) {
-      val expanse = BlockExpanse.offsetAndMax(map.calculateZeroBlockOffset(), map.calculateMaxBlock())
-      map.applyCoordinateOffset(expanse.offset)
+      val expanse = BlockExpanse.zeroOffsetAndMax(tracker.calculateZeroBlockOffset(), tracker.calculateMaxBlock())
+      val map = tracker.buildBlockMap(expanse.offset)
       val renderer = render!!.create(expanse, db)
       val image = renderer.render(ChangelogSlice.none, map)
       image.savePngFile("full.png")
