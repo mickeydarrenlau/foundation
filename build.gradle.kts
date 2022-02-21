@@ -1,24 +1,18 @@
+import cloud.kubelet.foundation.gradle.FoundationProjectPlugin
+import cloud.kubelet.foundation.gradle.isFoundationPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.com.google.gson.Gson
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.FileWriter
 
 plugins {
   java
   id("cloud.kubelet.foundation.gradle")
 }
 
-fun Project.isFoundationPlugin() = name.startsWith("foundation-")
-fun Project.isFoundationTool() = !isFoundationPlugin()
-
-// Disable the JAR task for the root project.
-tasks["jar"].enabled = false
-
 allprojects {
   repositories {
     mavenCentral()
     maven {
-      name = "papermc-repo"
+      name = "papermc"
       url = uri("https://papermc.io/repo/repository/maven-public/")
     }
 
@@ -29,58 +23,19 @@ allprojects {
   }
 }
 
-val manifestsDir = buildDir.resolve("manifests")
-manifestsDir.mkdirs()
-val gson = Gson()
-
-tasks.create("updateManifests") {
-  // TODO: not using task dependencies, outputs, blah blah blah.
-  doLast {
-    val updateFile = manifestsDir.resolve("update.json")
-    val writer = FileWriter(updateFile)
-    writer.use {
-      val rootPath = rootProject.rootDir.toPath()
-      val updateManifest = subprojects.mapNotNull { project ->
-        if (project.isFoundationTool()) {
-          return@mapNotNull null
-        }
-        val files = project.tasks.getByName("shadowJar").outputs
-        val paths = files.files.map { rootPath.relativize(it.toPath()).toString() }
-
-        if (paths.isNotEmpty()) project.name to mapOf(
-          "version" to project.version,
-          "artifacts" to paths,
-        )
-        else null
-      }.toMap()
-
-      gson.toJson(
-        updateManifest,
-        writer
-      )
-    }
-  }
-}
-
 tasks.assemble {
   dependsOn("updateManifests")
 }
+
+version = "0.2"
 
 subprojects {
   plugins.apply("org.jetbrains.kotlin.jvm")
   plugins.apply("org.jetbrains.kotlin.plugin.serialization")
   plugins.apply("com.github.johnrengelman.shadow")
+  plugins.apply(FoundationProjectPlugin::class)
 
-  version = "0.2"
   group = "io.gorence"
-
-  // Add build number if running under CI.
-  val versionWithBuild = if (System.getenv("CI_PIPELINE_IID") != null) {
-    version as String + ".${System.getenv("CI_PIPELINE_IID")}"
-  } else {
-    "DEV"
-  }
-  version = versionWithBuild
 
   dependencies {
     // Kotlin dependencies

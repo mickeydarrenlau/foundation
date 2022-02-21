@@ -17,5 +17,8 @@ class FoundationGradlePlugin : Plugin<Project> {
     }
     val runPaperServer = project.tasks.create<RunPaperServer>("runPaperServer")
     runPaperServer.dependsOn(setupPaperServer)
+
+    val updateManifests = project.tasks.create<UpdateManifestTask>("updateManifests")
+    project.tasks.getByName("assemble").dependsOn(updateManifests)
   }
 }

@@ -6,9 +6,11 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
-class PaperVersionClient(val client: HttpClient = HttpClient.newHttpClient()) {
+class PaperVersionClient(
+  val client: HttpClient = HttpClient.newHttpClient(),
+  private val gson: Gson = FoundationGlobals.gson
+) {
   private val apiBaseUrl = URI.create("https://papermc.io/api/v2/")
-  private val gson = Gson()
 
   fun getVersionBuilds(group: String): List<PaperBuild> {
     val response = client.send(
