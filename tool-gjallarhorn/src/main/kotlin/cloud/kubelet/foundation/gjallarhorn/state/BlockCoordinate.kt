@@ -35,5 +35,13 @@ data class BlockCoordinate(
 
       return BlockCoordinate(x, y, z)
     }
+
+    fun minOf(coordinates: List<BlockCoordinate>): BlockCoordinate {
+      val x = coordinates.minOf { it.x }
+      val y = coordinates.minOf { it.y }
+      val z = coordinates.minOf { it.z }
+
+      return BlockCoordinate(x, y, z)
+    }
   }
 }

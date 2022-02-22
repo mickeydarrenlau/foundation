@@ -5,7 +5,6 @@ import cloud.kubelet.foundation.gjallarhorn.export.CombinedChunkFormat
 import cloud.kubelet.foundation.gjallarhorn.state.BlockExpanse
 import cloud.kubelet.foundation.gjallarhorn.state.BlockLogTracker
 import cloud.kubelet.foundation.gjallarhorn.state.ChangelogSlice
-import cloud.kubelet.foundation.gjallarhorn.state.SparseBlockStateMap
 import cloud.kubelet.foundation.gjallarhorn.util.savePngFile
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -31,10 +30,8 @@ class ChunkExportLoaderCommand : CliktCommand("Chunk Export Loader", name = "chu
   private val saveCombinedFormat by option("--save-combined-format").flag()
 
   override fun run() {
-    val format: CombinedChunkFormat
-
     val combinedFormatFile = exportDirectoryPath.resolve("combined.json").toFile()
-    format = if (loadCombinedFormat) {
+    val format = if (loadCombinedFormat) {
       Json.decodeFromStream(CombinedChunkFormat.serializer(), combinedFormatFile.inputStream())
     } else {
       val tracker = BlockLogTracker(isConcurrent = true)

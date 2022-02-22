@@ -65,6 +65,7 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
       password = config.db.password
       schema = "heimdall"
       maximumPoolSize = 10
+      idleTimeout = Duration.ofMinutes(5).toMillis()
       maxLifetime = Duration.ofMinutes(10).toMillis()
     })
     val initMigrationContent = FoundationHeimdallPlugin::class.java.getResourceAsStream(
