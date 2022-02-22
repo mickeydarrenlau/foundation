@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
+import java.time.Duration
 
 class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
   private val jdbcConnectionUrl by option("-c", "--connection-url", help = "JDBC Connection URL")
@@ -27,6 +28,7 @@ class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
       password = jdbcConnectionPassword
       minimumIdle = dbPoolSize / 2
       maximumPoolSize = dbPoolSize
+      maxLifetime = Duration.ofHours(2).toMillis()
     })
     val db = Database.connect(pool)
     currentContext.findOrSetObject { db }
