@@ -29,7 +29,7 @@ import kotlin.io.path.inputStream
 class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   private lateinit var config: HeimdallConfig
   private lateinit var pool: HikariDataSource
-  internal lateinit var db: Database
+  internal var db: Database? = null
 
   private val buffer = EventBuffer()
   private val bufferFlushThread = BufferFlushThread(this, buffer)

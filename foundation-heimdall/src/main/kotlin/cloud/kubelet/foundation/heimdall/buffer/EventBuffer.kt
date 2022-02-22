@@ -21,4 +21,8 @@ class EventBuffer {
   fun push(event: HeimdallEvent) {
     events.add(event)
   }
+
+  fun clear() {
+    events = mutableListOf()
+  }
 }

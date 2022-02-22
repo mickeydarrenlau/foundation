@@ -31,6 +31,11 @@ class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventB
 
   fun flush() {
     try {
+      val db = plugin.db
+      if (db == null) {
+        buffer.clear()
+        return
+      }
       transaction(plugin.db) {
         val count = buffer.flush(this)
         if (count > 0) {
