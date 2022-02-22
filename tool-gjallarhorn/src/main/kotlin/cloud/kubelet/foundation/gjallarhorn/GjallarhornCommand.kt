@@ -28,7 +28,7 @@ class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
       password = jdbcConnectionPassword
       minimumIdle = dbPoolSize / 2
       maximumPoolSize = dbPoolSize
-      maxLifetime = Duration.ofHours(2).toMillis()
+      maxLifetime = Duration.ofMinutes(10).toMillis()
     })
     val db = Database.connect(pool)
     currentContext.findOrSetObject { db }

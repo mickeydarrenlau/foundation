@@ -21,6 +21,7 @@ import org.bukkit.event.player.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -63,6 +64,8 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
       username = config.db.username
       password = config.db.password
       schema = "heimdall"
+      maximumPoolSize = 10
+      maxLifetime = Duration.ofMinutes(10).toMillis()
     })
     val initMigrationContent = FoundationHeimdallPlugin::class.java.getResourceAsStream(
       "/init.sql"
