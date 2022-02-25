@@ -1,6 +1,5 @@
 package cloud.kubelet.foundation.heimdall.event
 
-import cloud.kubelet.foundation.heimdall.storageBlockName
 import cloud.kubelet.foundation.heimdall.table.BlockPlaceTable
 import org.bukkit.Location
 import org.bukkit.Material
@@ -29,7 +28,7 @@ class BlockPlace(
         it[z] = location.z
         it[pitch] = location.pitch.toDouble()
         it[yaw] = location.yaw.toDouble()
-        it[block] = material.storageBlockName
+        it[block] = material.key.toString()
       }
     }
   }

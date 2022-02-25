@@ -22,7 +22,7 @@ class ChunkExportLoader(
       chunkFiles = chunkFiles.take(limit)
     }
     if (fast) {
-      chunkFiles.parallelStream().forEach { loadChunkFile(it, id = chunkFiles.indexOf(it)) }
+      chunkFiles.withIndex().toList().parallelStream().forEach { loadChunkFile(it.value, id = it.index) }
     } else {
       for (filePath in chunkFiles) {
         loadChunkFile(filePath, id = chunkFiles.indexOf(filePath))
