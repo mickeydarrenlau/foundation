@@ -35,7 +35,7 @@ subprojects {
   plugins.apply("com.github.johnrengelman.shadow")
   plugins.apply(FoundationProjectPlugin::class)
 
-  group = "io.gorence"
+  group = "lgbt.mystic"
 
   dependencies {
     // Kotlin dependencies

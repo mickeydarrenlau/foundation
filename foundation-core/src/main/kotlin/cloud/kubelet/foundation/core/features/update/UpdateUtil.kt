@@ -15,7 +15,7 @@ object UpdateUtil {
 
   // TODO: Add environment variable override. Document it.
   private const val basePath =
-    "https://git.gorence.io/minecraft/foundation/-/jobs/artifacts/main/raw"
+    "https://git.mystic.run/minecraft/foundation/-/jobs/artifacts/main/raw"
   private const val basePathQueryParams = "job=build"
   private const val manifestPath = "build/manifests/update.json"
 

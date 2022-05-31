@@ -21,5 +21,5 @@ available.
 
 ```bash
 # Always validate the contents of a script from the internet!
-bash -c "$(curl -sL https://git.gorence.io/minecraft/foundation/-/raw/main/install.sh)"
+bash -c "$(curl -sL https://git.mystic.run/minecraft/foundation/-/raw/main/install.sh)"
 ```

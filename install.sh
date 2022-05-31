@@ -20,7 +20,7 @@ if [ ! -d plugins ]; then
 fi
 
 # Base GitLab update manifest.
-base_url="https://git.gorence.io/minecraft/foundation/-/jobs/artifacts/main/raw/"
+base_url="https://git.mystic.run/minecraft/foundation/-/jobs/artifacts/main/raw/"
 query_params="job=build"
 
 # Download the update manifest.
