@@ -1,0 +1,5 @@
+# Configuration for the Bifrost multi-server chat bridge.
+
+messageQueue:
+  host: localhost
+
