@@ -1,11 +1,11 @@
-import cloud.kubelet.foundation.gradle.FoundationProjectPlugin
-import cloud.kubelet.foundation.gradle.isFoundationPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import gay.pizza.foundation.gradle.FoundationProjectPlugin
+import gay.pizza.foundation.gradle.isFoundationPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("cloud.kubelet.foundation.gradle")
+  id("gay.pizza.foundation.gradle")
 }
 
 allprojects {

@@ -6,5 +6,5 @@ dependencies {
 }
 
 listOf(tasks.jar, tasks.shadowJar).map { it.get() }.forEach { task ->
-  task.manifest.attributes["Main-Class"] = "cloud.kubelet.foundation.gjallarhorn.MainKt"
+  task.manifest.attributes["Main-Class"] = "gay.pizza.foundation.gjallarhorn.MainKt"
 }

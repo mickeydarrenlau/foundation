@@ -15,6 +15,8 @@ server.
 
 ## Installation
 
+**These directions won't work for the time being.**
+
 The following command downloads and runs a script that will fetch the latest update manifest, and
 install all plugins available. It can also be used to update plugins to the latest version
 available.

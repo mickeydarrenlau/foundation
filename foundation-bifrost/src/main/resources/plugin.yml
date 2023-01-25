@@ -1,6 +1,6 @@
 name: Foundation-Bifrost
 version: '${version}'
-main: cloud.kubelet.foundation.bifrost.FoundationBifrostPlugin
+main: gay.pizza.foundation.bifrost.FoundationBifrostPlugin
 api-version: 1.18
 prefix: Foundation-Bifrost
 load: STARTUP

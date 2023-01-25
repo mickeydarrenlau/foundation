@@ -21,8 +21,8 @@ java.targetCompatibility = JavaVersion.VERSION_1_8
 gradlePlugin {
   plugins {
     create("foundation") {
-      id = "cloud.kubelet.foundation.gradle"
-      implementationClass = "cloud.kubelet.foundation.gradle.FoundationGradlePlugin"
+      id = "gay.pizza.foundation.gradle"
+      implementationClass = "gay.pizza.foundation.gradle.FoundationGradlePlugin"
     }
   }
 }
