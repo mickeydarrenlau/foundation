@@ -1,20 +1,14 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import gay.pizza.foundation.gradle.FoundationProjectPlugin
-import gay.pizza.foundation.gradle.isFoundationPlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("gay.pizza.foundation.gradle")
+  id("gay.pizza.foundation.concrete-root") version "0.6.0-SNAPSHOT"
+  id("gay.pizza.foundation.concrete-plugin") version "0.6.0-SNAPSHOT" apply false
 }
 
 allprojects {
   repositories {
     mavenCentral()
-    maven {
-      name = "papermc"
-      url = uri("https://papermc.io/repo/repository/maven-public/")
-    }
 
     maven {
       name = "sonatype"
@@ -23,19 +17,15 @@ allprojects {
   }
 }
 
-tasks.assemble {
-  dependsOn("updateManifests")
-}
-
 version = "0.2"
 
 subprojects {
   plugins.apply("org.jetbrains.kotlin.jvm")
   plugins.apply("org.jetbrains.kotlin.plugin.serialization")
   plugins.apply("com.github.johnrengelman.shadow")
-  plugins.apply(FoundationProjectPlugin::class)
+  plugins.apply("gay.pizza.foundation.concrete-plugin")
 
-  group = "lgbt.mystic"
+  group = "gay.pizza.foundation"
 
   dependencies {
     // Kotlin dependencies
@@ -53,9 +43,6 @@ subprojects {
     // Persistence
     implementation("org.jetbrains.xodus:xodus-openAPI:1.3.232")
     implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
-
-    // Paper API
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
   }
 
   java {
@@ -66,32 +53,14 @@ subprojects {
 
   tasks.withType<KotlinCompile> {
     kotlinOptions {
-      freeCompilerArgs =
-        freeCompilerArgs + "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+      freeCompilerArgs += "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
-  }
-
-  tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-      expand(props)
-    }
-  }
-
-  if (project.isFoundationPlugin()) {
-    tasks.withType<ShadowJar> {
-      archiveClassifier.set("plugin")
-    }
-  }
-
-  tasks.assemble {
-    dependsOn("shadowJar")
   }
 }
 
-foundation {
+concrete {
   minecraftServerPath.set("server")
   paperVersionGroup.set("1.18")
+  paperApiVersion.set("1.18.2-R0.1-SNAPSHOT")
+  acceptServerEula.set(true)
 }
