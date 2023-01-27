@@ -19,10 +19,12 @@ jobs:
         run: ./gradlew --no-daemon build
       - name: Organize artifacts
         run: ./tools/organize-artifacts.sh
-      - uses: shallwefootball/s3-upload-action@master
+      - uses: GayPizzaSpecifications/s3-upload-action@b2_support
         with:
           aws_key_id: ${{ secrets.ARTIFACTS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.ARTIFACTS_APP_KEY }}
           aws_bucket: ${{ secrets.ARTIFACTS_BUCKET }}
+          aws_endpoint: ${{ secrets.ARTIFACTS_ENDPOINT }}
+          aws_region: ${{ secrets.ARTIFACTS_REGION }}
           source_dir: 'artifacts/'
           destination_dir: 'foundation/'
