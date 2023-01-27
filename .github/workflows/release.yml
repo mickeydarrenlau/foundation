@@ -1,0 +1,28 @@
+name: Upload to S3
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build
+        run: ./gradlew --no-daemon build
+      - name: Organize artifacts
+        run: ./tools/organize-artifacts.sh
+      - uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.ARTIFACTS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.ARTIFACTS_APP_KEY }}
+          aws_bucket: ${{ secrets.ARTIFACTS_BUCKET }}
+          source_dir: 'artifacts/'
+          destination_dir: 'foundation/'
