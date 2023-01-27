@@ -19,7 +19,7 @@ jobs:
         run: ./gradlew --no-daemon build
       - name: Organize artifacts
         run: ./tools/organize-artifacts.sh
-      - uses: GayPizzaSpecifications/s3-upload-action@b2_support
+      - uses: GayPizzaSpecifications/upload-s3-action@b2_support
         with:
           aws_key_id: ${{ secrets.ARTIFACTS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.ARTIFACTS_APP_KEY }}
