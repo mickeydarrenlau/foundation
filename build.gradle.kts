@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("gay.pizza.foundation.concrete-root") version "0.6.0-SNAPSHOT"
-  id("gay.pizza.foundation.concrete-plugin") version "0.6.0-SNAPSHOT" apply false
+  id("gay.pizza.foundation.concrete-root") version "0.6.0"
+  id("gay.pizza.foundation.concrete-plugin") version "0.6.0" apply false
 }
 
 allprojects {
@@ -60,7 +60,7 @@ subprojects {
 
 concrete {
   minecraftServerPath.set("server")
-  paperVersionGroup.set("1.18")
+  paperServerVersionGroup.set("1.18")
   paperApiVersion.set("1.18.2-R0.1-SNAPSHOT")
   acceptServerEula.set(true)
 }
