@@ -1,0 +1,6 @@
+# Whether enabling the chaos mode is allowed.
+allowed: false
+# Chaos modules enablement.
+enable:
+  nearest-player-entity-spawn: true
+  teleport-all-entities-nearest-player: true

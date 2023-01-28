@@ -1,0 +1,15 @@
+name: Foundation-Chaos
+version: '${version}'
+main: gay.pizza.foundation.chaos.FoundationChaosPlugin
+api-version: 1.18
+prefix: Foundation-Chaos
+load: STARTUP
+depend:
+  - Foundation
+authors:
+  - kubelet
+commands:
+  chaos:
+    description: Chaos Toggle
+    usage: /chaos
+    permission: foundation.command.chaos

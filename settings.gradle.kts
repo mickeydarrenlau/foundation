@@ -11,4 +11,5 @@ pluginManagement {
 include(
   ":foundation-core",
   ":foundation-bifrost",
+  ":foundation-chaos",
 )
