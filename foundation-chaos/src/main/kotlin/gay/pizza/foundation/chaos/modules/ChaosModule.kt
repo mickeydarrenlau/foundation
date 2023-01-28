@@ -5,6 +5,6 @@ import org.bukkit.event.Listener
 interface ChaosModule : Listener {
   fun id(): String
   fun what(): String
-  fun load() {}
-  fun unload() {}
+  fun activate() {}
+  fun deactivate() {}
 }

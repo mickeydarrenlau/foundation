@@ -4,3 +4,4 @@ allowed: false
 enable:
   nearest-player-entity-spawn: true
   teleport-all-entities-nearest-player: true
+selectionTimerTicks: 100
