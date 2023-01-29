@@ -23,8 +23,6 @@ version = "0.2"
 subprojects {
   plugins.apply("org.jetbrains.kotlin.jvm")
   plugins.apply("org.jetbrains.kotlin.plugin.serialization")
-  plugins.apply("com.github.johnrengelman.shadow")
-  plugins.apply("gay.pizza.foundation.concrete-plugin")
 
   group = "gay.pizza.foundation"
 
