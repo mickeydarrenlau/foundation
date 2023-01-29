@@ -1,30 +1,28 @@
-name: Upload to S3
-
+name: Release
 on:
   push:
     branches:
-      - 'main'
-
+      - main
 jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Install JDK
-        uses: actions/setup-java@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build
-        run: ./gradlew --no-daemon build
-      - name: Organize artifacts
-        run: ./tools/organize-artifacts.sh
-      - uses: GayPizzaSpecifications/upload-s3-action@b2_support
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
         with:
-          aws_key_id: ${{ secrets.ARTIFACTS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.ARTIFACTS_APP_KEY }}
-          aws_bucket: ${{ secrets.ARTIFACTS_BUCKET }}
-          aws_endpoint: ${{ secrets.ARTIFACTS_ENDPOINT }}
-          aws_region: ${{ secrets.ARTIFACTS_REGION }}
-          source_dir: 'artifacts/'
-          destination_dir: 'foundation/'
+          arguments: build
+      - name: Organize Artifacts
+        run: ./tools/organize-artifacts.sh
+      - name: Upload to Backblaze
+        run: ./tools/gh-upload-backblaze.sh
+        env:
+          ARTIFACTS_KEY_ID: "${{ secrets.ARTIFACTS_KEY_ID }}"
+          ARTIFACTS_APP_KEY: "${{ secrets.ARTIFACTS_APP_KEY }}"
+          ARTIFACTS_BUCKET: "${{ secrets.ARTIFACTS_BUCKET }}"

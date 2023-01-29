@@ -1,9 +1,9 @@
 plugins {
-  id("gay.pizza.foundation.concrete-plugin") version "0.7.0"
+  id("gay.pizza.foundation.concrete-plugin")
 }
 
 dependencies {
-  implementation("net.dv8tion:JDA:5.0.0-alpha.2") {
+  implementation("net.dv8tion:JDA:5.0.0-beta.3") {
     exclude(module = "opus-java")
   }
 

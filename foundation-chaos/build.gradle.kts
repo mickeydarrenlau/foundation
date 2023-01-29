@@ -1,5 +1,5 @@
 plugins {
-  id("gay.pizza.foundation.concrete-plugin") version "0.7.0"
+  id("gay.pizza.foundation.concrete-plugin")
 }
 
 dependencies {
