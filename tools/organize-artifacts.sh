@@ -7,7 +7,7 @@ mkdir -p artifacts/
 mkdir -p artifacts/build/manifests
 cp build/manifests/update.json artifacts/build/manifests/
 
-find . -name "*-plugin.jar" | while read -r jar
+find . -name "*-plugin.jar" | grep "foundation-" | while read -r jar
 do
   DN=`dirname ${jar}`
   mkdir -p "artifacts/$DN"

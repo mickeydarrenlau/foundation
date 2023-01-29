@@ -1,0 +1,13 @@
+name: Heimdall
+version: '${version}'
+main: io.kexec.heimdall.plugin.HeimdallPlugin
+api-version: 1.18
+prefix: Heimdall
+load: STARTUP
+authors:
+  - kendfinger
+commands:
+  export_all_chunks:
+    description: Export All Chunks
+    usage: /export_all_chunks
+    permission: heimdall.command.export_all_chunks

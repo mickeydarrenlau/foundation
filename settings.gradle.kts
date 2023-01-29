@@ -9,7 +9,10 @@ pluginManagement {
 }
 
 include(
+  ":common-heimdall",
   ":foundation-core",
   ":foundation-bifrost",
   ":foundation-chaos",
+  ":foundation-heimdall",
+  ":tool-gjallarhorn",
 )

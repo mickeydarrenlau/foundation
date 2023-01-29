@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   java
   id("gay.pizza.foundation.concrete-root") version "0.7.0"
+  id("gay.pizza.foundation.concrete-library") version "0.7.0" apply false
   id("gay.pizza.foundation.concrete-plugin") version "0.7.0" apply false
 }
 
@@ -53,7 +54,7 @@ subprojects {
 
   tasks.withType<KotlinCompile> {
     kotlinOptions {
-      freeCompilerArgs += "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+      freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
   }
 }

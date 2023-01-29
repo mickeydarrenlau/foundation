@@ -1,0 +1,11 @@
+# Whether Heimdall should be enabled for tracking events.
+enabled: false
+
+# Database connection information.
+db:
+  # JDBC URL
+  url: "jdbc:postgresql://localhost/heimdall"
+  # JDBC Username
+  username: "heimdall"
+  # JDBC Password
+  password: "heimdall"
