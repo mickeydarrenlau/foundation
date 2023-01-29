@@ -4,8 +4,13 @@ import gay.pizza.foundation.chaos.model.ChaosConfig
 import gay.pizza.foundation.chaos.modules.ChaosModule
 import gay.pizza.foundation.chaos.modules.ChaosModules
 import net.kyori.adventure.text.Component
+import org.bukkit.boss.BarColor
+import org.bukkit.boss.BarStyle
+import org.bukkit.boss.BossBar
+import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -17,6 +22,8 @@ class ChaosController(val plugin: Plugin, val config: ChaosConfig) : Listener {
   private var allowedModules: List<ChaosModule> = emptyList()
   private var activeModules = mutableSetOf<ChaosModule>()
 
+  var bossBar: BossBar? = null
+
   fun load() {
     if (state.get()) {
       return
@@ -24,6 +31,10 @@ class ChaosController(val plugin: Plugin, val config: ChaosConfig) : Listener {
     allowedModules = allModules.filter { config.enable[it.id()] ?: true }
     state.set(true)
     selectorController.schedule()
+    bossBar = plugin.server.createBossBar("Chaos Mode", BarColor.RED, BarStyle.SOLID)
+    for (player in plugin.server.onlinePlayers) {
+      bossBar?.addPlayer(player)
+    }
   }
 
   fun activateAll() {
@@ -39,14 +50,19 @@ class ChaosController(val plugin: Plugin, val config: ChaosConfig) : Listener {
     plugin.server.pluginManager.registerEvents(module, plugin)
     module.activate()
     activeModules.add(module)
-    plugin.server.broadcast(Component.text("Chaos Module Activated: ${module.id()}"))
+    updateBossBar()
   }
 
   fun deactivate(module: ChaosModule) {
     HandlerList.unregisterAll(module)
     module.deactivate()
     activeModules.remove(module)
-    plugin.server.broadcast(Component.text("Chaos Module Deactivated: ${module.id()}"))
+    updateBossBar()
+  }
+
+  fun updateBossBar() {
+    val activeModuleText = activeModules.joinToString(", ") { it.name() }
+    bossBar?.setTitle("Chaos Mode: $activeModuleText")
   }
 
   fun deactivateAll() {
@@ -55,11 +71,18 @@ class ChaosController(val plugin: Plugin, val config: ChaosConfig) : Listener {
     }
   }
 
+  @EventHandler
+  fun onPlayerJoin(event: PlayerJoinEvent) {
+    bossBar?.addPlayer(event.player)
+  }
+
   fun unload() {
     if (!state.get()) {
       return
     }
     deactivateAll()
+    bossBar?.removeAll()
+    bossBar = null
     state.set(false)
     selectorController.cancel()
   }

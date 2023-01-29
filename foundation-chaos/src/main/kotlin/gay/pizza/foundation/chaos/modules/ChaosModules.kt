@@ -5,6 +5,8 @@ import org.bukkit.plugin.Plugin
 object ChaosModules {
   fun all(plugin: Plugin) = listOf(
     NearestPlayerEntitySpawn(plugin),
-    TeleportAllEntitiesNearestPlayer(plugin)
+    TeleportAllEntitiesNearestPlayer(plugin),
+    KillRandomPlayer(plugin),
+    TntAllPlayers(plugin)
   )
 }

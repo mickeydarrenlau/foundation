@@ -5,7 +5,8 @@ import org.bukkit.plugin.Plugin
 
 class TeleportAllEntitiesNearestPlayer(val plugin: Plugin) : ChaosModule {
   override fun id(): String = "teleport-all-entities-nearest-player"
-  override fun what(): String = "Teleports all entities to the nearest player."
+  override fun name(): String = "Monster Me Once"
+  override fun what(): String = "Teleport all entities to the nearest player"
 
   override fun activate() {
     for (world in plugin.server.worlds) {

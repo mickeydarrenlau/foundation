@@ -7,7 +7,8 @@ import org.bukkit.plugin.Plugin
 
 class NearestPlayerEntitySpawn(val plugin: Plugin) : ChaosModule {
   override fun id(): String = "nearest-player-entity-spawn"
-  override fun what(): String = "Teleports all entities on spawn to the nearest player."
+  override fun name(): String = "Monster Me"
+  override fun what(): String = "Teleport all spawned entities to the nearest player"
 
   @EventHandler
   fun onMobSpawn(e: EntitySpawnEvent) {
