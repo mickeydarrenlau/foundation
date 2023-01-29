@@ -4,4 +4,5 @@ plugins {
 
 dependencies {
   api(project(":common-heimdall"))
+  compileOnly(project(":foundation-core"))
 }

@@ -12,7 +12,7 @@ dependencies {
 
 tasks.jar {
   manifest.attributes(
-    "Main-Class" to "io.kexec.heimdall.tool.MainKt"
+    "Main-Class" to "gay.pizza.foundation.heimdall.tool.MainKt"
   )
 }
 

@@ -8,6 +8,7 @@ import gay.pizza.foundation.heimdall.plugin.export.ExportChunksCommand
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import gay.pizza.foundation.core.Util
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -46,7 +47,7 @@ class HeimdallPlugin : JavaPlugin(), Listener {
     val pluginDataPath = dataFolder.toPath()
     pluginDataPath.toFile().mkdir()
 
-    val configPath = copyDefaultConfig<HeimdallPlugin>(
+    val configPath = Util.copyDefaultConfig<HeimdallPlugin>(
       slF4JLogger,
       pluginDataPath,
       "heimdall.yaml"
@@ -168,34 +169,5 @@ class HeimdallPlugin : JavaPlugin(), Listener {
       ))
     }
     bufferFlushThread.flush()
-  }
-
-  private inline fun <reified T> copyDefaultConfig(log: Logger, targetPath: Path, resourceName: String): Path {
-    if (resourceName.startsWith("/")) {
-      throw IllegalArgumentException("resourceName starts with slash")
-    }
-
-    if (!targetPath.toFile().exists()) {
-      throw Exception("Configuration output path does not exist!")
-    }
-    val outPath = targetPath.resolve(resourceName)
-    val outFile = outPath.toFile()
-    if (outFile.exists()) {
-      log.debug("Configuration file already exists.")
-      return outPath
-    }
-
-    val resourceStream = T::class.java.getResourceAsStream("/$resourceName")
-      ?: throw Exception("Configuration resource does not exist!")
-    val outputStream = outFile.outputStream()
-
-    resourceStream.use {
-      outputStream.use {
-        log.info("Copied default configuration to $outPath")
-        resourceStream.copyTo(outputStream)
-      }
-    }
-
-    return outPath
   }
 }

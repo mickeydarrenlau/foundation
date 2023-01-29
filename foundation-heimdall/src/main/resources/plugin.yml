@@ -1,11 +1,13 @@
-name: Heimdall
+name: Foundation-Heimdall
 version: '${version}'
-main: io.kexec.heimdall.plugin.HeimdallPlugin
+main: gay.pizza.foundation.heimdall.plugin.HeimdallPlugin
 api-version: 1.18
-prefix: Heimdall
+prefix: Foundation-Heimdall
 load: STARTUP
+depend:
+  - Foundation
 authors:
-  - kendfinger
+  - azenla
 commands:
   export_all_chunks:
     description: Export All Chunks
