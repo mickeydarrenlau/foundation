@@ -60,9 +60,9 @@ class BlockChangelog(
 
   companion object {
     fun query(db: Database, filter: Op<Boolean> = Op.TRUE): BlockChangelog = transaction(db) {
-      BlockChangelog(gay.pizza.foundation.heimdall.view.BlockChangeView.select(filter).orderBy(gay.pizza.foundation.heimdall.view.BlockChangeView.time).map { row ->
-        val time = row[gay.pizza.foundation.heimdall.view.BlockChangeView.time]
-        val changeIsBreak = row[gay.pizza.foundation.heimdall.view.BlockChangeView.isBreak]
+      BlockChangelog(BlockChangeView.select(filter).orderBy(BlockChangeView.time).map { row ->
+        val time = row[BlockChangeView.time]
+        val changeIsBreak = row[BlockChangeView.isBreak]
         val x = row[gay.pizza.foundation.heimdall.view.BlockChangeView.x]
         val y = row[gay.pizza.foundation.heimdall.view.BlockChangeView.y]
         val z = row[gay.pizza.foundation.heimdall.view.BlockChangeView.z]

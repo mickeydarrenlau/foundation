@@ -21,18 +21,18 @@ class PlayerSessionExport : CliktCommand(name = "export-player-sessions", help =
   override fun run() {
     val filter = compose(
       combine = { a, b -> a and b },
-      { playerIdString != null } to { gay.pizza.foundation.heimdall.table.PlayerSessionTable.player eq UUID.fromString(playerIdString) },
-      { playerNameString != null } to { gay.pizza.foundation.heimdall.table.PlayerSessionTable.name eq playerNameString!! }
+      { playerIdString != null } to { PlayerSessionTable.player eq UUID.fromString(playerIdString) },
+      { playerNameString != null } to { PlayerSessionTable.name eq playerNameString!! }
     )
 
     println("id,player,name,start,end")
     transaction(db) {
-      gay.pizza.foundation.heimdall.table.PlayerSessionTable.select(filter).orderBy(gay.pizza.foundation.heimdall.table.PlayerSessionTable.endTime).forEach { row ->
+      PlayerSessionTable.select(filter).orderBy(PlayerSessionTable.endTime).forEach { row ->
         val id = row[gay.pizza.foundation.heimdall.table.PlayerSessionTable.id]
-        val player = row[gay.pizza.foundation.heimdall.table.PlayerSessionTable.player]
-        val name = row[gay.pizza.foundation.heimdall.table.PlayerSessionTable.name]
-        val start = row[gay.pizza.foundation.heimdall.table.PlayerSessionTable.startTime]
-        val end = row[gay.pizza.foundation.heimdall.table.PlayerSessionTable.endTime]
+        val player = row[PlayerSessionTable.player]
+        val name = row[PlayerSessionTable.name]
+        val start = row[PlayerSessionTable.startTime]
+        val end = row[PlayerSessionTable.endTime]
 
         println("${id},${player},${name},${start},${end}")
       }

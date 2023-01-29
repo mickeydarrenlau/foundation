@@ -1,9 +1,5 @@
 package gay.pizza.foundation.heimdall.tool.commands
 
-import gay.pizza.foundation.heimdall.tool.render.*
-import gay.pizza.foundation.heimdall.tool.state.*
-import gay.pizza.foundation.heimdall.tool.util.compose
-import gay.pizza.foundation.heimdall.tool.util.savePngFile
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.default
@@ -12,6 +8,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
+import gay.pizza.foundation.heimdall.tool.render.*
+import gay.pizza.foundation.heimdall.tool.state.*
+import gay.pizza.foundation.heimdall.tool.util.compose
 import gay.pizza.foundation.heimdall.view.BlockChangeView
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
@@ -75,10 +74,10 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     val trim = maybeBuildTrim()
     val filter = compose(
       combine = { a, b -> a and b },
-      { trim?.first?.x != null } to { gay.pizza.foundation.heimdall.view.BlockChangeView.x greaterEq trim!!.first.x },
-      { trim?.first?.z != null } to { gay.pizza.foundation.heimdall.view.BlockChangeView.z greaterEq trim!!.first.z },
-      { trim?.second?.x != null } to { gay.pizza.foundation.heimdall.view.BlockChangeView.x lessEq trim!!.second.x },
-      { trim?.second?.z != null } to { gay.pizza.foundation.heimdall.view.BlockChangeView.z lessEq trim!!.second.z }
+      { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x },
+      { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z },
+      { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x },
+      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z }
     )
 
     val changelog = BlockChangelog.query(db, filter)

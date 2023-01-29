@@ -33,7 +33,7 @@ class ChunkExportLoader(
   fun loadChunkFile(path: Path, id: Int = 0) {
     val fileInputStream = path.inputStream()
     val gzipInputStream = GZIPInputStream(fileInputStream)
-    val chunk = Json.decodeFromStream(gay.pizza.foundation.heimdall.export.ExportedChunk.serializer(), gzipInputStream)
+    val chunk = Json.decodeFromStream(ExportedChunk.serializer(), gzipInputStream)
 
     var blockCount = 0L
     val allBlocks = if (tracker != null) mutableMapOf<BlockCoordinate, BlockState>() else null

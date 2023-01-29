@@ -25,9 +25,9 @@ class PlayerPositionExport : CliktCommand(name = "export-player-positions", help
   override fun run() {
     val filter = compose(
       combine = { a, b -> a and b },
-      { startTimeString != null } to { gay.pizza.foundation.heimdall.table.PlayerPositionTable.time greaterEq Instant.parse(startTimeString) },
-      { endTimeString != null } to { gay.pizza.foundation.heimdall.table.PlayerPositionTable.time lessEq Instant.parse(endTimeString) },
-      { playerIdString != null } to { gay.pizza.foundation.heimdall.table.PlayerPositionTable.player eq UUID.fromString(playerIdString) }
+      { startTimeString != null } to { PlayerPositionTable.time greaterEq Instant.parse(startTimeString) },
+      { endTimeString != null } to { PlayerPositionTable.time lessEq Instant.parse(endTimeString) },
+      { playerIdString != null } to { PlayerPositionTable.player eq UUID.fromString(playerIdString) }
     )
 
     println("time,player,world,x,y,z,pitch,yaw")

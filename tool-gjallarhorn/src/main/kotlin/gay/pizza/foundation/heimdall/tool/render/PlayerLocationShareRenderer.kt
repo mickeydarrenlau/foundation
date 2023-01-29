@@ -25,15 +25,15 @@ class PlayerLocationShareRenderer(
     val playerSparseMap = BlockCoordinateSparseMap<MutableList<UUID>>()
     val allPlayerIds = HashSet<UUID>()
     transaction(db) {
-      gay.pizza.foundation.heimdall.table.PlayerPositionTable.select {
-        (gay.pizza.foundation.heimdall.table.PlayerPositionTable.time greater start) and
-            (gay.pizza.foundation.heimdall.table.PlayerPositionTable.time lessEq end)
+      PlayerPositionTable.select {
+        (PlayerPositionTable.time greater start) and
+            (PlayerPositionTable.time lessEq end)
       }.forEach {
-        val x = it[gay.pizza.foundation.heimdall.table.PlayerPositionTable.x].toLong()
-        val y = it[gay.pizza.foundation.heimdall.table.PlayerPositionTable.y].toLong()
-        val z = it[gay.pizza.foundation.heimdall.table.PlayerPositionTable.z].toLong()
+        val x = it[PlayerPositionTable.x].toLong()
+        val y = it[PlayerPositionTable.y].toLong()
+        val z = it[PlayerPositionTable.z].toLong()
         val coordinate = expanse.offset.applyAsOffset(BlockCoordinate(x, y, z))
-        val player = it[gay.pizza.foundation.heimdall.table.PlayerPositionTable.player]
+        val player = it[PlayerPositionTable.player]
         playerSparseMap.createOrModify(
           coordinate,
           create = { mutableListOf(player) },
