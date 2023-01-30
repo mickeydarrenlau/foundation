@@ -1,7 +1,16 @@
 # Whether enabling the chaos mode is allowed.
 allowed: false
-# Chaos modules enablement.
-enable:
-  nearest-player-entity-spawn: true
-  teleport-all-entities-nearest-player: true
-selectionTimerTicks: 100
+# The default module configuration for modules with
+# no explicit configuration.
+defaultModuleConfiguration:
+  enabled: true
+# Module configuration.
+modules:
+  nearest-player-entity-spawn:
+    enabled: true
+  teleport-all-entities-nearest-player:
+    enabled: true
+# Chaos selection configuration.
+selection:
+  # The number of ticks before a new selection is made.
+  timerTicks: 6000

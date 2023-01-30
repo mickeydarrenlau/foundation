@@ -10,7 +10,7 @@ class ChaosSelectorController(val controller: ChaosController, val plugin: Plugi
     cancel()
     task = plugin.server.scheduler.runTaskTimer(controller.plugin, { ->
       select()
-    }, controller.config.selectionTimerTicks, controller.config.selectionTimerTicks)
+    }, 20, controller.config.selection.timerTicks)
   }
 
   fun select() {

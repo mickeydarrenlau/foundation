@@ -1,9 +1,9 @@
 package gay.pizza.foundation.chaos
 
 import gay.pizza.foundation.chaos.model.ChaosConfig
+import gay.pizza.foundation.chaos.model.ChaosModuleConfig
 import gay.pizza.foundation.chaos.modules.ChaosModule
 import gay.pizza.foundation.chaos.modules.ChaosModules
-import net.kyori.adventure.text.Component
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.boss.BossBar
@@ -28,13 +28,18 @@ class ChaosController(val plugin: Plugin, val config: ChaosConfig) : Listener {
     if (state.get()) {
       return
     }
-    allowedModules = allModules.filter { config.enable[it.id()] ?: true }
+    allowedModules = filterEnabledModules()
     state.set(true)
     selectorController.schedule()
     bossBar = plugin.server.createBossBar("Chaos Mode", BarColor.RED, BarStyle.SOLID)
     for (player in plugin.server.onlinePlayers) {
       bossBar?.addPlayer(player)
     }
+  }
+
+  private fun filterEnabledModules(): List<ChaosModule> = allModules.filter { module ->
+    val moduleConfig = config.modules[module.id()] ?: config.defaultModuleConfiguration
+    moduleConfig.enabled
   }
 
   fun activateAll() {

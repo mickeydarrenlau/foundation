@@ -1,5 +1,6 @@
 package gay.pizza.foundation.chaos.modules
 
+import gay.pizza.foundation.common.spawn
 import org.bukkit.entity.TNTPrimed
 import org.bukkit.plugin.Plugin
 
@@ -10,7 +11,7 @@ class TntAllPlayers(val plugin: Plugin) : ChaosModule {
 
   override fun activate() {
     for (player in plugin.server.onlinePlayers) {
-      player.world.spawn(player.location, TNTPrimed::class.java)
+      player.spawn(TNTPrimed::class)
     }
   }
 }

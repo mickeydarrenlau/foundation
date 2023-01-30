@@ -7,6 +7,7 @@ object ChaosModules {
     NearestPlayerEntitySpawn(plugin),
     TeleportAllEntitiesNearestPlayer(plugin),
     KillRandomPlayer(plugin),
-    TntAllPlayers(plugin)
+    TntAllPlayers(plugin),
+    MegaTnt(plugin)
   )
 }

@@ -9,6 +9,7 @@ pluginManagement {
 }
 
 include(
+  ":common-plugin",
   ":common-heimdall",
   ":foundation-core",
   ":foundation-bifrost",

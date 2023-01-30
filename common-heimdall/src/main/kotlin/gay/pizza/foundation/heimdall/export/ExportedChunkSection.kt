@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class ExportedChunkSection(
   val x: Int,
   val z: Int,
-  val blocks: List<ExportedBlock>
+  val blocks: List<Int>
 )

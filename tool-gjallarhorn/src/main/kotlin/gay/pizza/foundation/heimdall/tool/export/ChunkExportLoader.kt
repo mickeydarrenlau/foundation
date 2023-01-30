@@ -40,7 +40,8 @@ class ChunkExportLoader(
     for (section in chunk.sections) {
       val x = (chunk.x * 16) + section.x
       val z = (chunk.z * 16) + section.z
-      for ((y, block) in section.blocks.withIndex()) {
+      for ((y, bidx) in section.blocks.withIndex()) {
+        val block = chunk.blocks[bidx]
         if (block.type == "minecraft:air") {
           continue
         }

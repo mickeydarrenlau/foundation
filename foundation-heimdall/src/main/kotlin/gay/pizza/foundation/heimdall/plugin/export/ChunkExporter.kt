@@ -33,16 +33,18 @@ class ChunkExporter(private val plugin: Plugin, val world: World) {
   }
 
   private fun exportChunkSnapshot(snapshot: ChunkSnapshot) {
+    val blocks = mutableMapOf<String, Pair<Int, ExportedBlock>>()
+    val blockList = mutableListOf<ExportedBlock>()
     val sections = mutableListOf<ExportedChunkSection>()
     val yRange = world.minHeight until world.maxHeight
     val chunkRange = 0..15
     for (x in chunkRange) {
       for (z in chunkRange) {
-        sections.add(exportChunkSection(snapshot, yRange, x, z))
+        sections.add(exportChunkSection(blocks, blockList, snapshot, yRange, x, z))
       }
     }
 
-    val exported = ExportedChunk(snapshot.x, snapshot.z, sections)
+    val exported = ExportedChunk(blocks = blockList, snapshot.x, snapshot.z, sections)
     saveChunkSnapshot(snapshot, exported)
   }
 
@@ -58,13 +60,20 @@ class ChunkExporter(private val plugin: Plugin, val world: World) {
     gzipOutputStream.close()
   }
 
-  private fun exportChunkSection(snapshot: ChunkSnapshot, yRange: IntRange, x: Int, z: Int): ExportedChunkSection {
-    val blocks = mutableListOf<ExportedBlock>()
+  private fun exportChunkSection(blocks: MutableMap<String, Pair<Int, ExportedBlock>>, blockList: MutableList<ExportedBlock>, snapshot: ChunkSnapshot, yRange: IntRange, x: Int, z: Int): ExportedChunkSection {
+    val contents = mutableListOf<Int>()
     for (y in yRange) {
       val blockData = snapshot.getBlockData(x, y, z)
-      val block = ExportedBlock(blockData.material.key.toString())
-      blocks.add(block)
+      val key = blockData.material.key.toString()
+      var idxToBlk = blocks[key]
+      if (idxToBlk == null) {
+        val idx = blockList.size
+        idxToBlk = idx to ExportedBlock(key)
+        blockList.add(idxToBlk.second)
+        blocks[key] = idxToBlk
+      }
+      contents.add(idxToBlk.first)
     }
-    return ExportedChunkSection(x, z, blocks)
+    return ExportedChunkSection(x, z, contents)
   }
 }
