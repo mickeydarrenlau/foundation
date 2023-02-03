@@ -13,17 +13,16 @@ import java.nio.file.Path
 object UpdateUtil {
   private val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
 
-  // TODO: Add environment variable override. Document it.
+  // TODO(liv): Add environment variable override. Document it.
   private const val basePath =
-    "https://git.mystic.run/minecraft/foundation/-/jobs/artifacts/main/raw"
-  private const val basePathQueryParams = "job=build"
+    "https://artifacts.gay.pizza/foundation"
   private const val manifestPath = "build/manifests/update.json"
 
   fun fetchManifest() = fetchFile(
     getUrl(manifestPath), MapSerializer(String.serializer(), ModuleManifest.serializer()),
   )
 
-  fun getUrl(path: String) = "$basePath/$path?$basePathQueryParams"
+  fun getUrl(path: String) = "$basePath/$path"
 
   private inline fun <reified T> fetchFile(url: String, strategy: DeserializationStrategy<T>): T {
     val request = HttpRequest
