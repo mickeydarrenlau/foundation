@@ -18,6 +18,8 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
+        env:
+          CONCRETE_BUILD_NUMBER: "${{ github.run_number }}"
       - name: Organize Artifacts
         run: ./tools/organize-artifacts.sh
       - name: Upload to Backblaze

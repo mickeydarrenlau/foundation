@@ -21,9 +21,9 @@ object UpdateService {
 
       sender.sendMessage("Updates:")
       modules.forEach { (name, manifest) ->
-        // Dumb naming problem. Don't want to fix it right now.
+        // Foolish naming problem. Don't want to fix it right now.
         val plugin = if (name == "foundation-core") {
-          plugins["foundation"]
+          plugins["foundation"] ?: plugins[name.lowercase()]
         } else {
           plugins[name.lowercase()]
         }
