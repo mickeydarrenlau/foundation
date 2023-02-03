@@ -7,8 +7,8 @@ echo
 
 # Ensure curl and jq are installed.
 if ! hash curl jq &> /dev/null; then
-    echo "curl and jq must be installed"
-    exit 1
+  echo "curl and jq must be installed"
+  exit 1
 fi
 
 echo "Installing..."
@@ -20,11 +20,10 @@ if [ ! -d plugins ]; then
 fi
 
 # Base GitLab update manifest.
-base_url="https://git.mystic.run/minecraft/foundation/-/jobs/artifacts/main/raw/"
-query_params="job=build"
+base_url="https://artifacts.gay.pizza/foundation/"
 
 # Download the update manifest.
-manifest=$(curl -Ls "$base_url/build/manifests/update.json?$query_params")
+manifest=$(curl --fail -Ls "$base_url/build/manifests/update.json" || (echo "Failed to download manifest."; exit 1))
 
 # Get plugins list from the manifest.
 plugins=$(echo "$manifest" | jq -r 'keys | .[]')
@@ -40,5 +39,6 @@ do
   echo "Installing $plugin v$version to $dl_path"
 
   # Download the plugin and store it at the mentioned path.
-  curl -Ls "$base_url/$artifact_path?$query_params" --output "$dl_path"
+  curl --fail -Ls "$base_url/$artifact_path" --output "$dl_path" || (echo "Failed to download ${artifact_path}"; exit 1)
 done
+
