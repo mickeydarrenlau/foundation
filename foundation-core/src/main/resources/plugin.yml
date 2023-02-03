@@ -63,3 +63,8 @@ commands:
     usage: /localweather <type>
     aliases:
       - lw
+  goose:
+    description: Goose
+    usage: /goose
+    aliases:
+      - the_most_wonderful_kitty_ever
