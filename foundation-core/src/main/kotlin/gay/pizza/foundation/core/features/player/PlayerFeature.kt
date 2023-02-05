@@ -48,6 +48,7 @@ class PlayerFeature : Feature() {
     registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
     registerCommandExecutor(listOf("localweather", "lw"), LocalWeatherCommand())
     registerCommandExecutor(listOf("goose", "the_most_wonderful_kitty_ever"), GooseCommand())
+    registerCommandExecutor(listOf("megatnt"), MegaTntCommand())
   }
 
   override fun module() = org.koin.dsl.module {

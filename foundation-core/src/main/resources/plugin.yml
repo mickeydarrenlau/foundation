@@ -61,10 +61,16 @@ commands:
   localweather:
     description: Set the player's local weather in the client.
     usage: /localweather <type>
+    permission: foundation.command.localweather
     aliases:
       - lw
   goose:
     description: Goose
     usage: /goose
+    permission: foundation.command.goose
     aliases:
       - the_most_wonderful_kitty_ever
+  megatnt:
+    description: Mega TNT
+    usage: /megatnt
+    permission: foundation.command.megatnt
