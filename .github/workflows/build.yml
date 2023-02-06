@@ -19,6 +19,6 @@ jobs:
         run: ./tools/organize-artifacts.sh
       - uses: actions/upload-artifact@v3
         with:
-          name: foundation-build.zip
+          name: foundation-build
           path: |
             artifacts/*
