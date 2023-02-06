@@ -5,6 +5,8 @@ plugins {
   id("gay.pizza.foundation.concrete-root") version "0.8.0"
   id("gay.pizza.foundation.concrete-library") version "0.8.0" apply false
   id("gay.pizza.foundation.concrete-plugin") version "0.8.0" apply false
+
+  id("com.github.ben-manes.versions") version "0.45.0"
 }
 
 allprojects {
