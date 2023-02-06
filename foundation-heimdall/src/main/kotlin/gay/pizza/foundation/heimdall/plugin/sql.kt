@@ -1,6 +1,6 @@
 package gay.pizza.foundation.heimdall.plugin
 
-fun String.sqlSplitStatements(): List<String> {
+fun sqlSplitStatements(input: String): List<String> {
   val statements = mutableListOf<String>()
   val buffer = StringBuilder()
   fun flush() {
@@ -9,7 +9,7 @@ fun String.sqlSplitStatements(): List<String> {
       statements.add(trimmed)
     }
   }
-  for (line in lines()) {
+  for (line in input.lines()) {
     if (line.trim() == "--") {
       flush()
     } else {

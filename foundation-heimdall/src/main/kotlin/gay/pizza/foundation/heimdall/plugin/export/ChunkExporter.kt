@@ -12,27 +12,27 @@ import org.bukkit.plugin.Plugin
 import java.io.File
 import java.util.zip.GZIPOutputStream
 
-class ChunkExporter(private val plugin: Plugin, val world: World) {
+class ChunkExporter(private val plugin: Plugin) {
   private val json = Json {
     ignoreUnknownKeys = true
   }
 
-  fun exportLoadedChunksAsync() {
-    exportChunkListAsync(world.loadedChunks.toList())
+  fun exportLoadedChunksAsync(world: World) {
+    exportChunkListAsync(world, world.loadedChunks.toList())
   }
 
-  private fun exportChunkListAsync(chunks: List<Chunk>) {
-    plugin.slF4JLogger.info("Exporting ${chunks.size} Chunks")
+  private fun exportChunkListAsync(world: World, chunks: List<Chunk>) {
+    plugin.slF4JLogger.info("Exporting ${chunks.size} chunks")
     val snapshots = chunks.map { it.chunkSnapshot }
     Thread {
       for (snapshot in snapshots) {
-        exportChunkSnapshot(snapshot)
+        exportChunkSnapshot(world, snapshot)
       }
-      plugin.slF4JLogger.info("Exported ${chunks.size} Chunks")
+      plugin.slF4JLogger.info("Exported ${chunks.size} chunks for world ${world.name}")
     }.start()
   }
 
-  private fun exportChunkSnapshot(snapshot: ChunkSnapshot) {
+  private fun exportChunkSnapshot(world: World, snapshot: ChunkSnapshot) {
     val blocks = mutableMapOf<String, Pair<Int, ExportedBlock>>()
     val blockList = mutableListOf<ExportedBlock>()
     val sections = mutableListOf<ExportedChunkSection>()
@@ -60,7 +60,14 @@ class ChunkExporter(private val plugin: Plugin, val world: World) {
     gzipOutputStream.close()
   }
 
-  private fun exportChunkSection(blocks: MutableMap<String, Pair<Int, ExportedBlock>>, blockList: MutableList<ExportedBlock>, snapshot: ChunkSnapshot, yRange: IntRange, x: Int, z: Int): ExportedChunkSection {
+  private fun exportChunkSection(
+    blocks: MutableMap<String, Pair<Int, ExportedBlock>>,
+    blockList: MutableList<ExportedBlock>,
+    snapshot: ChunkSnapshot,
+    yRange: IntRange,
+    x: Int,
+    z: Int
+  ): ExportedChunkSection {
     val contents = mutableListOf<Int>()
     for (y in yRange) {
       val blockData = snapshot.getBlockData(x, y, z)

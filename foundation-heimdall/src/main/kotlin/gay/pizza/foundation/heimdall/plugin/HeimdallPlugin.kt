@@ -1,14 +1,14 @@
 package gay.pizza.foundation.heimdall.plugin
 
-import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
-import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
-import gay.pizza.foundation.heimdall.plugin.event.*
-import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
-import gay.pizza.foundation.heimdall.plugin.export.ExportChunksCommand
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import gay.pizza.foundation.core.Util
+import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
+import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
+import gay.pizza.foundation.heimdall.plugin.event.*
+import gay.pizza.foundation.heimdall.plugin.export.ExportAllChunksCommand
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -20,8 +20,6 @@ import org.bukkit.event.player.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
-import org.slf4j.Logger
-import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -42,7 +40,7 @@ class HeimdallPlugin : JavaPlugin(), Listener {
 
   override fun onEnable() {
     val exportChunksCommand = getCommand("export_all_chunks") ?: throw Exception("Failed to get export_all_chunks command")
-    exportChunksCommand.setExecutor(ExportChunksCommand(this))
+    exportChunksCommand.setExecutor(ExportAllChunksCommand(this))
 
     val pluginDataPath = dataFolder.toPath()
     pluginDataPath.toFile().mkdir()
@@ -73,7 +71,7 @@ class HeimdallPlugin : JavaPlugin(), Listener {
       "/init.sql"
     )?.readAllBytes()?.decodeToString() ?: throw RuntimeException("Unable to find Heimdall init.sql")
 
-    val statements = initMigrationContent.sqlSplitStatements()
+    val statements = sqlSplitStatements(initMigrationContent)
 
     pool.connection.use { conn ->
       conn.autoCommit = false
