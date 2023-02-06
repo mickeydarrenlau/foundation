@@ -2,11 +2,13 @@ package gay.pizza.foundation.chaos
 
 import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.chaos.model.ChaosConfig
+import gay.pizza.foundation.common.PluginMainClass
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.Util
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.io.path.inputStream
 
+@PluginMainClass
 class FoundationChaosPlugin : JavaPlugin() {
   lateinit var config: ChaosConfig
 

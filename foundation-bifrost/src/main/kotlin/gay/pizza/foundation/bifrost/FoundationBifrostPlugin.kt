@@ -2,6 +2,7 @@ package gay.pizza.foundation.bifrost
 
 import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.bifrost.model.BifrostConfig
+import gay.pizza.foundation.common.PluginMainClass
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.core.util.AdvancementTitleCache
@@ -29,6 +30,7 @@ import kotlin.io.path.inputStream
 import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
 import org.bukkit.event.Listener as BukkitEventListener
 
+@PluginMainClass
 class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventListener {
   private lateinit var config: BifrostConfig
   private var jda: JDA? = null
@@ -158,7 +160,7 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
     if (!config.channel.sendPlayerDeath) return
     @Suppress("DEPRECATION")
     var deathMessage = e.deathMessage
-    if (deathMessage == null || deathMessage.isBlank()) {
+    if (deathMessage.isNullOrBlank()) {
       deathMessage = "${e.player.name} died"
     }
     sendEmbedMessage(Color.YELLOW, deathMessage)

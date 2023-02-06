@@ -1,10 +1,10 @@
 package gay.pizza.foundation.heimdall.plugin.buffer
 
-import gay.pizza.foundation.heimdall.plugin.HeimdallPlugin
+import gay.pizza.foundation.heimdall.plugin.FoundationHeimdallPlugin
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.concurrent.atomic.AtomicBoolean
 
-class BufferFlushThread(val plugin: HeimdallPlugin, val buffer: EventBuffer) {
+class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventBuffer) {
   private val running = AtomicBoolean(false)
   private var thread: Thread? = null
 

@@ -3,6 +3,7 @@ package gay.pizza.foundation.heimdall.plugin
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import gay.pizza.foundation.common.PluginMainClass
 import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
@@ -26,7 +27,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.inputStream
 
-class HeimdallPlugin : JavaPlugin(), Listener {
+@PluginMainClass
+class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   private lateinit var config: HeimdallConfig
   private lateinit var pool: HikariDataSource
   internal var db: Database? = null
@@ -45,7 +47,7 @@ class HeimdallPlugin : JavaPlugin(), Listener {
     val pluginDataPath = dataFolder.toPath()
     pluginDataPath.toFile().mkdir()
 
-    val configPath = Util.copyDefaultConfig<HeimdallPlugin>(
+    val configPath = Util.copyDefaultConfig<FoundationHeimdallPlugin>(
       slF4JLogger,
       pluginDataPath,
       "heimdall.yaml"
@@ -67,7 +69,7 @@ class HeimdallPlugin : JavaPlugin(), Listener {
       idleTimeout = Duration.ofMinutes(5).toMillis()
       maxLifetime = Duration.ofMinutes(10).toMillis()
     })
-    val initMigrationContent = HeimdallPlugin::class.java.getResourceAsStream(
+    val initMigrationContent = FoundationHeimdallPlugin::class.java.getResourceAsStream(
       "/init.sql"
     )?.readAllBytes()?.decodeToString() ?: throw RuntimeException("Unable to find Heimdall init.sql")
 
