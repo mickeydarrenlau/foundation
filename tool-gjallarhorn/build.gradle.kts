@@ -6,8 +6,8 @@ plugins {
 dependencies {
   api(project(":common-heimdall"))
 
-  implementation("com.github.ajalt.clikt:clikt:3.5.0")
-  implementation("org.slf4j:slf4j-simple:1.7.36")
+  implementation("com.github.ajalt.clikt:clikt:3.5.1")
+  implementation("org.slf4j:slf4j-simple:2.0.6")
 }
 
 tasks.jar {

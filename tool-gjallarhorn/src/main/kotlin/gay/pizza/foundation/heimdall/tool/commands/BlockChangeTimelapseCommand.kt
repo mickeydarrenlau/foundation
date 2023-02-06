@@ -74,10 +74,10 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
     val trim = maybeBuildTrim()
     val filter = compose(
       combine = { a, b -> a and b },
-      { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x },
-      { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z },
-      { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x },
-      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z }
+      { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x.toDouble() },
+      { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z.toDouble() },
+      { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x.toDouble() },
+      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z.toDouble() }
     )
 
     val changelog = BlockChangelog.query(db, filter)

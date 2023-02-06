@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("gay.pizza.foundation.concrete-root") version "0.8.0"
-  id("gay.pizza.foundation.concrete-library") version "0.8.0" apply false
-  id("gay.pizza.foundation.concrete-plugin") version "0.8.0" apply false
+  id("gay.pizza.foundation.concrete-root") version "0.9.0"
+  id("gay.pizza.foundation.concrete-library") version "0.9.0" apply false
+  id("gay.pizza.foundation.concrete-plugin") version "0.9.0" apply false
 
   id("com.github.ben-manes.versions") version "0.45.0"
 }
@@ -34,16 +34,16 @@ subprojects {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     // Core libraries.
-    implementation("io.insert-koin:koin-core:3.1.4")
-    testImplementation("io.insert-koin:koin-test:3.1.4")
+    implementation("io.insert-koin:koin-core:3.3.2")
+    testImplementation("io.insert-koin:koin-test:3.3.2")
 
     // Serialization
-    implementation("com.charleskorn.kaml:kaml:0.38.0")
+    implementation("com.charleskorn.kaml:kaml:0.51.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
 
     // Persistence
-    implementation("org.jetbrains.xodus:xodus-openAPI:1.3.232")
-    implementation("org.jetbrains.xodus:xodus-entity-store:1.3.232")
+    implementation("org.jetbrains.xodus:xodus-openAPI:2.0.1")
+    implementation("org.jetbrains.xodus:xodus-entity-store:2.0.1")
   }
 
   java {
