@@ -1,4 +1,4 @@
-package gay.pizza.foundation.core.util
+package gay.pizza.foundation.common
 
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
@@ -20,7 +20,7 @@ private fun Class<*>.getDeclaredFieldAccessible(name: String): Field {
 private fun Advancement.getInternalAdvancementDisplay(handle: Any = getInternalHandle()): Any? =
   handle.javaClass.methods.firstOrNull {
     it.returnType.simpleName == "AdvancementDisplay" &&
-        it.parameterCount == 0
+      it.parameterCount == 0
   }?.invoke(handle) ?: handle.javaClass.getDeclaredFieldAccessible("c").get(handle)
 
 private fun Advancement.displayTitleText(): String? {
@@ -53,8 +53,8 @@ private fun Advancement.displayTitleText(): String? {
 
     if (chatSerializerClass != null) {
       val componentJson = chatSerializerClass
-          .getMethod("a", titleChatBaseComponent.javaClass)
-          .invoke(null, titleChatBaseComponent).toString()
+        .getMethod("a", titleChatBaseComponent.javaClass)
+        .invoke(null, titleChatBaseComponent).toString()
       val gson = GsonComponentSerializer.gson().deserialize(componentJson)
       return LegacyComponentSerializer.legacySection().serialize(gson)
     }

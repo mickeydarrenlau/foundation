@@ -5,7 +5,7 @@ import gay.pizza.foundation.bifrost.model.BifrostConfig
 import gay.pizza.foundation.common.PluginMainClass
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.Util
-import gay.pizza.foundation.core.util.AdvancementTitleCache
+import gay.pizza.foundation.common.AdvancementTitleCache
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
