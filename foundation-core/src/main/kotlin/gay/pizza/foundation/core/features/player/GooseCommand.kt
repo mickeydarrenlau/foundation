@@ -1,5 +1,6 @@
 package gay.pizza.foundation.core.features.player
 
+import gay.pizza.foundation.common.chat
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -15,8 +16,10 @@ class GooseCommand : CommandExecutor {
       sender.sendMessage("Player is required for this command.")
       return true
     }
-    sender.chat("Goose is the most beautiful kbity to ever exist <3")
-    sender.chat("I don't know who Nat is but there is no way she can compare to Goose.")
+    sender.chat(
+      "Goose is the most beautiful kbity to ever exist <3",
+      "I don't know who Nat is but there is no way she can compare to Goose."
+    )
     return true
   }
 }

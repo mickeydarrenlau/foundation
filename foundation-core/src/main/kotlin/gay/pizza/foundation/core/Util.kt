@@ -12,7 +12,7 @@ object Util {
   private val foundationName: Component = Component.text("Foundation")
 
   fun formatSystemMessage(message: String): Component {
-    return formatSystemMessage(TextColors.AMARANTH_PINK, message)
+    return formatSystemMessage(TextColors.AmaranthPink, message)
   }
 
   fun formatSystemMessage(prefixColor: TextColor, message: String): Component {
@@ -56,10 +56,5 @@ object Util {
     }
 
     return outPath
-  }
-
-  fun isPlatformWindows(): Boolean {
-    val os = System.getProperty("os.name")
-    return os != null && os.lowercase().startsWith("windows")
   }
 }
