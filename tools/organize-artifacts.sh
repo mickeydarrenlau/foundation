@@ -13,3 +13,10 @@ do
   mkdir -p "artifacts/$DN"
   cp "${JAR}" "artifacts/${JAR}"
 done
+
+find . -name "tool-*-all.jar" | while read -r JAR
+do
+  DN="$(dirname "${JAR}")"
+  mkdir -p "artifacts/$DN"
+  cp "${JAR}" "artifacts/${JAR}"
+done
