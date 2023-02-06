@@ -28,3 +28,8 @@ jobs:
           ARTIFACTS_KEY_ID: "${{ secrets.ARTIFACTS_KEY_ID }}"
           ARTIFACTS_APP_KEY: "${{ secrets.ARTIFACTS_APP_KEY }}"
           ARTIFACTS_BUCKET: "${{ secrets.ARTIFACTS_BUCKET }}"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: foundation-build.zip
+          path: |
+            artifacts/*
