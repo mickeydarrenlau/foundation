@@ -12,6 +12,8 @@ import gay.pizza.foundation.core.features.scheduler.SchedulerFeature
 import gay.pizza.foundation.core.features.stats.StatsFeature
 import gay.pizza.foundation.core.features.update.UpdateFeature
 import gay.pizza.foundation.core.features.world.WorldFeature
+import gay.pizza.foundation.shared.PersistentStore
+import gay.pizza.foundation.shared.PluginPersistence
 import org.koin.dsl.module
 import java.nio.file.Path
 
@@ -33,6 +35,8 @@ class FoundationCorePlugin : IFoundationCore, FoundationPlugin() {
     private set(value) {
       _pluginDataPath = value
     }
+
+  override val persistence: PluginPersistence = PluginPersistence(this)
 
   override fun onEnable() {
     // Create core plugin directory.

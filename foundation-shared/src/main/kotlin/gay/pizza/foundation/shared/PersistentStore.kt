@@ -1,13 +1,12 @@
-package gay.pizza.foundation.core.features.persist
+package gay.pizza.foundation.shared
 
-import gay.pizza.foundation.core.FoundationCorePlugin
 import jetbrains.exodus.entitystore.Entity
 import jetbrains.exodus.entitystore.EntityIterable
 import jetbrains.exodus.entitystore.PersistentEntityStores
 import jetbrains.exodus.entitystore.StoreTransaction
 
-class PersistentStore(corePlugin: FoundationCorePlugin, fileStoreName: String) : AutoCloseable {
-  private val fileStorePath = corePlugin.pluginDataPath.resolve("persistence/${fileStoreName}")
+class PersistentStore(core: IFoundationCore, fileStoreName: String) : AutoCloseable {
+  private val fileStorePath = core.pluginDataPath.resolve("persistence/${fileStoreName}")
   private val entityStore = PersistentEntityStores.newInstance(fileStorePath.toFile())
 
   fun <R> transact(block: StoreTransaction.() -> R): R {

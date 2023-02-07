@@ -1,10 +1,10 @@
 package gay.pizza.foundation.core.features.stats
 
 import gay.pizza.foundation.core.abstraction.Feature
-import gay.pizza.foundation.core.features.persist.PersistentStore
 import gay.pizza.foundation.core.features.persist.PersistentStoreCommand
-import gay.pizza.foundation.core.features.persist.PluginPersistence
 import gay.pizza.foundation.core.features.persist.setAllProperties
+import gay.pizza.foundation.shared.PersistentStore
+import gay.pizza.foundation.shared.PluginPersistence
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.event.EventHandler

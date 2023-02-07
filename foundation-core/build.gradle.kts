@@ -12,7 +12,4 @@ dependencies {
 
   implementation("io.insert-koin:koin-core:3.3.2")
   testImplementation("io.insert-koin:koin-test:3.3.2")
-
-  implementation("org.jetbrains.xodus:xodus-openAPI:2.0.1")
-  implementation("org.jetbrains.xodus:xodus-entity-store:2.0.1")
 }
