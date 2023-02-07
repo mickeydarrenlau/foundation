@@ -9,6 +9,7 @@ pluginManagement {
 }
 
 include(
+  ":common-all",
   ":common-plugin",
   ":common-heimdall",
   ":foundation-core",

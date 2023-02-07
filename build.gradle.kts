@@ -23,34 +23,7 @@ allprojects {
 version = "0.2"
 
 subprojects {
-  plugins.apply("org.jetbrains.kotlin.jvm")
-  plugins.apply("org.jetbrains.kotlin.plugin.serialization")
-
   group = "gay.pizza.foundation"
-
-  dependencies {
-    // Kotlin dependencies
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    // Core libraries.
-    implementation("io.insert-koin:koin-core:3.3.2")
-    testImplementation("io.insert-koin:koin-test:3.3.2")
-
-    // Serialization
-    implementation("com.charleskorn.kaml:kaml:0.51.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
-
-    // Persistence
-    implementation("org.jetbrains.xodus:xodus-openAPI:2.0.1")
-    implementation("org.jetbrains.xodus:xodus-entity-store:2.0.1")
-  }
-
-  java {
-    val javaVersion = JavaVersion.toVersion(17)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-  }
 
   tasks.withType<KotlinCompile> {
     kotlinOptions {

@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
+  api(project(":common-all"))
   compileOnly(project(":foundation-shared"))
 }
