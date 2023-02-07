@@ -10,6 +10,7 @@ import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.event.*
 import gay.pizza.foundation.heimdall.plugin.export.ExportAllChunksCommand
+import gay.pizza.foundation.heimdall.plugin.load.ImportWorldLoadCommand
 import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.event.EventHandler
@@ -44,6 +45,9 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   override fun onEnable() {
     val exportChunksCommand = getCommand("export_all_chunks") ?: throw Exception("Failed to get export_all_chunks command")
     exportChunksCommand.setExecutor(ExportAllChunksCommand(this))
+
+    val importWorldLoadCommand = getCommand("import_world_load") ?: throw Exception("Failed to get import_world_load command")
+    importWorldLoadCommand.setExecutor(ImportWorldLoadCommand(this))
 
     val foundation = FoundationCoreLoader.get(server)
     val configPath = copyDefaultConfig<FoundationHeimdallPlugin>(

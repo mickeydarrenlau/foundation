@@ -50,6 +50,15 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
     return map
   }
 
+  fun <T> buildBlockMap(offset: BlockCoordinate = BlockCoordinate.zero, value: (BlockState) -> T): BlockCoordinateSparseMap<T> {
+    val map = BlockCoordinateSparseMap<T>()
+    blocks.forEach { (position, state) ->
+      val realPosition = offset.applyAsOffset(position)
+      map.put(realPosition, value(state))
+    }
+    return map
+  }
+
   fun replay(changelog: BlockChangelog) = changelog.changes.forEach { change ->
     if (change.type == BlockChangeType.Break) {
       delete(change.location)

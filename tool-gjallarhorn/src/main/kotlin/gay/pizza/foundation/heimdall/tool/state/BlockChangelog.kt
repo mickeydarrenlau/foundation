@@ -63,10 +63,11 @@ class BlockChangelog(
       BlockChangelog(BlockChangeView.select(filter).orderBy(BlockChangeView.time).map { row ->
         val time = row[BlockChangeView.time]
         val changeIsBreak = row[BlockChangeView.isBreak]
+        val world = row[BlockChangeView.world]
         val x = row[BlockChangeView.x]
         val y = row[BlockChangeView.y]
         val z = row[BlockChangeView.z]
-        val block = row[gay.pizza.foundation.heimdall.view.BlockChangeView.block]
+        val block = row[BlockChangeView.block]
         val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
 
         val fromBlock = if (changeIsBreak) {
@@ -83,6 +84,7 @@ class BlockChangelog(
 
         BlockChange(
           time,
+          world,
           if (changeIsBreak) BlockChangeType.Break else BlockChangeType.Place,
           location,
           fromBlock,
@@ -90,5 +92,19 @@ class BlockChangelog(
         )
       })
     }
+  }
+
+  fun <T> splitBy(key: (BlockChange) -> T): Map<T, BlockChangelog> {
+    val logs = mutableMapOf<T, MutableList<BlockChange>>()
+    for (change in changes) {
+      val k = key(change)
+      var log = logs[k]
+      if (log == null) {
+        log = mutableListOf()
+        logs[k] = log
+      }
+      log.add(change)
+    }
+    return logs.mapValues { BlockChangelog(it.value) }
   }
 }

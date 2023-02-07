@@ -30,6 +30,7 @@ class GjallarhornCommand : CliktCommand(invokeWithoutSubcommand = true) {
       maximumPoolSize = dbPoolSize
       idleTimeout = Duration.ofMinutes(5).toMillis()
       maxLifetime = Duration.ofMinutes(10).toMillis()
+      schema = "heimdall"
     })
     val db = Database.connect(pool)
     currentContext.findOrSetObject { db }
