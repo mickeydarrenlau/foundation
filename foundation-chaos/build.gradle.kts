@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
   implementation(project(":common-plugin"))
-  compileOnly(project(":foundation-core"))
+  compileOnly(project(":foundation-shared"))
 }

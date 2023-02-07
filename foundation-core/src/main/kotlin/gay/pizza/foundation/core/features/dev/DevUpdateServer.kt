@@ -3,8 +3,8 @@ package gay.pizza.foundation.core.features.dev
 import com.charleskorn.kaml.Yaml
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.core.features.update.UpdateService
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -23,7 +23,7 @@ class DevUpdateServer(val plugin: FoundationCorePlugin) {
   }
 
   fun enable() {
-    val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
+    val configPath = copyDefaultConfig<FoundationCorePlugin>(
       plugin.slF4JLogger,
       plugin.pluginDataPath,
       "devupdate.yaml"

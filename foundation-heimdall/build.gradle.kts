@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
-  api(project(":common-heimdall"))
-  compileOnly(project(":foundation-core"))
+  implementation(project(":common-plugin"))
+  compileOnly(project(":foundation-shared"))
+  implementation(project(":common-heimdall"))
 }

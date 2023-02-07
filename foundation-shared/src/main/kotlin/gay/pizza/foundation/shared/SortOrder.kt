@@ -1,4 +1,4 @@
-package gay.pizza.foundation.common
+package gay.pizza.foundation.shared
 
 enum class SortOrder {
   Ascending,

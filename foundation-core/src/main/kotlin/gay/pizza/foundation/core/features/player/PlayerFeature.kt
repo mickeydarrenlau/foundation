@@ -4,8 +4,8 @@ import com.charleskorn.kaml.Yaml
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
+import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.core.abstraction.Feature
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
@@ -53,7 +53,7 @@ class PlayerFeature : Feature() {
 
   override fun module() = org.koin.dsl.module {
     single {
-      val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
+      val configPath = copyDefaultConfig<FoundationCorePlugin>(
         plugin.slF4JLogger,
         plugin.pluginDataPath,
         "player.yaml",

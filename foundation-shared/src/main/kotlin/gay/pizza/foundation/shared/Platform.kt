@@ -1,4 +1,4 @@
-package gay.pizza.foundation.common
+package gay.pizza.foundation.shared
 
 object Platform {
   private val os: String? = System.getProperty("os.name")

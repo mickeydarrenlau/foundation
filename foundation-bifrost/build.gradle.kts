@@ -7,5 +7,6 @@ dependencies {
     exclude(module = "opus-java")
   }
 
-  compileOnly(project(":foundation-core"))
+  implementation(project(":common-plugin"))
+  compileOnly(project(":foundation-shared"))
 }

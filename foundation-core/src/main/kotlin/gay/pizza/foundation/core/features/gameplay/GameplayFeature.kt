@@ -1,8 +1,8 @@
 package gay.pizza.foundation.core.features.gameplay
 
 import com.charleskorn.kaml.Yaml
+import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.core.abstraction.Feature
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -24,7 +24,7 @@ class GameplayFeature : Feature() {
 
   override fun module() = module {
     single {
-      val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
+      val configPath = copyDefaultConfig<FoundationCorePlugin>(
         plugin.slF4JLogger,
         plugin.pluginDataPath,
         "gameplay.yaml",

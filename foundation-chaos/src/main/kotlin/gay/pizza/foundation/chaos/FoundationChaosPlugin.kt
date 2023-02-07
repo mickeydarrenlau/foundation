@@ -2,9 +2,9 @@ package gay.pizza.foundation.chaos
 
 import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.chaos.model.ChaosConfig
-import gay.pizza.foundation.common.PluginMainClass
-import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
+import gay.pizza.foundation.common.FoundationCoreLoader
+import gay.pizza.foundation.shared.PluginMainClass
+import gay.pizza.foundation.shared.copyDefaultConfig
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.io.path.inputStream
 
@@ -17,9 +17,8 @@ class FoundationChaosPlugin : JavaPlugin() {
   }
 
   override fun onEnable() {
-    val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
-    slF4JLogger.info("Plugin data path: ${foundation.pluginDataPath}")
-    val configPath = Util.copyDefaultConfig<FoundationChaosPlugin>(
+    val foundation = FoundationCoreLoader.get(server)
+    val configPath = copyDefaultConfig<FoundationChaosPlugin>(
       slF4JLogger,
       foundation.pluginDataPath,
       "chaos.yaml"

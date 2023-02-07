@@ -12,6 +12,7 @@ include(
   ":common-plugin",
   ":common-heimdall",
   ":foundation-core",
+  ":foundation-shared",
   ":foundation-bifrost",
   ":foundation-chaos",
   ":foundation-heimdall",

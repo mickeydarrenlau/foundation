@@ -1,8 +1,8 @@
 package gay.pizza.foundation.core.features.backup
 
 import com.charleskorn.kaml.Yaml
+import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
 import gay.pizza.foundation.core.abstraction.Feature
 import gay.pizza.foundation.core.features.scheduler.cancel
 import gay.pizza.foundation.core.features.scheduler.cron
@@ -46,7 +46,7 @@ class BackupFeature : Feature() {
 
   override fun module() = module {
     single {
-      val configPath = Util.copyDefaultConfig<FoundationCorePlugin>(
+      val configPath = copyDefaultConfig<FoundationCorePlugin>(
         plugin.slF4JLogger,
         plugin.pluginDataPath,
         "backup.yaml",

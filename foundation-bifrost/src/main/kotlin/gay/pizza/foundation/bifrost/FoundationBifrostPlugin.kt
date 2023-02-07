@@ -2,10 +2,8 @@ package gay.pizza.foundation.bifrost
 
 import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.bifrost.model.BifrostConfig
-import gay.pizza.foundation.common.PluginMainClass
-import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
-import gay.pizza.foundation.common.AdvancementTitleCache
+import gay.pizza.foundation.common.FoundationCoreLoader
+import gay.pizza.foundation.shared.*
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
@@ -38,11 +36,8 @@ class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventL
 
   override fun onEnable() {
     isDev = description.version == "DEV"
-
-    val foundation = server.pluginManager.getPlugin("Foundation") as FoundationCorePlugin
-    slF4JLogger.info("Plugin data path: ${foundation.pluginDataPath}")
-
-    val configPath = Util.copyDefaultConfig<FoundationBifrostPlugin>(
+    val foundation = FoundationCoreLoader.get(server)
+    val configPath = copyDefaultConfig<FoundationBifrostPlugin>(
       slF4JLogger,
       foundation.pluginDataPath,
       "bifrost.yaml"

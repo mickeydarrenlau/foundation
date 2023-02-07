@@ -1,6 +1,7 @@
 package gay.pizza.foundation.core
 
-import gay.pizza.foundation.common.PluginMainClass
+import gay.pizza.foundation.shared.IFoundationCore
+import gay.pizza.foundation.shared.PluginMainClass
 import gay.pizza.foundation.core.abstraction.FoundationPlugin
 import gay.pizza.foundation.core.features.backup.BackupFeature
 import gay.pizza.foundation.core.features.dev.DevFeature
@@ -15,17 +16,17 @@ import org.koin.dsl.module
 import java.nio.file.Path
 
 @PluginMainClass
-class FoundationCorePlugin : FoundationPlugin() {
+class FoundationCorePlugin : IFoundationCore, FoundationPlugin() {
   private lateinit var _pluginDataPath: Path
 
-  var pluginDataPath: Path
+  override var pluginDataPath: Path
     /**
      * Data path of the core plugin.
      * Can be used as a check of sorts for dependencies to be sure the plugin is loaded.
      */
     get() {
       if (!::_pluginDataPath.isInitialized) {
-        throw Exception("FoundationCore is not loaded!")
+        throw Exception("Foundation Core is not loaded!")
       }
       return _pluginDataPath
     }

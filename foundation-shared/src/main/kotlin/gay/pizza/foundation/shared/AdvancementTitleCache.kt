@@ -1,4 +1,4 @@
-package gay.pizza.foundation.common
+package gay.pizza.foundation.shared
 
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer

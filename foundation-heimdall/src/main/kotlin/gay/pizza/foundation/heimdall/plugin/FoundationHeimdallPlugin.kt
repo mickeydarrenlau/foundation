@@ -3,8 +3,9 @@ package gay.pizza.foundation.heimdall.plugin
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import gay.pizza.foundation.common.PluginMainClass
-import gay.pizza.foundation.core.Util
+import gay.pizza.foundation.common.FoundationCoreLoader
+import gay.pizza.foundation.shared.PluginMainClass
+import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.event.*
@@ -44,12 +45,10 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     val exportChunksCommand = getCommand("export_all_chunks") ?: throw Exception("Failed to get export_all_chunks command")
     exportChunksCommand.setExecutor(ExportAllChunksCommand(this))
 
-    val pluginDataPath = dataFolder.toPath()
-    pluginDataPath.toFile().mkdir()
-
-    val configPath = Util.copyDefaultConfig<FoundationHeimdallPlugin>(
+    val foundation = FoundationCoreLoader.get(server)
+    val configPath = copyDefaultConfig<FoundationHeimdallPlugin>(
       slF4JLogger,
-      pluginDataPath,
+      foundation.pluginDataPath,
       "heimdall.yaml"
     )
     config = Yaml.default.decodeFromStream(HeimdallConfig.serializer(), configPath.inputStream())

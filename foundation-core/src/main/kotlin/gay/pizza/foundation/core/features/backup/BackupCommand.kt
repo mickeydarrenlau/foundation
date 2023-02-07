@@ -1,6 +1,6 @@
 package gay.pizza.foundation.core.features.backup
 
-import gay.pizza.foundation.common.Platform
+import gay.pizza.foundation.shared.Platform
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.Util
 import net.kyori.adventure.text.Component

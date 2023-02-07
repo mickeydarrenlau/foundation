@@ -1,6 +1,6 @@
 name: Foundation-Heimdall
 version: '${version}'
-main: gay.pizza.foundation.heimdall.plugin.HeimdallPlugin
+main: gay.pizza.foundation.heimdall.plugin.FoundationHeimdallPlugin
 api-version: 1.18
 prefix: Foundation-Heimdall
 load: STARTUP

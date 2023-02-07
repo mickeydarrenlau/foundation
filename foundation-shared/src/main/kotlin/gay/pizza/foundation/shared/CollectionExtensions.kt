@@ -1,4 +1,4 @@
-package gay.pizza.foundation.common
+package gay.pizza.foundation.shared
 
 fun <T, R : Comparable<R>> Collection<T>.sortedBy(order: SortOrder, selector: (T) -> R?): List<T> =
   if (order == SortOrder.Ascending) {
