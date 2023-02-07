@@ -63,9 +63,9 @@ class BlockChangelog(
       BlockChangelog(BlockChangeView.select(filter).orderBy(BlockChangeView.time).map { row ->
         val time = row[BlockChangeView.time]
         val changeIsBreak = row[BlockChangeView.isBreak]
-        val x = row[gay.pizza.foundation.heimdall.view.BlockChangeView.x]
-        val y = row[gay.pizza.foundation.heimdall.view.BlockChangeView.y]
-        val z = row[gay.pizza.foundation.heimdall.view.BlockChangeView.z]
+        val x = row[BlockChangeView.x]
+        val y = row[BlockChangeView.y]
+        val z = row[BlockChangeView.z]
         val block = row[gay.pizza.foundation.heimdall.view.BlockChangeView.block]
         val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
 

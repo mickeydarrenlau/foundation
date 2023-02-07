@@ -17,7 +17,7 @@ class WorldChange(
   override fun store(transaction: Transaction) {
     transaction.apply {
       WorldChangeTable.insert {
-        it[time] = timestamp
+        putTimedEvent(it, timestamp)
         it[player] = playerUniqueIdentity
         it[fromWorld] = fromWorldId
         it[fromWorldName] = fromWorldActualName

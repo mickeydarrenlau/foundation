@@ -17,14 +17,7 @@ class EntityKill(
   override fun store(transaction: Transaction) {
     transaction.apply {
       EntityKillTable.insert {
-        it[time] = timestamp
-        it[player] = playerUniqueIdentity
-        it[world] = location.world.uid
-        it[x] = location.x
-        it[y] = location.y
-        it[z] = location.z
-        it[pitch] = location.pitch.toDouble()
-        it[yaw] = location.yaw.toDouble()
+        putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
         it[entity] = entityUniqueIdentity
         it[entityType] = entityTypeName
       }

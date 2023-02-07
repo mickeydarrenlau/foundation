@@ -15,19 +15,16 @@ class PlayerAdvancement(
   val advancement: Advancement,
   val timestamp: Instant = Instant.now()
 ) : HeimdallEvent() {
-  constructor(event: PlayerAdvancementDoneEvent) : this(event.player.uniqueId, event.player.location, event.advancement)
+  constructor(event: PlayerAdvancementDoneEvent) : this(
+    event.player.uniqueId,
+    event.player.location,
+    event.advancement
+  )
 
   override fun store(transaction: Transaction) {
     transaction.apply {
       PlayerAdvancementTable.insert {
-        it[time] = timestamp
-        it[player] = playerUniqueIdentity
-        it[world] = location.world.uid
-        it[x] = location.x
-        it[y] = location.y
-        it[z] = location.z
-        it[pitch] = location.pitch.toDouble()
-        it[yaw] = location.yaw.toDouble()
+        putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
         it[advancement] = this@PlayerAdvancement.advancement.key.toString()
       }
     }

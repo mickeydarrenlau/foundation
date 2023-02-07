@@ -1,7 +1,6 @@
 package gay.pizza.foundation.chaos
 
 import gay.pizza.foundation.chaos.model.ChaosConfig
-import gay.pizza.foundation.chaos.model.ChaosModuleConfig
 import gay.pizza.foundation.chaos.modules.ChaosModule
 import gay.pizza.foundation.chaos.modules.ChaosModules
 import org.bukkit.boss.BarColor

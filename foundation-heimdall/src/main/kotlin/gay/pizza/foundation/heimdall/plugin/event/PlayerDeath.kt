@@ -25,14 +25,7 @@ class PlayerDeath(
   override fun store(transaction: Transaction) {
     transaction.apply {
       PlayerDeathTable.insert {
-        it[time] = timestamp
-        it[player] = playerUniqueIdentity
-        it[world] = location.world.uid
-        it[x] = location.x
-        it[y] = location.y
-        it[z] = location.z
-        it[pitch] = location.pitch.toDouble()
-        it[yaw] = location.yaw.toDouble()
+        putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
         it[experience] = experienceLevel.toDouble()
         it[message] = deathMessage
       }
