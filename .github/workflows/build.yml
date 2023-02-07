@@ -17,7 +17,8 @@ jobs:
           arguments: build check
       - name: Organize Artifacts
         run: ./tools/organize-artifacts.sh
-      - uses: actions/upload-artifact@v3
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: foundation-build
           path: |
