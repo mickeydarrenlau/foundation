@@ -8,20 +8,26 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
+import gay.pizza.foundation.heimdall.table.WorldChangeTable
 import gay.pizza.foundation.heimdall.tool.render.*
 import gay.pizza.foundation.heimdall.tool.state.*
 import gay.pizza.foundation.heimdall.tool.util.compose
 import gay.pizza.foundation.heimdall.view.BlockChangeView
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.awt.Font
 import java.awt.font.TextLayout
 import java.awt.image.BufferedImage
+import java.lang.Exception
 import java.time.Duration
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
@@ -53,6 +59,8 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   private val shouldRenderLoop by option("--loop-render", help = "Loop Render").flag()
   private val quadPixelNoop by option("--quad-pixel-noop", help = "Disable Quad Pixel Render").flag()
 
+  private val filterByWorld by option("--world", help = "World ID or Name").default("world")
+
   private val logger = LoggerFactory.getLogger(BlockChangeTimelapseCommand::class.java)
 
   override fun run() {
@@ -72,12 +80,31 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
 
   private fun perform(threadPoolExecutor: ScheduledThreadPoolExecutor) {
     val trim = maybeBuildTrim()
+
+    val worldNames = transaction(db) {
+      WorldChangeTable.selectAll()
+        .associate { it[WorldChangeTable.toWorld] to it[WorldChangeTable.toWorldName] }
+    }
+
+    var world: UUID? = null
+    try {
+      world = UUID.fromString(filterByWorld)
+    } catch (_: Exception) {}
+    if (world == null) {
+      world = worldNames.entries.firstOrNull { it.value == filterByWorld }?.key
+    }
+
+    if (world == null) {
+      throw RuntimeException("World '${filterByWorld}' not found.")
+    }
+
     val filter = compose(
       combine = { a, b -> a and b },
       { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x.toDouble() },
       { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z.toDouble() },
       { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x.toDouble() },
-      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z.toDouble() }
+      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z.toDouble() },
+      { true } to { BlockChangeView.world eq world }
     )
 
     val changelog = BlockChangelog.query(db, filter)
