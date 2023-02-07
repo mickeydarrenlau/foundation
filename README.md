@@ -7,6 +7,7 @@ server.
 
 * foundation-core: Core functionality
 * foundation-bifrost: Discord chat bridge
+* foundation-chaos: Simulate chaos inside a minecraft world
 * foundation-heimdall: Event tracking
 
 ## Tools

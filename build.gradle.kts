@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("gay.pizza.foundation.concrete-root") version "0.9.0"
-  id("gay.pizza.foundation.concrete-library") version "0.9.0" apply false
-  id("gay.pizza.foundation.concrete-plugin") version "0.9.0" apply false
+  id("gay.pizza.foundation.concrete-root") version "0.10.0"
+  id("gay.pizza.foundation.concrete-library") version "0.10.0" apply false
+  id("gay.pizza.foundation.concrete-plugin") version "0.10.0" apply false
 
   id("com.github.ben-manes.versions") version "0.45.0"
 }
