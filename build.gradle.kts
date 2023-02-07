@@ -2,11 +2,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   java
-  id("gay.pizza.foundation.concrete-root") version "0.10.0"
-  id("gay.pizza.foundation.concrete-library") version "0.10.0" apply false
-  id("gay.pizza.foundation.concrete-plugin") version "0.10.0" apply false
 
-  id("com.github.ben-manes.versions") version "0.45.0"
+  alias(libs.plugins.concrete.root)
+  alias(libs.plugins.concrete.base) apply false
+  alias(libs.plugins.concrete.library) apply false
+  alias(libs.plugins.concrete.plugin) apply false
+
+  alias(libs.plugins.versions)
 }
 
 allprojects {

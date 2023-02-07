@@ -119,3 +119,6 @@ run/
 
 # Foundation Server
 /server
+
+# Foundation build
+/.concrete-local-path

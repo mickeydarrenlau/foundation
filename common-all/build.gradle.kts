@@ -4,6 +4,6 @@ plugins {
 
 dependencies {
   // Serialization
-  api("com.charleskorn.kaml:kaml:0.51.0")
-  api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+  api(libs.kotlin.serialization.json)
+  api(libs.kotlin.serialization.yaml)
 }
