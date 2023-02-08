@@ -1,8 +1,11 @@
 package gay.pizza.foundation.heimdall.plugin.event
 
+import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
+import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
 import gay.pizza.foundation.heimdall.table.PlayerAdvancementTable
 import org.bukkit.Location
 import org.bukkit.advancement.Advancement
+import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.insert
@@ -28,5 +31,14 @@ class PlayerAdvancement(
         it[advancement] = this@PlayerAdvancement.advancement.key.toString()
       }
     }
+  }
+
+  class Collector(val buffer: IEventBuffer) : EventCollector<PlayerAdvancement> {
+    @EventHandler
+    fun onPlayerAdvancementDone(event: PlayerAdvancementDoneEvent) = buffer.push(PlayerAdvancement(event))
+  }
+
+  companion object : EventCollectorProvider<PlayerAdvancement> {
+    override fun collector(buffer: EventBuffer): EventCollector<PlayerAdvancement> = Collector(buffer)
   }
 }

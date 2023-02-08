@@ -30,11 +30,7 @@ fun <T : PlayerTimedLocalEventTable, K : Any> T.putPlayerTimedLocalEvent(
   location: Location,
   player: UUID
 ) {
-  statement[this.time] = time
-  statement[this.world] = location.world.uid
-  statement[this.x] = location.x
-  statement[this.y] = location.y
-  statement[this.z] = location.z
+  putTimedLocalEvent(statement, time, location)
   statement[this.player] = player
   statement[this.pitch] = location.pitch.toDouble()
   statement[this.yaw] = location.yaw.toDouble()

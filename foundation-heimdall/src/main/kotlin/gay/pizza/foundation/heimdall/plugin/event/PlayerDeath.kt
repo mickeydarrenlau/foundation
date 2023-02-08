@@ -1,7 +1,11 @@
 package gay.pizza.foundation.heimdall.plugin.event
 
+import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
+import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
 import gay.pizza.foundation.heimdall.table.PlayerDeathTable
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
+import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.insert
@@ -30,5 +34,24 @@ class PlayerDeath(
         it[message] = deathMessage
       }
     }
+  }
+
+  class Collector(val buffer: IEventBuffer) : EventCollector<PlayerDeath> {
+    private val legacyComponentSerializer = LegacyComponentSerializer.builder().build()
+
+    @EventHandler
+    fun onPlayerDeath(event: PlayerDeathEvent) {
+      val deathMessage = event.deathMessage()
+      val deathMessageString = if (deathMessage != null) {
+        legacyComponentSerializer.serialize(deathMessage)
+      } else {
+        null
+      }
+      buffer.push(PlayerDeath(event, deathMessageString))
+    }
+  }
+
+  companion object : EventCollectorProvider<PlayerDeath> {
+    override fun collector(buffer: EventBuffer): EventCollector<PlayerDeath> = Collector(buffer)
   }
 }

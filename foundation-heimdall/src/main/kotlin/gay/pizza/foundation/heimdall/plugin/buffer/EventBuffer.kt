@@ -3,7 +3,7 @@ package gay.pizza.foundation.heimdall.plugin.buffer
 import gay.pizza.foundation.heimdall.plugin.event.HeimdallEvent
 import org.jetbrains.exposed.sql.Transaction
 
-class EventBuffer {
+class EventBuffer : IEventBuffer {
   private var events = mutableListOf<HeimdallEvent>()
 
   fun flush(transaction: Transaction): Long {
@@ -18,7 +18,7 @@ class EventBuffer {
     return count
   }
 
-  fun push(event: HeimdallEvent) {
+  override fun push(event: HeimdallEvent) {
     events.add(event)
   }
 
