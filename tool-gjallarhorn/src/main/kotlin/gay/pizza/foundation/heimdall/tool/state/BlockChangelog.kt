@@ -68,10 +68,11 @@ class BlockChangelog(
         val y = row[BlockChangeView.y]
         val z = row[BlockChangeView.z]
         val block = row[BlockChangeView.block]
+        val blockData = row[BlockChangeView.blockData]
         val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
 
         val fromBlock = if (changeIsBreak) {
-          BlockState.cached(block)
+          BlockState(block, blockData)
         } else {
           BlockState.AirBlock
         }
@@ -79,7 +80,7 @@ class BlockChangelog(
         val toBlock = if (changeIsBreak) {
           BlockState.AirBlock
         } else {
-          BlockState.cached(block)
+          BlockState(block, blockData)
         }
 
         BlockChange(

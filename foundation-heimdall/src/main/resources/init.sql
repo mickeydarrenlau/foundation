@@ -126,12 +126,6 @@ create table if not exists entity_kills (
 --
 select create_hypertable('entity_kills', 'time', 'player', 4,  if_not_exists => TRUE);
 --
-create or replace view block_changes as
-    select true as break, *
-    from block_breaks
-    union all
-    select false as break, * from block_places;
---
 create or replace view player_names as
     with unique_player_ids as (
         select distinct player
@@ -145,3 +139,14 @@ create or replace view player_names as
         limit 1
     ) as name
     from unique_player_ids;
+--
+alter table block_places add column if not exists block_data text null;
+--
+alter table block_breaks add column if not exists block_data text null;
+--
+create or replace view block_changes as
+    select true as break, *
+    from block_breaks
+    union all
+    select false as break, * from block_places;
+--

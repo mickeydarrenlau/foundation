@@ -1,15 +1,13 @@
 package gay.pizza.foundation.heimdall.tool.state
 
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.serialization.Serializable
 
-@Serializable(BlockStateSerializer::class)
-data class BlockState(val type: String) {
+@Serializable
+data class BlockState(
+  val type: String,
+  val data: String? = null
+) {
   companion object {
-    private val cache = ConcurrentHashMap<String, BlockState>()
-
-    val AirBlock: BlockState = cached("minecraft:air")
-
-    fun cached(type: String): BlockState = cache.computeIfAbsent(type) { BlockState(type) }
+    val AirBlock: BlockState = BlockState("minecraft:air")
   }
 }

@@ -33,7 +33,7 @@ class GenerateWorldLoadFile : CliktCommand(name = "generate-world-load", help = 
     for ((id, changelog) in worldChangelogs) {
       val tracker = BlockLogTracker()
       tracker.replay(changelog)
-      val sparse = tracker.buildBlockMap { ExportedBlock(it.type) }
+      val sparse = tracker.buildBlockMap { ExportedBlock(it.type, it.data) }
       val blocks = sparse.blocks
       worlds[id.toString().lowercase()] = WorldLoadWorld(
         worldNames[id] ?: "unknown_$id",

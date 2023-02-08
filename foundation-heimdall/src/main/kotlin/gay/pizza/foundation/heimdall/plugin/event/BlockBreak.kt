@@ -16,12 +16,14 @@ class BlockBreak(
   val playerUniqueIdentity: UUID,
   val location: Location,
   val material: Material,
+  val blockData: String? = null,
   val timestamp: Instant = Instant.now()
 ) : HeimdallEvent() {
   constructor(event: BlockBreakEvent) : this(
     event.player.uniqueId,
     event.block.location,
-    event.block.type
+    event.block.type,
+    event.block.blockData.asString
   )
 
   override fun store(transaction: Transaction) {
@@ -29,6 +31,7 @@ class BlockBreak(
       BlockBreakTable.insert {
         putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
         it[block] = material.key.toString()
+        it[blockData] = this@BlockBreak.blockData
       }
     }
   }

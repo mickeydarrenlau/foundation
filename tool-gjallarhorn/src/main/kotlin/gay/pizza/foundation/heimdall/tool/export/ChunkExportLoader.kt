@@ -47,7 +47,7 @@ class ChunkExportLoader(
         }
 
         val coordinate = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
-        val state = BlockState.cached(block.type)
+        val state = BlockState(block.type, block.data)
         map?.put(coordinate, state)
         if (allBlocks != null) {
           allBlocks[coordinate] = state

@@ -1,5 +1,6 @@
 package gay.pizza.foundation.heimdall.plugin.load
 
+import gay.pizza.foundation.heimdall.export.ExportedBlock
 import gay.pizza.foundation.heimdall.load.WorldLoadFormat
 import gay.pizza.foundation.heimdall.load.WorldLoadWorld
 import org.bukkit.Location
@@ -24,7 +25,7 @@ class WorldReassembler(val plugin: Plugin, val server: Server, val format: World
           continue
         }
 
-        val blocksToMake = mutableListOf<Pair<Location, Material>>()
+        val blocksToMake = mutableListOf<Pair<Location, ExportedBlock>>()
 
         for ((x, zBlocks) in load.blocks) {
           for ((z, yBlocks) in zBlocks) {
@@ -36,7 +37,7 @@ class WorldReassembler(val plugin: Plugin, val server: Server, val format: World
                 continue
               }
 
-              blocksToMake.add(Location(world, x.toDouble(), y.toDouble(), z.toDouble()) to material)
+              blocksToMake.add(Location(world, x.toDouble(), y.toDouble(), z.toDouble()) to block)
             }
           }
         }
@@ -50,9 +51,15 @@ class WorldReassembler(val plugin: Plugin, val server: Server, val format: World
           val copy = section.toList()
           val runnable = object : BukkitRunnable() {
             override fun run() {
-              for ((location, material) in copy) {
+              for ((location, blk) in copy) {
                 val block = world.getBlockAt(location)
-                block.type = material
+                val blockData = if (blk.data != null) server.createBlockData(blk.data!!) else null
+                if (blockData != null) {
+                  block.blockData = blockData
+                } else {
+                  val material = Material.matchMaterial(blk.type)!!
+                  block.type = material
+                }
                 count.incrementAndGet()
               }
               feedback("Placed ${count.get()} blocks in ${world.name}")
