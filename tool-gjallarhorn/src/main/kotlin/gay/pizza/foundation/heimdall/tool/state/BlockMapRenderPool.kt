@@ -8,7 +8,6 @@ import java.util.concurrent.ThreadPoolExecutor
 
 class BlockMapRenderPool<T>(
   val changelog: BlockChangelog,
-  val blockTrackMode: BlockTrackMode,
   val createRendererFunction: (BlockExpanse) -> BlockMapRenderer<T>,
   val delegate: BlockMapRenderPoolDelegate<T>,
   val threadPoolExecutor: ThreadPoolExecutor,
@@ -64,7 +63,7 @@ class BlockMapRenderPool<T>(
   private fun runPlaybackSlice(id: String, slice: ChangelogSlice) {
     val start = System.currentTimeMillis()
     val sliced = changelog.slice(slice)
-    val tracker = BlockLogTracker(blockTrackMode)
+    val tracker = BlockLogTracker()
     tracker.replay(sliced)
     if (tracker.isNotEmpty()) {
       trackers[slice] = tracker

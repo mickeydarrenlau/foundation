@@ -8,11 +8,11 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
+import gay.pizza.foundation.heimdall.table.BlockChangeTable
 import gay.pizza.foundation.heimdall.table.WorldChangeTable
 import gay.pizza.foundation.heimdall.tool.render.*
 import gay.pizza.foundation.heimdall.tool.state.*
 import gay.pizza.foundation.heimdall.tool.util.compose
-import gay.pizza.foundation.heimdall.view.BlockChangeView
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
@@ -48,8 +48,6 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
   private val renderImageFormat by option("--render-image-format", help = "Render Image Format")
     .enum<ImageFormatType> { it.id }
     .default(ImageFormatType.Png)
-
-  private val considerAirBlocks by option("--consider-air-blocks", help = "Enable Air Block Consideration").flag()
 
   private val fromCoordinate by option("--trim-from", help = "Trim From Coordinate")
   private val toCoordinate by option("--trim-to", help = "Trim To Coordinate")
@@ -100,11 +98,11 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
 
     val filter = compose(
       combine = { a, b -> a and b },
-      { trim?.first?.x != null } to { BlockChangeView.x greaterEq trim!!.first.x.toDouble() },
-      { trim?.first?.z != null } to { BlockChangeView.z greaterEq trim!!.first.z.toDouble() },
-      { trim?.second?.x != null } to { BlockChangeView.x lessEq trim!!.second.x.toDouble() },
-      { trim?.second?.z != null } to { BlockChangeView.z lessEq trim!!.second.z.toDouble() },
-      { true } to { BlockChangeView.world eq world }
+      { trim?.first?.x != null } to { BlockChangeTable.x greaterEq trim!!.first.x.toDouble() },
+      { trim?.first?.z != null } to { BlockChangeTable.z greaterEq trim!!.first.z.toDouble() },
+      { trim?.second?.x != null } to { BlockChangeTable.x lessEq trim!!.second.x.toDouble() },
+      { trim?.second?.z != null } to { BlockChangeTable.z lessEq trim!!.second.z.toDouble() },
+      { true } to { BlockChangeTable.world eq world }
     )
 
     val changelog = BlockChangelog.query(db, filter)
@@ -131,7 +129,6 @@ class BlockChangeTimelapseCommand : CliktCommand("Block Change Timelapse", name 
 
     val pool = BlockMapRenderPool(
       changelog = changelog,
-      blockTrackMode = if (considerAirBlocks) BlockTrackMode.AirOnDelete else BlockTrackMode.RemoveOnDelete,
       delegate = timelapse,
       createRendererFunction = { expanse -> render.createNewRenderer(expanse, db) },
       threadPoolExecutor = threadPoolExecutor

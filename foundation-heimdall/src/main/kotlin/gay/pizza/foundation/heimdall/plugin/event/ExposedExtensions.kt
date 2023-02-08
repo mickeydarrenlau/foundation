@@ -28,7 +28,7 @@ fun <T : PlayerTimedLocalEventTable, K : Any> T.putPlayerTimedLocalEvent(
   statement: InsertStatement<K>,
   time: Instant,
   location: Location,
-  player: UUID
+  player: UUID?
 ) {
   putTimedLocalEvent(statement, time, location)
   statement[this.player] = player

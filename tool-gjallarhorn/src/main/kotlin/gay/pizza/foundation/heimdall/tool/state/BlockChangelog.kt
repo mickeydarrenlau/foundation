@@ -1,6 +1,6 @@
 package gay.pizza.foundation.heimdall.tool.state
 
-import gay.pizza.foundation.heimdall.view.BlockChangeView
+import gay.pizza.foundation.heimdall.table.BlockChangeTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.select
@@ -10,7 +10,7 @@ import java.time.Instant
 import java.util.stream.Stream
 
 class BlockChangelog(
-  val changes: List<BlockChange>
+  val changes: List<RecordedBlockChange>
 ) {
   fun slice(slice: ChangelogSlice): BlockChangelog = BlockChangelog(changes.filter {
     slice.isTimeWithinFullRange(it.time)
@@ -60,43 +60,30 @@ class BlockChangelog(
 
   companion object {
     fun query(db: Database, filter: Op<Boolean> = Op.TRUE): BlockChangelog = transaction(db) {
-      BlockChangelog(BlockChangeView.select(filter).orderBy(BlockChangeView.time).map { row ->
-        val time = row[BlockChangeView.time]
-        val changeIsBreak = row[BlockChangeView.isBreak]
-        val world = row[BlockChangeView.world]
-        val x = row[BlockChangeView.x]
-        val y = row[BlockChangeView.y]
-        val z = row[BlockChangeView.z]
-        val block = row[BlockChangeView.block]
-        val blockData = row[BlockChangeView.blockData]
+      BlockChangelog(BlockChangeTable.select(filter).orderBy(BlockChangeTable.time).map { row ->
+        val time = row[BlockChangeTable.time]
+        val world = row[BlockChangeTable.world]
+        val x = row[BlockChangeTable.x]
+        val y = row[BlockChangeTable.y]
+        val z = row[BlockChangeTable.z]
+        val blockMaterial = row[BlockChangeTable.block]
+        val blockData = row[BlockChangeTable.data]
         val location = BlockCoordinate(x.toLong(), y.toLong(), z.toLong())
 
-        val fromBlock = if (changeIsBreak) {
-          BlockState(block, blockData)
-        } else {
-          BlockState.AirBlock
-        }
+        val block = BlockState(blockMaterial, blockData)
 
-        val toBlock = if (changeIsBreak) {
-          BlockState.AirBlock
-        } else {
-          BlockState(block, blockData)
-        }
-
-        BlockChange(
+        RecordedBlockChange(
           time,
           world,
-          if (changeIsBreak) BlockChangeType.Break else BlockChangeType.Place,
           location,
-          fromBlock,
-          toBlock
+          block
         )
       })
     }
   }
 
-  fun <T> splitBy(key: (BlockChange) -> T): Map<T, BlockChangelog> {
-    val logs = mutableMapOf<T, MutableList<BlockChange>>()
+  fun <T> splitBy(key: (RecordedBlockChange) -> T): Map<T, BlockChangelog> {
+    val logs = mutableMapOf<T, MutableList<RecordedBlockChange>>()
     for (change in changes) {
       val k = key(change)
       var log = logs[k]

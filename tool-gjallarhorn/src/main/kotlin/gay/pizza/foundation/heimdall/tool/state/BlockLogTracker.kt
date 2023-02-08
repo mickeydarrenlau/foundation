@@ -5,7 +5,7 @@ import gay.pizza.foundation.heimdall.tool.util.minOfAll
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.absoluteValue
 
-class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOnDelete, isConcurrent: Boolean = false) {
+class BlockLogTracker(isConcurrent: Boolean = false) {
   internal val blocks: MutableMap<BlockCoordinate, BlockState> = if (isConcurrent) ConcurrentHashMap() else mutableMapOf()
 
   fun place(position: BlockCoordinate, state: BlockState) {
@@ -14,14 +14,6 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
 
   fun placeAll(map: Map<BlockCoordinate, BlockState>) {
     blocks.putAll(map)
-  }
-
-  fun delete(position: BlockCoordinate) {
-    if (mode == BlockTrackMode.AirOnDelete) {
-      blocks[position] = BlockState.AirBlock
-    } else {
-      blocks.remove(position)
-    }
   }
 
   fun calculateZeroBlockOffset(): BlockCoordinate {
@@ -60,11 +52,7 @@ class BlockLogTracker(private val mode: BlockTrackMode = BlockTrackMode.RemoveOn
   }
 
   fun replay(changelog: BlockChangelog) = changelog.changes.forEach { change ->
-    if (change.type == BlockChangeType.Break) {
-      delete(change.location)
-    } else {
-      place(change.location, change.to)
-    }
+    place(change.location, change.state)
   }
 
   fun get(position: BlockCoordinate): BlockState? = blocks[position]

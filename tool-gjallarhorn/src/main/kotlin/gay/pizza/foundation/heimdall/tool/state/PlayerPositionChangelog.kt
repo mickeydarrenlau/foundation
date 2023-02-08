@@ -21,7 +21,7 @@ class PlayerPositionChangelog(
         val pitch = row[PlayerPositionTable.z]
         val yaw = row[PlayerPositionTable.z]
 
-        PlayerPositionChange(time, player, world, x, y, z, pitch, yaw)
+        PlayerPositionChange(time, player!!, world, x, y, z, pitch, yaw)
       })
     }
   }

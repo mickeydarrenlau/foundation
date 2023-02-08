@@ -36,9 +36,9 @@ class PlayerLocationShareRenderer(
         val player = it[PlayerPositionTable.player]
         playerSparseMap.createOrModify(
           coordinate,
-          create = { mutableListOf(player) },
-          modify = { players -> players.add(player) })
-        allPlayerIds.add(player)
+          create = { mutableListOf(player!!) },
+          modify = { players -> players.add(player!!) })
+        allPlayerIds.add(player!!)
       }
     }
 

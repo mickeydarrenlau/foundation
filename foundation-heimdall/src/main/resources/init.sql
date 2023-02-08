@@ -26,9 +26,9 @@ alter table player_positions set (
 --
 select add_compression_policy('player_positions', interval '3 days', if_not_exists => true);
 --
-create table if not exists block_breaks (
+create table if not exists block_changes (
     time timestamp not null,
-    player uuid not null,
+    player uuid null,
     world uuid not null,
     x double precision not null,
     y double precision not null,
@@ -36,25 +36,12 @@ create table if not exists block_breaks (
     pitch double precision not null,
     yaw double precision not null,
     block text not null,
-    PRIMARY KEY (time, player, world)
+    data text not null,
+    cause text not null,
+    PRIMARY KEY (time, world, x, y, z)
 );
 --
-select create_hypertable('block_breaks', 'time', 'player', 4,  if_not_exists => TRUE);
---
-create table if not exists block_places (
-    time timestamp not null,
-    player uuid not null,
-    world uuid not null,
-    x double precision not null,
-    y double precision not null,
-    z double precision not null,
-    pitch double precision not null,
-    yaw double precision not null,
-    block text not null,
-    PRIMARY KEY (time, player, world)
-);
---
-select create_hypertable('block_places', 'time', 'player', 4,  if_not_exists => TRUE);
+select create_hypertable('block_changes', 'time', 'x', 4,  if_not_exists => TRUE);
 --
 create table if not exists player_sessions (
     id uuid not null,
@@ -139,14 +126,4 @@ create or replace view player_names as
         limit 1
     ) as name
     from unique_player_ids;
---
-alter table block_places add column if not exists block_data text null;
---
-alter table block_breaks add column if not exists block_data text null;
---
-create or replace view block_changes as
-    select true as break, *
-    from block_breaks
-    union all
-    select false as break, * from block_places;
 --
