@@ -29,7 +29,7 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
   private val buffer = EventBuffer()
   private val bufferFlushThread = BufferFlushThread(this, buffer)
 
-  private val collectors = mutableListOf<EventCollector<*>>()
+  val collectors = mutableListOf<EventCollector<*>>()
 
   override fun onEnable() {
     val exportChunksCommand = getCommand("export_all_chunks") ?:
@@ -48,10 +48,10 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     )
     config = Yaml.default.decodeFromStream(HeimdallConfig.serializer(), configPath.inputStream())
     if (!config.enabled) {
-      slF4JLogger.info("Heimdall is not enabled.")
+      slF4JLogger.info("Heimdall tracking is not enabled.")
       return
     }
-    slF4JLogger.info("Heimdall is enabled.")
+    slF4JLogger.info("Heimdall tracking is enabled.")
     if (!Driver.isRegistered()) {
       Driver.register()
     }
@@ -91,7 +91,7 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     bufferFlushThread.start()
 
     for (collectorProvider in EventCollectorProviders.all) {
-      val collector = collectorProvider.collector(buffer)
+      val collector = collectorProvider.collector(config, buffer)
       server.pluginManager.registerEvents(collector, this)
       collectors.add(collector)
     }

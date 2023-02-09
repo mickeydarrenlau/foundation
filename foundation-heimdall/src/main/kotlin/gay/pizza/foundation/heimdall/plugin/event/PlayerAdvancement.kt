@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.PlayerAdvancementTable
 import org.bukkit.Location
 import org.bukkit.advancement.Advancement
@@ -20,11 +21,11 @@ class PlayerAdvancement(
 ) : HeimdallEvent() {
   constructor(event: PlayerAdvancementDoneEvent) : this(
     event.player.uniqueId,
-    event.player.location,
+    event.player.location.clone(),
     event.advancement
   )
 
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       PlayerAdvancementTable.insert {
         putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
@@ -39,6 +40,6 @@ class PlayerAdvancement(
   }
 
   companion object : EventCollectorProvider<PlayerAdvancement> {
-    override fun collector(buffer: EventBuffer): EventCollector<PlayerAdvancement> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<PlayerAdvancement> = Collector(buffer)
   }
 }

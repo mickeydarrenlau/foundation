@@ -11,12 +11,12 @@ class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventB
   fun start() {
     running.set(true)
     val thread = Thread {
-      plugin.slF4JLogger.info("Buffer Flusher Started")
+      plugin.slF4JLogger.info("Buffer flusher started.")
       while (running.get()) {
         flush()
         Thread.sleep(5000)
       }
-      plugin.slF4JLogger.info("Buffer Flusher Stopped")
+      plugin.slF4JLogger.info("Buffer flusher stopped.")
     }
     thread.name = "Heimdall Buffer Flush"
     thread.isDaemon = false
@@ -31,6 +31,10 @@ class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventB
 
   fun flush() {
     try {
+      for (collector in plugin.collectors) {
+        collector.beforeBufferFlush()
+      }
+
       val db = plugin.db
       if (db == null) {
         buffer.clear()
@@ -39,7 +43,7 @@ class BufferFlushThread(val plugin: FoundationHeimdallPlugin, val buffer: EventB
       transaction(plugin.db) {
         val count = buffer.flush(this)
         if (count > 0) {
-          plugin.slF4JLogger.debug("Flushed $count Events")
+          plugin.slF4JLogger.debug("Flushed $count events.")
         }
       }
     } catch (e: Exception) {

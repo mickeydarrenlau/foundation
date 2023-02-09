@@ -4,4 +4,5 @@ object BlockChangeTable : PlayerTimedLocalEventTable("block_changes") {
   val block = text("block")
   val data = text("data")
   val cause = text("cause")
+  val inc = integer("inc")
 }

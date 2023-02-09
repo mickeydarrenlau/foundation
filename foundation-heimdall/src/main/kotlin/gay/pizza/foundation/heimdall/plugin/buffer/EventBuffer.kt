@@ -12,7 +12,7 @@ class EventBuffer : IEventBuffer {
     var count = 0L
     while (referenceOfEvents.isNotEmpty()) {
       val event = referenceOfEvents.removeAt(0)
-      event.store(transaction)
+      event.store(transaction, count.toInt())
       count++
     }
     return count
@@ -20,6 +20,10 @@ class EventBuffer : IEventBuffer {
 
   override fun push(event: HeimdallEvent) {
     events.add(event)
+  }
+
+  override fun pushAll(events: List<HeimdallEvent>) {
+    this.events.addAll(events)
   }
 
   fun clear() {

@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.EntityKillTable
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -18,7 +19,7 @@ class EntityKill(
   val entityTypeName: String,
   val timestamp: Instant = Instant.now()
 ) : HeimdallEvent() {
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       EntityKillTable.insert {
         putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
@@ -35,7 +36,7 @@ class EntityKill(
       buffer.push(
         EntityKill(
           killer.uniqueId,
-          killer.location,
+          killer.location.clone(),
           event.entity.uniqueId,
           event.entityType.key.toString()
         )
@@ -44,6 +45,6 @@ class EntityKill(
   }
 
   companion object : EventCollectorProvider<EntityKill> {
-    override fun collector(buffer: EventBuffer): EventCollector<EntityKill> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<EntityKill> = Collector(buffer)
   }
 }

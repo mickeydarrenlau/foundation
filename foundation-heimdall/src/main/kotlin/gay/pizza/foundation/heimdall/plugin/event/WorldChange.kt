@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.WorldChangeTable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerChangedWorldEvent
@@ -18,7 +19,7 @@ class WorldChange(
   val toWorldActualName: String,
   val timestamp: Instant = Instant.now()
 ) : HeimdallEvent() {
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       WorldChangeTable.insert {
         putTimedEvent(it, timestamp)
@@ -45,6 +46,6 @@ class WorldChange(
   }
 
   companion object : EventCollectorProvider<WorldChange> {
-    override fun collector(buffer: EventBuffer): EventCollector<WorldChange> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<WorldChange> = Collector(buffer)
   }
 }

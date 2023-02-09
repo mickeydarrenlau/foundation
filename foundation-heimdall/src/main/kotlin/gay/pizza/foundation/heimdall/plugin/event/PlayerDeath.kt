@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.PlayerDeathTable
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
@@ -21,12 +22,12 @@ class PlayerDeath(
 ) : HeimdallEvent() {
   constructor(event: PlayerDeathEvent, deathMessage: String? = null) : this(
     event.player.uniqueId,
-    event.player.location,
+    event.player.location.clone(),
     event.player.exp,
     deathMessage
   )
 
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       PlayerDeathTable.insert {
         putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
@@ -52,6 +53,6 @@ class PlayerDeath(
   }
 
   companion object : EventCollectorProvider<PlayerDeath> {
-    override fun collector(buffer: EventBuffer): EventCollector<PlayerDeath> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<PlayerDeath> = Collector(buffer)
   }
 }

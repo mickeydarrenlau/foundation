@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.PlayerSessionTable
 import org.bukkit.Server
 import org.bukkit.event.EventHandler
@@ -19,7 +20,7 @@ class PlayerSession(
   val startTimeInstant: Instant,
   val endTimeInstant: Instant
 ) : HeimdallEvent() {
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       PlayerSessionTable.insert {
         it[id] = UUID.randomUUID()
@@ -61,6 +62,6 @@ class PlayerSession(
   }
 
   companion object : EventCollectorProvider<PlayerSession> {
-    override fun collector(buffer: EventBuffer): EventCollector<PlayerSession> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<PlayerSession> = Collector(buffer)
   }
 }

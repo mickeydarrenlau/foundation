@@ -1,6 +1,16 @@
 # Whether Heimdall should be enabled for tracking events.
 enabled: false
 
+# Whether the block change events should be precise.
+# Detail of the cause will be lost but all block updates
+# will be captured utilizing physics recording.
+blockChangePrecise: false
+
+# Whether the precise block change collector should
+# immediately insert changes to the buffer. This is not
+# recommended as this may cause large insert operations.
+blockChangePreciseImmediate: false
+
 # Database connection information.
 db:
   # JDBC URL

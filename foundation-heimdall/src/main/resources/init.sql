@@ -28,6 +28,7 @@ select add_compression_policy('player_positions', interval '3 days', if_not_exis
 --
 create table if not exists block_changes (
     time timestamp not null,
+    inc int not null,
     player uuid null,
     world uuid not null,
     x double precision not null,
@@ -38,10 +39,10 @@ create table if not exists block_changes (
     block text not null,
     data text not null,
     cause text not null,
-    PRIMARY KEY (time, world, x, y, z)
+    PRIMARY KEY (time, inc)
 );
 --
-select create_hypertable('block_changes', 'time', 'x', 4,  if_not_exists => TRUE);
+select create_hypertable('block_changes', 'time', 'inc', 4,  if_not_exists => TRUE);
 --
 create table if not exists player_sessions (
     id uuid not null,

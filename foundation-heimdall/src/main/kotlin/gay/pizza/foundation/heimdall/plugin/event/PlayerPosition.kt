@@ -2,6 +2,7 @@ package gay.pizza.foundation.heimdall.plugin.event
 
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
 import gay.pizza.foundation.heimdall.plugin.buffer.IEventBuffer
+import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.heimdall.table.PlayerPositionTable
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -18,10 +19,10 @@ class PlayerPosition(
 ) : HeimdallEvent() {
   constructor(event: PlayerMoveEvent) : this(
     event.player.uniqueId,
-    event.to
+    event.to.clone()
   )
 
-  override fun store(transaction: Transaction) {
+  override fun store(transaction: Transaction, index: Int) {
     transaction.apply {
       PlayerPositionTable.insert {
         putPlayerTimedLocalEvent(it, timestamp, location, playerUniqueIdentity)
@@ -35,6 +36,6 @@ class PlayerPosition(
   }
 
   companion object : EventCollectorProvider<PlayerPosition> {
-    override fun collector(buffer: EventBuffer): EventCollector<PlayerPosition> = Collector(buffer)
+    override fun collector(config: HeimdallConfig, buffer: EventBuffer): EventCollector<PlayerPosition> = Collector(buffer)
   }
 }
