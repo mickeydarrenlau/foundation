@@ -1,4 +1,4 @@
-package gay.pizza.foundation.core
+package gay.pizza.foundation.shared
 
 import net.kyori.adventure.text.format.TextColor
 

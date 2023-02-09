@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler
 import org.koin.core.component.inject
 import java.time.Instant
 
+@Suppress("IdentifierGrammar")
 class StatsFeature : Feature() {
   internal val persistence = inject<PluginPersistence>()
   private lateinit var chatLogStore: PersistentStore

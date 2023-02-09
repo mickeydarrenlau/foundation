@@ -2,7 +2,7 @@ package gay.pizza.foundation.core.features.backup
 
 import gay.pizza.foundation.shared.Platform
 import gay.pizza.foundation.core.FoundationCorePlugin
-import gay.pizza.foundation.core.Util
+import gay.pizza.foundation.shared.MessageUtil
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Server
@@ -27,14 +27,14 @@ import java.util.zip.ZipOutputStream
 // TODO: Clean up dependency injection.
 class BackupCommand(
   private val plugin: FoundationCorePlugin,
-  private val backupsPath: Path,
+  private val backupFilePath: Path,
   private val config: BackupConfig,
   private val s3Client: S3Client,
 ) : CommandExecutor {
   override fun onCommand(
     sender: CommandSender, command: Command, label: String, args: Array<String>
   ): Boolean {
-    if (RUNNING.get()) {
+    if (running.get()) {
       sender.sendMessage(
         Component
           .text("Backup is already running.")
@@ -52,10 +52,10 @@ class BackupCommand(
 
   // TODO: Pull backup creation code into a separate service.
   private fun runBackup(server: Server, sender: CommandSender? = null) = try {
-    RUNNING.set(true)
+    running.set(true)
 
     server.scheduler.runTask(plugin) { ->
-      server.sendMessage(Util.formatSystemMessage("Backup started."))
+      server.sendMessage(MessageUtil.formatSystemMessage("Backup started."))
     }
 
     val backupTime = Instant.now()
@@ -65,7 +65,7 @@ class BackupCommand(
       backupTime.toString()
     }
     val backupFileName = String.format("backup-%s.zip", backupIdentifier)
-    val backupPath = backupsPath.resolve(backupFileName)
+    val backupPath = backupFilePath.resolve(backupFileName)
     val backupFile = backupPath.toFile()
 
     FileOutputStream(backupFile).use { zipFileStream ->
@@ -94,9 +94,9 @@ class BackupCommand(
     }
     plugin.slF4JLogger.warn("Failed to backup.", e)
   } finally {
-    RUNNING.set(false)
+    running.set(false)
     server.scheduler.runTask(plugin) { ->
-      server.sendMessage(Util.formatSystemMessage("Backup finished."))
+      server.sendMessage(MessageUtil.formatSystemMessage("Backup finished."))
     }
   }
 
@@ -140,7 +140,7 @@ class BackupCommand(
       .filter { path -> !matchers.any { it.matches(Paths.get(path.normalize().toString())) } }
       .toList()
     val buffer = ByteArray(16 * 1024)
-    val backupsPath = backupsPath.toRealPath()
+    val backupsPath = backupFilePath.toRealPath()
 
     for (path in paths) {
       val realPath = path.toRealPath()
@@ -163,6 +163,6 @@ class BackupCommand(
   }
 
   companion object {
-    private val RUNNING = AtomicBoolean()
+    private val running = AtomicBoolean()
   }
 }

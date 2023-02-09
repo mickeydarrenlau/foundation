@@ -1,9 +1,9 @@
-package gay.pizza.foundation.core
+package gay.pizza.foundation.shared
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextColor
 
-object Util {
+object MessageUtil {
   private val leftBracket: Component = Component.text('[')
   private val rightBracket: Component = Component.text(']')
   private val whitespace: Component = Component.text(' ')

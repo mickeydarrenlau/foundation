@@ -9,7 +9,7 @@ import org.bukkit.entity.EntityType
 val Server.allPlayers: List<OfflinePlayer>
   get() = listOf(onlinePlayers, offlinePlayers.filter { !isPlayerOnline(it) }.toList()).flatten()
 
-fun Server.isPlayerOnline(player: OfflinePlayer) =
+fun Server.isPlayerOnline(player: OfflinePlayer): Boolean =
   onlinePlayers.any { onlinePlayer -> onlinePlayer.name == player.name }
 
 fun Server.allPlayerStatisticsOf(
@@ -17,7 +17,7 @@ fun Server.allPlayerStatisticsOf(
   material: Material? = null,
   entityType: EntityType? = null,
   order: SortOrder = SortOrder.Ascending
-) = allPlayers.map { player ->
+): List<Pair<OfflinePlayer, Int>> = allPlayers.map { player ->
   player to if (material != null) {
     player.getStatistic(statistic, material)
   } else if (entityType != null) {

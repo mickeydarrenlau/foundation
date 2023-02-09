@@ -1,7 +1,5 @@
 package gay.pizza.foundation.core
 
-import gay.pizza.foundation.shared.IFoundationCore
-import gay.pizza.foundation.shared.PluginMainClass
 import gay.pizza.foundation.core.abstraction.FoundationPlugin
 import gay.pizza.foundation.core.features.backup.BackupFeature
 import gay.pizza.foundation.core.features.dev.DevFeature
@@ -12,7 +10,8 @@ import gay.pizza.foundation.core.features.scheduler.SchedulerFeature
 import gay.pizza.foundation.core.features.stats.StatsFeature
 import gay.pizza.foundation.core.features.update.UpdateFeature
 import gay.pizza.foundation.core.features.world.WorldFeature
-import gay.pizza.foundation.shared.PersistentStore
+import gay.pizza.foundation.shared.IFoundationCore
+import gay.pizza.foundation.shared.PluginMainClass
 import gay.pizza.foundation.shared.PluginPersistence
 import org.koin.dsl.module
 import java.nio.file.Path
