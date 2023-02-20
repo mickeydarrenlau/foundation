@@ -14,6 +14,13 @@ server.
 
 * tool-gjallarhorn - Heimdall swiss army knife
 
+## Libraries
+
+* common-all: Common code for every Foundation module.
+* common-plugin: Common code for every Foundation plugin. Included directly in the plugin jar.
+* common-heimdall: Common code for Heimdall modules.
+* foundation-shared: Common code for every Foundation plugin. Linked dynamically from Foundation Core.
+
 ## Installation
 
 The following command downloads and runs a script that will fetch the latest update manifest, and
