@@ -4,9 +4,9 @@ import com.charleskorn.kaml.Yaml
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
-import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.abstraction.Feature
+import gay.pizza.foundation.shared.copyDefaultConfig
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
@@ -42,13 +42,13 @@ class PlayerFeature : Feature() {
       playerActivity.cleanUp()
     }, 20, 100)
 
-    registerCommandExecutor(listOf("survival", "s"), GamemodeCommand(GameMode.SURVIVAL))
-    registerCommandExecutor(listOf("creative", "c"), GamemodeCommand(GameMode.CREATIVE))
-    registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
-    registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
-    registerCommandExecutor(listOf("localweather", "lw"), LocalWeatherCommand())
-    registerCommandExecutor(listOf("goose", "the_most_wonderful_kitty_ever"), GooseCommand())
-    registerCommandExecutor(listOf("megatnt"), MegaTntCommand())
+    plugin.registerCommandExecutor(listOf("survival", "s"), GamemodeCommand(GameMode.SURVIVAL))
+    plugin.registerCommandExecutor(listOf("creative", "c"), GamemodeCommand(GameMode.CREATIVE))
+    plugin.registerCommandExecutor(listOf("adventure", "a"), GamemodeCommand(GameMode.ADVENTURE))
+    plugin.registerCommandExecutor(listOf("spectator", "sp"), GamemodeCommand(GameMode.SPECTATOR))
+    plugin.registerCommandExecutor(listOf("localweather", "lw"), LocalWeatherCommand())
+    plugin.registerCommandExecutor(listOf("goose", "the_most_wonderful_kitty_ever"), GooseCommand())
+    plugin.registerCommandExecutor(listOf("megatnt"), MegaTntCommand())
   }
 
   override fun module() = org.koin.dsl.module {

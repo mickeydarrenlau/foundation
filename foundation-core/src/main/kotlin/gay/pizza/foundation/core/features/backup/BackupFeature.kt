@@ -1,11 +1,11 @@
 package gay.pizza.foundation.core.features.backup
 
 import com.charleskorn.kaml.Yaml
-import gay.pizza.foundation.shared.copyDefaultConfig
 import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.abstraction.Feature
 import gay.pizza.foundation.core.features.scheduler.cancel
 import gay.pizza.foundation.core.features.scheduler.cron
+import gay.pizza.foundation.shared.copyDefaultConfig
 import org.koin.core.component.inject
 import org.koin.dsl.module
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials
@@ -25,7 +25,7 @@ class BackupFeature : Feature() {
     val backupPath = plugin.pluginDataPath.resolve(BACKUPS_DIRECTORY)
     backupPath.toFile().mkdir()
 
-    registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath, config, s3Client))
+    plugin.registerCommandExecutor("fbackup", BackupCommand(plugin, backupPath, config, s3Client))
 
     if (config.schedule.cron.isNotEmpty()) {
       // Assume the user never wants to modify the second. I'm not sure why this is enforced in Quartz.

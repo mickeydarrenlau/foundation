@@ -27,20 +27,18 @@ class WorldReassembler(val plugin: Plugin, val server: Server, val format: World
 
         val blocksToMake = mutableListOf<Pair<Location, ExportedBlock>>()
 
-        for ((x, zBlocks) in load.blocks) {
-          for ((z, yBlocks) in zBlocks) {
-            for ((y, block) in yBlocks) {
-              val material: Material? = Material.matchMaterial(block.type)
+        load.crawl { x, z, y, blockIndex ->
+          val block = format.blockLookupTable[blockIndex]
+          val material: Material? = Material.matchMaterial(block.type)
 
-              if (material == null) {
-                feedback("Unknown Material '${block.type}' at $x $y $z")
-                continue
-              }
-
-              blocksToMake.add(Location(world, x.toDouble(), y.toDouble(), z.toDouble()) to block)
-            }
+          if (material == null) {
+            feedback("Unknown Material '${block.type}' at $x $y $z")
+            return@crawl
           }
+
+          blocksToMake.add(Location(world, x.toDouble(), y.toDouble(), z.toDouble()) to block)
         }
+
         blocksToMake.sortBy { it.first.x }
 
         feedback("Will place ${blocksToMake.size} blocks in ${world.name}")

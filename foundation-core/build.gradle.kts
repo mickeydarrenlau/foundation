@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
   api(project(":common-all"))
+  api(project(":common-plugin"))
   implementation(project(":foundation-shared"))
 
   implementation(libs.aws.sdk.s3)

@@ -3,6 +3,7 @@ package gay.pizza.foundation.heimdall.plugin
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import gay.pizza.foundation.common.BaseFoundationPlugin
 import gay.pizza.foundation.common.FoundationCoreLoader
 import gay.pizza.foundation.heimdall.plugin.buffer.BufferFlushThread
 import gay.pizza.foundation.heimdall.plugin.buffer.EventBuffer
@@ -14,14 +15,13 @@ import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.shared.PluginMainClass
 import gay.pizza.foundation.shared.copyDefaultConfig
 import org.bukkit.event.Listener
-import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
 import java.time.Duration
 import kotlin.io.path.inputStream
 
 @PluginMainClass
-class FoundationHeimdallPlugin : JavaPlugin(), Listener {
+class FoundationHeimdallPlugin : BaseFoundationPlugin(), Listener {
   private lateinit var config: HeimdallConfig
   private lateinit var pool: HikariDataSource
   internal var db: Database? = null
@@ -35,6 +35,10 @@ class FoundationHeimdallPlugin : JavaPlugin(), Listener {
     val exportChunksCommand = getCommand("export_all_chunks") ?:
       throw Exception("Failed to get export_all_chunks command")
     exportChunksCommand.setExecutor(ExportAllChunksCommand(this))
+
+    registerCommandExecutor("export_all_chunks", ExportAllChunksCommand(this))
+    registerCommandExecutor("export_world_load", ExportAllChunksCommand(this))
+    registerCommandExecutor("import_world_load", ExportAllChunksCommand(this))
 
     val importWorldLoadCommand = getCommand("import_world_load") ?:
       throw Exception("Failed to get import_world_load command")

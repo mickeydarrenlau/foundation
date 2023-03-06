@@ -1,13 +1,13 @@
 package gay.pizza.foundation.core.abstraction
 
-import org.bukkit.plugin.java.JavaPlugin
+import gay.pizza.foundation.common.BaseFoundationPlugin
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-abstract class FoundationPlugin : JavaPlugin() {
+abstract class FoundationPlugin : BaseFoundationPlugin() {
   private lateinit var pluginModule: Module
   private lateinit var pluginApplication: KoinApplication
   private lateinit var features: List<CoreFeature>

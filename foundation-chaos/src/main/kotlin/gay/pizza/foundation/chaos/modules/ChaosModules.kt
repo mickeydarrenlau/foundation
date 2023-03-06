@@ -8,6 +8,7 @@ object ChaosModules {
     TeleportAllEntitiesNearestPlayer(plugin),
     KillRandomPlayer(plugin),
     TntAllPlayers(plugin),
-    MegaTnt(plugin)
-  )
+    MegaTnt(plugin),
+    PlayerSwap(plugin)
+  ).shuffled()
 }

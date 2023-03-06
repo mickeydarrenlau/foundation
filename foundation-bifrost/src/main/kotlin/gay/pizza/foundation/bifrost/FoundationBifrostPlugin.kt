@@ -2,6 +2,7 @@ package gay.pizza.foundation.bifrost
 
 import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.bifrost.model.BifrostConfig
+import gay.pizza.foundation.common.BaseFoundationPlugin
 import gay.pizza.foundation.common.FoundationCoreLoader
 import gay.pizza.foundation.shared.*
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -22,14 +23,13 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.plugin.java.JavaPlugin
 import java.awt.Color
 import kotlin.io.path.inputStream
 import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
 import org.bukkit.event.Listener as BukkitEventListener
 
 @PluginMainClass
-class FoundationBifrostPlugin : JavaPlugin(), DiscordEventListener, BukkitEventListener {
+class FoundationBifrostPlugin : BaseFoundationPlugin(), DiscordEventListener, BukkitEventListener {
   private lateinit var config: BifrostConfig
   private var jda: JDA? = null
   private var isDev = false

@@ -13,10 +13,6 @@ import java.io.File
 import java.util.zip.GZIPOutputStream
 
 class ChunkExporter(private val plugin: Plugin) {
-  private val json = Json {
-    ignoreUnknownKeys = true
-  }
-
   fun exportLoadedChunksAsync(world: World) {
     exportChunkListAsync(world, world.loadedChunks.toList())
   }
@@ -56,7 +52,7 @@ class ChunkExporter(private val plugin: Plugin) {
 
     val fileOutputStream = file.outputStream()
     val gzipOutputStream = GZIPOutputStream(fileOutputStream)
-    json.encodeToStream(ExportedChunk.serializer(), chunk, gzipOutputStream)
+    Json.encodeToStream(ExportedChunk.serializer(), chunk, gzipOutputStream)
     gzipOutputStream.close()
   }
 

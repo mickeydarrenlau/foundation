@@ -13,6 +13,10 @@ commands:
     description: Export All Chunks
     usage: /export_all_chunks
     permission: heimdall.command.export_all_chunks
+  export_world_load:
+    description: Export World Load
+    usage: /export_world_load
+    permission: heimdall.command.export_world_load
   import_world_load:
     description: Import World Load
     usage: /import_world_load

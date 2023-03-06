@@ -4,7 +4,7 @@ import gay.pizza.foundation.core.abstraction.Feature
 
 class WorldFeature : Feature() {
   override fun enable() {
-    registerCommandExecutor("setspawn", SetSpawnCommand())
-    registerCommandExecutor("spawn", SpawnCommand())
+    plugin.registerCommandExecutor("setspawn", SetSpawnCommand())
+    plugin.registerCommandExecutor("spawn", SpawnCommand())
   }
 }
