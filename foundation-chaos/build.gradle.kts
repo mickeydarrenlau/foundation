@@ -6,3 +6,7 @@ dependencies {
   implementation(project(":common-plugin"))
   compileOnly(project(":foundation-shared"))
 }
+
+plugin {
+  dependency(project(":foundation-core"))
+}

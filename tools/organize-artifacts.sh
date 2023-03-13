@@ -6,6 +6,7 @@ rm -rf artifacts/
 mkdir -p artifacts/
 mkdir -p artifacts/build/manifests
 cp build/manifests/update.json artifacts/build/manifests/
+cp build/manifests/manifest.json artifacts/
 
 find . -name "*-plugin.jar" | grep "foundation-" | while read -r JAR
 do

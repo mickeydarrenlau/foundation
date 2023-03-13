@@ -1,0 +1,62 @@
+{
+  "items": [
+    {
+      "name": "foundation-bifrost",
+      "type": "bukkit-plugin",
+      "version": "DEV",
+      "dependencies": [
+        "foundation-core"
+      ],
+      "files": [
+        {
+          "name": "foundation-bifrost-DEV-plugin.jar",
+          "type": "plugin-jar",
+          "path": "foundation-bifrost/build/libs/foundation-bifrost-DEV-plugin.jar"
+        }
+      ]
+    },
+    {
+      "name": "foundation-chaos",
+      "type": "bukkit-plugin",
+      "version": "DEV",
+      "dependencies": [
+        "foundation-core"
+      ],
+      "files": [
+        {
+          "name": "foundation-chaos-DEV-plugin.jar",
+          "type": "plugin-jar",
+          "path": "foundation-chaos/build/libs/foundation-chaos-DEV-plugin.jar"
+        }
+      ]
+    },
+    {
+      "name": "foundation-core",
+      "type": "bukkit-plugin",
+      "version": "DEV",
+      "dependencies": [],
+      "files": [
+        {
+          "name": "foundation-core-DEV-plugin.jar",
+          "type": "plugin-jar",
+          "path": "foundation-core/build/libs/foundation-core-DEV-plugin.jar"
+        }
+      ]
+    },
+    {
+      "name": "foundation-heimdall",
+      "type": "bukkit-plugin",
+      "version": "DEV",
+      "dependencies": [
+        "foundation-core"
+      ],
+      "files": [
+        {
+          "name": "foundation-heimdall-DEV-plugin.jar",
+          "type": "plugin-jar",
+          "path": "foundation-heimdall/build/libs/foundation-heimdall-DEV-plugin.jar"
+        }
+      ]
+    }
+  ]
+}

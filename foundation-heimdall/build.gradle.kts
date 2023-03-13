@@ -7,3 +7,7 @@ dependencies {
   compileOnly(project(":foundation-shared"))
   implementation(project(":common-heimdall"))
 }
+
+plugin {
+  dependency(project(":foundation-core"))
+}

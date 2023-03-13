@@ -40,7 +40,7 @@ dependencyResolutionManagement {
   versionCatalogs {
     create("libs") {
       version("versions-plugin", "0.45.0")
-      version("concrete", "0.11.0")
+      version("concrete", "0.14.0")
 
       plugin("versions", "com.github.ben-manes.versions").versionRef("versions-plugin")
 
