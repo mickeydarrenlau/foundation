@@ -4,7 +4,6 @@ import org.bukkit.command.CommandSender
 import kotlin.io.path.name
 import kotlin.io.path.toPath
 
-// TODO: Switch to a class and use dependency injection with koin.
 object UpdateService {
   fun updatePlugins(sender: CommandSender, onFinish: (() -> Unit)? = null) {
     val updateDir = sender.server.pluginsFolder.resolve("update")
@@ -16,29 +15,24 @@ object UpdateService {
     val updatePath = updateDir.toPath()
 
     Thread {
-      val modules = UpdateUtil.fetchManifest()
-      val plugins = sender.server.pluginManager.plugins.associateBy { it.name.lowercase() }
-
+      val resolver = UpdateResolver()
+      val manifest = resolver.fetchCurrentManifest()
+      val plan = resolver.resolve(manifest, sender.server)
       sender.sendMessage("Updates:")
-      modules.forEach { (name, manifest) ->
-        // Foolish naming problem. Don't want to fix it right now.
-        val plugin = if (name == "foundation-core") {
-          plugins["foundation"] ?: plugins[name.lowercase()]
-        } else {
-          plugins[name.lowercase()]
+      plan.items.forEach { (item, plugin) ->
+        val pluginJarFileItem = item.files.firstOrNull { it.type == "plugin-jar" }
+        if (pluginJarFileItem == null) {
+          sender.sendMessage("WARNING: ${item.name} is required but plugin-jar file not found in manifest. Skipping.")
+          return@forEach
         }
+        val maybeExistingPluginFileName = plugin?.javaClass?.protectionDomain?.codeSource?.location?.toURI()?.toPath()?.name
+        val fileName = maybeExistingPluginFileName ?: "${item.name}.jar"
+        val artifactPath = pluginJarFileItem.path
 
-        if (plugin == null) {
-          sender.sendMessage("Plugin in manifest, but not installed: $name (${manifest.version})")
-        } else {
-          val fileName = plugin.javaClass.protectionDomain.codeSource.location.toURI().toPath().name
-          val artifactPath = manifest.artifacts.getOrNull(0) ?: return@forEach
-
-          sender.sendMessage("${plugin.name}: Updating ${plugin.description.version} to ${manifest.version}")
-          UpdateUtil.downloadArtifact(artifactPath, updatePath.resolve(fileName))
-        }
+        sender.sendMessage("${item.name}: Updating ${plugin?.description?.version ?: "[not-installed]"} to ${item.version}")
+        UpdateUtil.downloadArtifact(artifactPath, updatePath.resolve(fileName))
       }
-      sender.sendMessage("Restart to take effect")
+      sender.sendMessage("Restart for updates to take effect.")
 
       if (onFinish != null) onFinish()
     }.start()

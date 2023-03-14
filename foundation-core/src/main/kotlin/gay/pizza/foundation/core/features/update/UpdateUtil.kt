@@ -1,8 +1,6 @@
 package gay.pizza.foundation.core.features.update
 
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import java.net.URI
 import java.net.http.HttpClient
@@ -13,16 +11,11 @@ import java.nio.file.Path
 object UpdateUtil {
   private val client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
 
-  // TODO(liv): Add environment variable override. Document it.
-  private const val basePath =
-    "https://artifacts.gay.pizza/foundation"
-  private const val manifestPath = "build/manifests/update.json"
-
-  fun fetchManifest() = fetchFile(
-    getUrl(manifestPath), MapSerializer(String.serializer(), ModuleManifest.serializer()),
-  )
-
-  fun getUrl(path: String) = "$basePath/$path"
+  fun getUrl(path: String): String =
+    UpdateResolver.latestManifestUrl
+      .toURI()
+      .resolve(path)
+      .toString()
 
   private inline fun <reified T> fetchFile(url: String, strategy: DeserializationStrategy<T>): T {
     val request = HttpRequest
@@ -43,16 +36,20 @@ object UpdateUtil {
   }
 
   fun downloadArtifact(path: String, outPath: Path) {
+    val uri = URI.create(getUrl(path))
     val request = HttpRequest
       .newBuilder()
       .GET()
-      .uri(URI.create(getUrl(path)))
+      .uri(uri)
       .build()
 
     val response = client.send(
       request,
       HttpResponse.BodyHandlers.ofFile(outPath)
     )
+    if (response.statusCode() != 200) {
+      throw RuntimeException("Failed to download URL $uri (Status Code: ${response.statusCode()})")
+    }
     response.body()
   }
 }

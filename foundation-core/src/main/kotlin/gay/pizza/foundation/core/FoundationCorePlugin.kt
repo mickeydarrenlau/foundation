@@ -2,7 +2,6 @@ package gay.pizza.foundation.core
 
 import gay.pizza.foundation.core.abstraction.FoundationPlugin
 import gay.pizza.foundation.core.features.backup.BackupFeature
-import gay.pizza.foundation.core.features.dev.DevFeature
 import gay.pizza.foundation.core.features.gameplay.GameplayFeature
 import gay.pizza.foundation.core.features.persist.PersistenceFeature
 import gay.pizza.foundation.core.features.player.PlayerFeature
@@ -49,7 +48,6 @@ class FoundationCorePlugin : IFoundationCore, FoundationPlugin() {
     SchedulerFeature(),
     PersistenceFeature(),
     BackupFeature(),
-    DevFeature(),
     GameplayFeature(),
     PlayerFeature(),
     StatsFeature(),
