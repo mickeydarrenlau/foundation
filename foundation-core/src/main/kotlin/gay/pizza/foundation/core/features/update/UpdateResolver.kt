@@ -18,6 +18,7 @@ class UpdateResolver {
       nameOverride ?: key
     }
     val installSet = manifest.items
+      .filter { it.type == "bukkit-plugin" }
       .filter { installedPlugins.containsKey(it.name) }
       .associateWith { installedPlugins[it.name] }
       .toMutableMap()
