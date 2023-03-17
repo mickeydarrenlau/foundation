@@ -37,7 +37,7 @@ subprojects {
 
 val paperServerVersion: String = project.properties["paperServerVersion"]?.toString() ?: "1.18"
 
-concrete {
+concreteRoot {
   minecraftServerPath.set("server")
   paperServerVersionGroup.set(paperServerVersion)
   paperApiVersion.set("1.18.2-R0.1-SNAPSHOT")

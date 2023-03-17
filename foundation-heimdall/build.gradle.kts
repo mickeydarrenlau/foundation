@@ -8,6 +8,6 @@ dependencies {
   implementation(project(":common-heimdall"))
 }
 
-plugin {
+concreteItem {
   dependency(project(":foundation-core"))
 }

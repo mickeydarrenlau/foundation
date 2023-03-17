@@ -7,6 +7,6 @@ dependencies {
   compileOnly(project(":foundation-shared"))
 }
 
-plugin {
+concreteItem {
   dependency(project(":foundation-core"))
 }

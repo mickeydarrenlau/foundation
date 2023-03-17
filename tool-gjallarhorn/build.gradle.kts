@@ -19,3 +19,11 @@ tasks.jar {
 tasks.assemble {
   dependsOn("shadowJar")
 }
+
+concreteItem {
+  type.set("tool")
+
+  fileInclusion {
+    tasks.shadowJar.get().outputs.files.associateWith { "tool-jar" }
+  }
+}
