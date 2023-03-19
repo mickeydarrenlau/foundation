@@ -5,6 +5,7 @@ import gay.pizza.tailscale.core.TailscaleConn
 import gay.pizza.tailscale.core.TailscaleListener
 import org.bukkit.Server
 import java.net.InetSocketAddress
+import java.net.StandardSocketOptions
 import java.nio.ByteBuffer
 import java.nio.channels.ClosedChannelException
 import java.nio.channels.ReadableByteChannel
@@ -27,25 +28,28 @@ class TailscaleProxyServer(val server: Server, val tailscale: Tailscale) {
   }
 
   fun handleServerConnection(conn: TailscaleConn) {
-    val socketChannel = SocketChannel.open(InetSocketAddress("127.0.0.1", server.port))
-    val connChannel = conn.openReadWriteChannel()
+    val socketChannel = SocketChannel.open()
+    socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, true)
+    socketChannel.connect(InetSocketAddress("127.0.0.1", server.port))
+    val readChannel = conn.openReadChannel()
+    val writeChannel = conn.openWriteChannel()
 
     fun closeAll() {
       socketChannel.close()
-      connChannel.close()
+      readChannel.close()
+      writeChannel.close()
     }
 
     fun startCopyThread(name: String, from: ReadableByteChannel, to: WritableByteChannel) {
       val thread = Thread {
         try {
-          while (from.isOpen && to.isOpen) {
+          while (true) {
             val buffer = ByteBuffer.allocate(2048)
             val size = from.read(buffer)
             if (size < 0) {
               break
             } else {
               buffer.flip()
-              val array = buffer.array()
               to.write(buffer)
             }
             buffer.clear()
@@ -60,8 +64,8 @@ class TailscaleProxyServer(val server: Server, val tailscale: Tailscale) {
       thread.start()
     }
 
-    startCopyThread("Tailscale to Socket Pipe", connChannel, socketChannel)
-    startCopyThread("Socket to Tailscale Pipe", socketChannel, connChannel)
+    startCopyThread("Tailscale to Socket Pipe", readChannel, socketChannel)
+    startCopyThread("Socket to Tailscale Pipe", socketChannel, writeChannel)
   }
 
   fun close() {
