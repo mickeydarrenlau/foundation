@@ -1,6 +1,5 @@
 package gay.pizza.foundation.bifrost
 
-import com.charleskorn.kaml.Yaml
 import gay.pizza.foundation.bifrost.model.BifrostConfig
 import gay.pizza.foundation.common.BaseFoundationPlugin
 import gay.pizza.foundation.common.FoundationCoreLoader
@@ -24,7 +23,6 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.awt.Color
-import kotlin.io.path.inputStream
 import net.dv8tion.jda.api.hooks.EventListener as DiscordEventListener
 import org.bukkit.event.Listener as BukkitEventListener
 
@@ -37,13 +35,11 @@ class FoundationBifrostPlugin : BaseFoundationPlugin(), DiscordEventListener, Bu
   override fun onEnable() {
     isDev = description.version == "DEV"
     val foundation = FoundationCoreLoader.get(server)
-    val configPath = copyDefaultConfig<FoundationBifrostPlugin>(
-      slF4JLogger,
-      foundation.pluginDataPath,
+    config = loadConfigurationWithDefault(
+      foundation,
+      BifrostConfig.serializer(),
       "bifrost.yaml"
     )
-    config = Yaml.default.decodeFromStream(BifrostConfig.serializer(), configPath.inputStream())
-
     server.pluginManager.registerEvents(this, this)
     if (config.authentication.token.isEmpty()) {
       slF4JLogger.warn("Token empty, Bifrost will not connect to Discord.")

@@ -1,5 +1,8 @@
 package gay.pizza.foundation.common
 
+import gay.pizza.foundation.shared.IFoundationCore
+import gay.pizza.foundation.shared.loadConfigurationWithDefault
+import kotlinx.serialization.DeserializationStrategy
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.TabCompleter
 import org.bukkit.plugin.java.JavaPlugin
@@ -17,5 +20,15 @@ abstract class BaseFoundationPlugin : JavaPlugin() {
         command.tabCompleter = executor
       }
     }
+  }
+
+  inline fun <reified T> loadConfigurationWithDefault(
+    core: IFoundationCore,
+    deserializer: DeserializationStrategy<T>,
+    name: String
+  ): T {
+    return loadConfigurationWithDefault(
+      slF4JLogger, deserializer,
+      core.pluginDataPath, name)
   }
 }

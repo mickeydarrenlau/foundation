@@ -1,8 +1,5 @@
 package gay.pizza.foundation.core.features.gameplay
 
-import com.charleskorn.kaml.Yaml
-import gay.pizza.foundation.shared.copyDefaultConfig
-import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.abstraction.Feature
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -17,21 +14,16 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.inject
 import org.koin.dsl.module
-import kotlin.io.path.inputStream
 
 class GameplayFeature : Feature() {
   private val config by inject<GameplayConfig>()
 
   override fun module() = module {
     single {
-      val configPath = copyDefaultConfig<FoundationCorePlugin>(
-        plugin.slF4JLogger,
-        plugin.pluginDataPath,
-        "gameplay.yaml",
-      )
-      return@single Yaml.default.decodeFromStream(
+      plugin.loadConfigurationWithDefault(
+        plugin,
         GameplayConfig.serializer(),
-        configPath.inputStream()
+        "gameplay.yaml"
       )
     }
   }

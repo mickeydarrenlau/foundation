@@ -1,12 +1,9 @@
 package gay.pizza.foundation.core.features.player
 
-import com.charleskorn.kaml.Yaml
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.RemovalCause
-import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.abstraction.Feature
-import gay.pizza.foundation.shared.copyDefaultConfig
 import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
@@ -16,7 +13,6 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.inject
 import java.time.Duration
-import kotlin.io.path.inputStream
 
 class PlayerFeature : Feature() {
   private val config by inject<PlayerConfig>()
@@ -53,14 +49,10 @@ class PlayerFeature : Feature() {
 
   override fun module() = org.koin.dsl.module {
     single {
-      val configPath = copyDefaultConfig<FoundationCorePlugin>(
-        plugin.slF4JLogger,
-        plugin.pluginDataPath,
-        "player.yaml",
-      )
-      return@single Yaml.default.decodeFromStream(
+      plugin.loadConfigurationWithDefault(
+        plugin,
         PlayerConfig.serializer(),
-        configPath.inputStream()
+        "player.yaml"
       )
     }
   }

@@ -1,11 +1,8 @@
 package gay.pizza.foundation.core.features.backup
 
-import com.charleskorn.kaml.Yaml
-import gay.pizza.foundation.core.FoundationCorePlugin
 import gay.pizza.foundation.core.abstraction.Feature
 import gay.pizza.foundation.core.features.scheduler.cancel
 import gay.pizza.foundation.core.features.scheduler.cron
-import gay.pizza.foundation.shared.copyDefaultConfig
 import org.koin.core.component.inject
 import org.koin.dsl.module
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials
@@ -13,7 +10,6 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
-import kotlin.io.path.inputStream
 
 class BackupFeature : Feature() {
   private val s3Client by inject<S3Client>()
@@ -46,14 +42,10 @@ class BackupFeature : Feature() {
 
   override fun module() = module {
     single {
-      val configPath = copyDefaultConfig<FoundationCorePlugin>(
-        plugin.slF4JLogger,
-        plugin.pluginDataPath,
-        "backup.yaml",
-      )
-      return@single Yaml.default.decodeFromStream(
+      plugin.loadConfigurationWithDefault(
+        plugin,
         BackupConfig.serializer(),
-        configPath.inputStream()
+        "backup.yaml"
       )
     }
     single {

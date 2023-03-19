@@ -1,7 +1,10 @@
 package gay.pizza.foundation.shared
 
+import com.charleskorn.kaml.Yaml
+import kotlinx.serialization.DeserializationStrategy
 import org.slf4j.Logger
 import java.nio.file.Path
+import kotlin.io.path.inputStream
 
 /**
  * Copy the default configuration from the resource [resourceName] into the directory [targetPath].
@@ -20,7 +23,6 @@ inline fun <reified T> copyDefaultConfig(log: Logger, targetPath: Path, resource
   val outPath = targetPath.resolve(resourceName)
   val outFile = outPath.toFile()
   if (outFile.exists()) {
-    log.debug("Configuration file already exists.")
     return outPath
   }
 
@@ -36,4 +38,14 @@ inline fun <reified T> copyDefaultConfig(log: Logger, targetPath: Path, resource
   }
 
   return outPath
+}
+
+inline fun <reified T> loadConfigurationWithDefault(
+  log: Logger,
+  deserializer: DeserializationStrategy<T>,
+  pluginConfigDirectoryPath: Path,
+  name: String
+): T {
+  val path = copyDefaultConfig<T>(log, pluginConfigDirectoryPath, name)
+  return Yaml.default.decodeFromStream(deserializer, path.inputStream())
 }

@@ -1,6 +1,5 @@
 package gay.pizza.foundation.heimdall.plugin
 
-import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import gay.pizza.foundation.common.BaseFoundationPlugin
@@ -13,12 +12,10 @@ import gay.pizza.foundation.heimdall.plugin.export.ExportAllChunksCommand
 import gay.pizza.foundation.heimdall.plugin.load.ImportWorldLoadCommand
 import gay.pizza.foundation.heimdall.plugin.model.HeimdallConfig
 import gay.pizza.foundation.shared.PluginMainClass
-import gay.pizza.foundation.shared.copyDefaultConfig
 import org.bukkit.event.Listener
 import org.jetbrains.exposed.sql.Database
 import org.postgresql.Driver
 import java.time.Duration
-import kotlin.io.path.inputStream
 
 @PluginMainClass
 class FoundationHeimdallPlugin : BaseFoundationPlugin(), Listener {
@@ -45,12 +42,11 @@ class FoundationHeimdallPlugin : BaseFoundationPlugin(), Listener {
     importWorldLoadCommand.setExecutor(ImportWorldLoadCommand(this))
 
     val foundation = FoundationCoreLoader.get(server)
-    val configPath = copyDefaultConfig<FoundationHeimdallPlugin>(
-      slF4JLogger,
-      foundation.pluginDataPath,
+    config = loadConfigurationWithDefault(
+      foundation,
+      HeimdallConfig.serializer(),
       "heimdall.yaml"
     )
-    config = Yaml.default.decodeFromStream(HeimdallConfig.serializer(), configPath.inputStream())
     if (!config.enabled) {
       slF4JLogger.info("Heimdall tracking is not enabled.")
       return
