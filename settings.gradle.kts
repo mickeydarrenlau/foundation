@@ -33,6 +33,7 @@ include(
   ":foundation-bifrost",
   ":foundation-chaos",
   ":foundation-heimdall",
+  ":foundation-tailscale",
   ":tool-gjallarhorn",
 )
 
@@ -72,6 +73,7 @@ dependencyResolutionManagement {
       version("postgresql", "42.5.3")
       version("exposed", "0.41.1")
       version("hikaricp", "5.0.1")
+      version("libtailscale", "0.1.2-SNAPSHOT")
 
       library("clikt", "com.github.ajalt.clikt", "clikt").versionRef("clikt")
       library("xodus-core", "org.jetbrains.xodus", "xodus-openAPI").versionRef("xodus")
@@ -90,6 +92,7 @@ dependencyResolutionManagement {
       library("exposed-jdbc", "org.jetbrains.exposed", "exposed-jdbc").versionRef("exposed")
       library("exposed-java-time", "org.jetbrains.exposed", "exposed-java-time").versionRef("exposed")
       library("hikaricp", "com.zaxxer", "HikariCP").versionRef("hikaricp")
+      library("tailscale", "gay.pizza.tailscale", "tailscale").versionRef("libtailscale")
     }
   }
 }

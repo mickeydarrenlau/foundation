@@ -1,0 +1,11 @@
+name: Foundation-Tailscale
+version: '${version}'
+main: gay.pizza.foundation.tailscale.FoundationTailscalePlugin
+api-version: 1.18
+prefix: Foundation-Tailscale
+load: STARTUP
+depend:
+  - Foundation
+authors:
+  - kubeliv
+  - azenla

@@ -41,4 +41,3 @@ do
   # Download the plugin and store it at the mentioned path.
   curl --fail -Ls "$base_url/$artifact_path" --output "$dl_path" || (echo "Failed to download ${artifact_path}"; exit 1)
 done
-

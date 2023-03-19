@@ -1,0 +1,12 @@
+# Whether Tailscale is enabled.
+enabled: false
+# Hostname for Tailscale node.
+hostname: minecraft
+# Tailscale control URL. Null for the default.
+controlUrl: null
+# Tailscale authentication key. Null for the default.
+authKey: null
+# Tailscale path. Null for the default.
+tailscalePath: null
+# Tailscale ephemeral mode.
+ephemeral: false
