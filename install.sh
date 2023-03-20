@@ -20,24 +20,36 @@ if [ ! -d plugins ]; then
 fi
 
 # Base GitLab update manifest.
-base_url="https://artifacts.gay.pizza/foundation/"
+base_url="https://artifacts.gay.pizza/foundation"
 
 # Download the update manifest.
-manifest=$(curl --fail -Ls "$base_url/build/manifests/update.json" || (echo "Failed to download manifest."; exit 1))
+manifest=$(curl --fail -Ls "$base_url/manifest.json" || (echo "Failed to download manifest."; exit 1))
 
-# Get plugins list from the manifest.
-plugins=$(echo "$manifest" | jq -r 'keys | .[]')
+# Get items list from the manifest.
+items=$(echo "$manifest" | jq -r '.items[].name')
+
+i=0
 
 # Download each plugin from the manifest, can also update plugins.
-for plugin in $plugins
+for item in $items
 do
+  type=$(echo "$manifest" | jq -r " .items[$i].type")
+
   # Determine download path, extract version and artifact path URL.
-  dl_path="plugins/$plugin.jar"
-  version=$(echo "$manifest" | jq -r " .[\"$plugin\"].version")
-  artifact_path=$(echo "$manifest" | jq -r " .[\"$plugin\"].artifacts[0]")
+  dl_path="plugins/$item.jar"
+  version=$(echo "$manifest" | jq -r " .items[$i].version")
 
-  echo "Installing $plugin v$version to $dl_path"
+  function get_artifact_path() {
+    echo "$manifest" | jq -r " .items[$i].files[] | select(.type == \"${1}\") | .path"
+  }
 
-  # Download the plugin and store it at the mentioned path.
-  curl --fail -Ls "$base_url/$artifact_path" --output "$dl_path" || (echo "Failed to download ${artifact_path}"; exit 1)
+  if [ "${type}" = "bukkit-plugin" ]
+  then
+    artifact_path=$(get_artifact_path "plugin-jar")
+    echo "Installing $item v$version to $dl_path from $base_url/$artifact_path"
+    # Download the plugin and store it at the mentioned path.
+    curl --fail -Ls "$base_url/$artifact_path" --output "$dl_path" || (echo "Failed to download ${artifact_path}"; exit 1)
+  fi
+
+  i=$((i + 1))
 done
