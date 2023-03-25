@@ -8,14 +8,14 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 class PersistenceFeature : Feature() {
-  private val persistence = inject<PluginPersistence>()
-  private val core = inject<FoundationCorePlugin>()
+  private val persistence by inject<PluginPersistence>()
+  private val core by inject<FoundationCorePlugin>()
 
   override fun disable() {
-    persistence.value.unload()
+    persistence.unload()
   }
 
   override fun module(): Module = module {
-    single { core.value.persistence }
+    single { core.persistence }
   }
 }

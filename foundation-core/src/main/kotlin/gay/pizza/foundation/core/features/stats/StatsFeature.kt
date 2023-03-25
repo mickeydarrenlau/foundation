@@ -13,11 +13,11 @@ import java.time.Instant
 
 @Suppress("IdentifierGrammar")
 class StatsFeature : Feature() {
-  internal val persistence = inject<PluginPersistence>()
+  internal val persistence by inject<PluginPersistence>()
   private lateinit var chatLogStore: PersistentStore
 
   override fun enable() {
-    chatLogStore = persistence.value.store("chat-logs")
+    chatLogStore = persistence.store("chat-logs")
 
     plugin.registerCommandExecutor(listOf("leaderboard", "lb"), LeaderboardCommand())
     plugin.registerCommandExecutor("pstore", PersistentStoreCommand(this))

@@ -52,12 +52,10 @@ class GameplayFeature : Feature() {
   private fun onPlayerInteractEntity(event: PlayerInteractEntityEvent) {
     val mainHandItem = event.player.inventory.itemInMainHand
     val hasLead = mainHandItem.type == Material.LEAD
-    val isLivingEntity = event.rightClicked is LivingEntity
+    val livingEntity = event.rightClicked as? LivingEntity
 
     // If leads are allowed on all mobs, then start leading the mob.
-    if (config.mobs.allowLeads && hasLead && isLivingEntity) {
-      val livingEntity = event.rightClicked as LivingEntity
-
+    if (config.mobs.allowLeads && hasLead && livingEntity != null) {
       // Something to do with Bukkit, leashes must happen after the event.
       Bukkit.getScheduler().runTask(plugin) { ->
         // If the entity is already leashed, don't do anything.
