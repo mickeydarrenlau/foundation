@@ -13,6 +13,7 @@ dependencies {
   implementation(project(":common-plugin"))
   compileOnly(project(":foundation-shared"))
   implementation(libs.tailscale)
+  implementation(libs.tailscale.channel)
 }
 
 concreteItem {

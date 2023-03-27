@@ -18,7 +18,7 @@ class FoundationChaosPlugin : BaseFoundationPlugin() {
     config = loadConfigurationWithDefault(
       foundation,
       ChaosConfig.serializer(),
-      "heimdall.yaml"
+      "chaos.yaml"
     )
     registerCommandExecutor("chaos", ChaosToggleCommand())
   }
