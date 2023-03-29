@@ -1,13 +1,16 @@
 package gay.pizza.foundation.tailscale
 
-import gay.pizza.tailscale.channel.ChannelCopier
 import gay.pizza.tailscale.core.Tailscale
 import gay.pizza.tailscale.core.TailscaleConn
 import gay.pizza.tailscale.core.TailscaleListener
 import org.bukkit.Server
 import java.net.InetSocketAddress
 import java.net.StandardSocketOptions
+import java.nio.ByteBuffer
+import java.nio.channels.ClosedChannelException
+import java.nio.channels.ReadableByteChannel
 import java.nio.channels.SocketChannel
+import java.nio.channels.WritableByteChannel
 
 class TailscaleProxyServer(val server: Server, val tailscale: Tailscale) {
   private var minecraftServerListener: TailscaleListener? = null
@@ -31,13 +34,38 @@ class TailscaleProxyServer(val server: Server, val tailscale: Tailscale) {
     val readChannel = conn.openReadChannel()
     val writeChannel = conn.openWriteChannel()
 
-    val closeHandler = { socketChannel.close() }
-    val tailscaleSocketCopier = ChannelCopier(readChannel, socketChannel)
-    tailscaleSocketCopier.spawnCopyThread(
-      "Tailscale to Socket Copier", onClose = closeHandler)
-    val socketTailscaleCopier = ChannelCopier(socketChannel, writeChannel)
-    socketTailscaleCopier.spawnCopyThread(
-      "Socket to Tailscale Copier", onClose = closeHandler)
+    fun closeAll() {
+      socketChannel.close()
+      readChannel.close()
+      writeChannel.close()
+    }
+
+    fun startCopyThread(name: String, from: ReadableByteChannel, to: WritableByteChannel) {
+      val thread = Thread {
+        try {
+          while (true) {
+            val buffer = ByteBuffer.allocate(2048)
+            val size = from.read(buffer)
+            if (size < 0) {
+              break
+            } else {
+              buffer.flip()
+              to.write(buffer)
+            }
+            buffer.clear()
+          }
+        } catch (_: ClosedChannelException) {
+        } finally {
+          closeAll()
+        }
+      }
+
+      thread.name = name
+      thread.start()
+    }
+
+    startCopyThread("Tailscale to Socket Pipe", readChannel, socketChannel)
+    startCopyThread("Socket to Tailscale Pipe", socketChannel, writeChannel)
   }
 
   fun close() {
