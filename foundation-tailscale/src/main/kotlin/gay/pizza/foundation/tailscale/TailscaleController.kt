@@ -12,6 +12,7 @@ class TailscaleController(val server: Server, val config: TailscaleConfig) {
     if (!config.enabled) {
       return
     }
+    tailscale.useProcSelfFd = config.useProcSelfFd
     tailscale.hostname = config.hostname
 
     if (config.controlUrl != null) {

@@ -9,5 +9,6 @@ data class TailscaleConfig(
   val controlUrl: String? = null,
   val authKey: String? = null,
   val tailscalePath: String? = null,
-  val ephemeral: Boolean = false
+  val ephemeral: Boolean = false,
+  val useProcSelfFd: Boolean = false
 )
