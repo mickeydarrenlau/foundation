@@ -4,5 +4,6 @@ import gay.pizza.foundation.concrete.ExtensibleManifestItem
 import org.bukkit.plugin.Plugin
 
 class UpdatePlan(
-  val items: Map<ExtensibleManifestItem, Plugin?>
+  val installedSet: Map<ExtensibleManifestItem, Plugin?>,
+  val updateSet: Map<ExtensibleManifestItem, Plugin?>
 )

@@ -1,0 +1,3 @@
+# Automatic update schedule.
+autoUpdateSchedule:
+  cron: ""

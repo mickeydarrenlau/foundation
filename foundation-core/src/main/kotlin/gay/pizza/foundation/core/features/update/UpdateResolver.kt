@@ -34,7 +34,20 @@ class UpdateResolver {
         installSet[newDependency] = null
       }
     }
-    return UpdatePlan(installSet)
+
+    val updateSet = installSet.filter { entry ->
+      if (entry.value == null) {
+        true
+      } else {
+        val installed = entry.value!!.description.version
+        if (installed == "DEV") {
+          false
+        } else {
+          entry.key.version != installed
+        }
+      }
+    }
+    return UpdatePlan(installSet, updateSet)
   }
 
   companion object {
