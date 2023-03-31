@@ -73,7 +73,7 @@ dependencyResolutionManagement {
       version("postgresql", "42.5.3")
       version("exposed", "0.41.1")
       version("hikaricp", "5.0.1")
-      version("libtailscale", "0.1.5-SNAPSHOT")
+      version("libtailscale", "0.1.6-SNAPSHOT")
 
       library("clikt", "com.github.ajalt.clikt", "clikt").versionRef("clikt")
       library("xodus-core", "org.jetbrains.xodus", "xodus-openAPI").versionRef("xodus")
