@@ -9,6 +9,7 @@ object ChaosModules {
     KillRandomPlayer(plugin),
     TntAllPlayers(plugin),
     MegaTnt(plugin),
-    PlayerSwap(plugin)
+    PlayerSwap(plugin),
+    WorldSwapper(plugin)
   ).shuffled()
 }
