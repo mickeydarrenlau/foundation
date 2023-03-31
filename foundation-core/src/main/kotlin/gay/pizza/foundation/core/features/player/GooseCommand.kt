@@ -17,7 +17,7 @@ class GooseCommand : CommandExecutor {
       return true
     }
     sender.chat(
-      "Goose is the most beautiful kbity to ever exist <3",
+      "Goose is the most beautiful kitty to ever exist <3",
       "I don't know who Nat is but there is no way she can compare to Goose."
     )
     return true
