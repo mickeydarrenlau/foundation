@@ -10,6 +10,7 @@ object ChaosModules {
     TntAllPlayers(plugin),
     MegaTnt(plugin),
     PlayerSwap(plugin),
-    WorldSwapper(plugin)
+    WorldSwapper(plugin),
+    ChunkEnterRotate()
   ).shuffled()
 }
