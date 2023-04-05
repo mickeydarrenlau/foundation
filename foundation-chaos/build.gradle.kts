@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+  implementation(project(":common-all"))
   implementation(project(":common-plugin"))
   compileOnly(project(":foundation-shared"))
 }

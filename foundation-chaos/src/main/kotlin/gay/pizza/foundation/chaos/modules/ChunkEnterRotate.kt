@@ -23,20 +23,15 @@ class ChunkEnterRotate : ChaosModule {
     }
     rotateChunk(currentChunk)
     if (!player.isFlying) {
-      player.teleport(player.location.toHighestLocation().add(0.0, 1.0, 0.0))
+      player.teleportHighestLocation()
     }
   }
 
   private fun rotateChunk(chunk: Chunk) {
     val snapshot = chunk.chunkSnapshot
-    for (x in 0..15) {
-      for (z in 0..15) {
-        for (y in chunk.world.minHeight until chunk.world.maxHeight) {
-          val rotatedBlock = chunk.getBlock(z, y, x)
-          val originalBlockData = snapshot.getBlockData(x, y, z)
-          rotatedBlock.blockData = originalBlockData
-        }
-      }
+    chunk.forEachBlock { x, y, z, rotatedBlock ->
+      val originalBlockData = snapshot.getBlockData(z, y, x)
+      rotatedBlock.blockData = originalBlockData
     }
   }
 }

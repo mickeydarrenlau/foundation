@@ -1,9 +1,9 @@
 package gay.pizza.foundation.chaos.modules
 
 import gay.pizza.foundation.chaos.randomPlayer
+import gay.pizza.foundation.common.without
 import org.bukkit.Chunk
 import org.bukkit.ChunkSnapshot
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.plugin.Plugin
@@ -20,22 +20,12 @@ class WorldSwapper(val plugin: Plugin) : ChaosModule {
     val baseChunk = player.chunk
     recordInvert(baseChunk)
     player.teleport(player.location.toHighestLocation())
-    val chunksToInvert = player.world.loadedChunks.filter { it != baseChunk }.toMutableList()
+    val chunksToInvert = player.world.loadedChunks.without(baseChunk).toMutableList()
 
     println("Inverting ${chunksToInvert.size} chunks...")
-    fun scheduleOne() {
-      if (chunksToInvert.isEmpty()) {
-        return
-      }
-
-      val chunk = chunksToInvert.removeAt(0)
-      plugin.server.scheduler.runTaskLater(plugin, { ->
-        recordInvert(chunk)
-        scheduleOne()
-      }, 5)
+    plugin.server.scheduler.scheduleUntilEmpty(plugin, chunksToInvert, 5) { chunk ->
+      recordInvert(chunk)
     }
-
-    scheduleOne()
   }
 
   fun recordInvert(chunk: Chunk) {
@@ -60,20 +50,18 @@ class WorldSwapper(val plugin: Plugin) : ChaosModule {
 
   fun invertChunk(chunk: Chunk): ChunkInversion {
     val snapshot = chunk.chunkSnapshot
-    for (x in 0..15) {
-      for (z in 0..15) {
-        var sy = chunk.world.minHeight
-        var ey = chunk.world.maxHeight
-        while (sy != ey) {
-          sy++
-          ey--
-          val targetBlock = chunk.getBlock(x, sy, z)
-          val targetBlockData = targetBlock.blockData.clone()
-          val nextBlock = chunk.getBlock(x, ey, z)
-          val nextBlockData = nextBlock.blockData.clone()
-          invertSetBlockData(targetBlock, nextBlockData)
-          invertSetBlockData(nextBlock, targetBlockData)
-        }
+    forEachChunkPosition { x, z ->
+      var sy = chunk.world.minHeight
+      var ey = chunk.world.maxHeight
+      while (sy != ey) {
+        sy++
+        ey--
+        val targetBlock = chunk.getBlock(x, sy, z)
+        val targetBlockData = targetBlock.blockData.clone()
+        val nextBlock = chunk.getBlock(x, ey, z)
+        val nextBlockData = nextBlock.blockData.clone()
+        invertSetBlockData(targetBlock, nextBlockData)
+        invertSetBlockData(nextBlock, targetBlockData)
       }
     }
     return ChunkInversion(plugin, snapshot)
@@ -83,23 +71,11 @@ class WorldSwapper(val plugin: Plugin) : ChaosModule {
     block.setBlockData(data, false)
   }
 
-  class ChunkInversion(
-    val plugin: Plugin,
-    val snapshot: ChunkSnapshot
-  ) {
+  class ChunkInversion(val plugin: Plugin, val snapshot: ChunkSnapshot) {
     fun revert() {
       val world = plugin.server.getWorld(snapshot.worldName) ?: return
       val chunk = world.getChunkAt(snapshot.x, snapshot.z)
-
-      for (x in 0..15) {
-        for (z in 0..15) {
-          val heightRange = chunk.world.minHeight + 1 until chunk.world.maxHeight
-          for (y in heightRange) {
-            val originalBlock = snapshot.getBlockData(x, y, z)
-            chunk.getBlock(x, y, z).blockData = originalBlock
-          }
-        }
-      }
+      chunk.applyChunkSnapshot(snapshot)
     }
   }
 }
