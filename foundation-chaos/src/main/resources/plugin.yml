@@ -7,7 +7,6 @@ load: STARTUP
 depend:
   - Foundation
 authors:
-  - kubeliv
   - azenla
 commands:
   chaos:

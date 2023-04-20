@@ -7,5 +7,4 @@ load: STARTUP
 depend:
   - Foundation
 authors:
-  - kubeliv
   - azenla
